@@ -1,0 +1,47 @@
+﻿{
+  "status": 0,
+  "result": {
+    "done": true,
+    "fileProperties": [
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-10T12:43:04.000Z",
+        "fileName": "unpackaged/layouts/Opportunity-Opportunity %28Support%29 Layout.layout",
+        "fullName": "Opportunity-Opportunity %28Support%29 Layout",
+        "id": "00hf6000003SNLJAA4",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-13T18:42:48.000Z",
+        "manageableState": "unmanaged",
+        "type": "Layout"
+      },
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-16T11:20:06.965Z",
+        "fileName": "unpackaged/package.xml",
+        "fullName": "unpackaged/package.xml",
+        "id": "",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-16T11:20:06.965Z",
+        "manageableState": "unmanaged",
+        "type": "Package"
+      }
+    ],
+    "id": "09Sf6000000NCA9EAO",
+    "status": "Succeeded",
+    "success": true,
+    "messages": [],
+    "files": [
+      {
+        "fullName": "Opportunity-Opportunity %28Support%29 Layout",
+        "type": "Layout",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\layouts\\Opportunity-Opportunity %28Support%29 Layout.layout-meta.xml"
+      }
+    ]
+  },
+  "warnings": []
+}

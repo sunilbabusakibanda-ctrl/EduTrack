@@ -1,0 +1,118 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-14T16:22:22.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-14T16:22:20.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "columnNumber": 27,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:22:21.000Z",
+          "deleted": false,
+          "fileName": "classes/InvoicePDFController.cls",
+          "fullName": "InvoicePDFController",
+          "lineNumber": 28,
+          "problem": "Field is not writeable: Invoice__c.Name",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-14T16:22:22.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager",
+          "fullName": "admissionManager",
+          "id": "0Rbf6000000ldM5CAI",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-14T16:22:22.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003iG0yCAE",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-14T16:22:22.000Z",
+    "numberComponentErrors": 1,
+    "numberComponentsDeployed": 1,
+    "numberComponentsTotal": 2,
+    "numberFiles": "10",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-14T16:22:20.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 11845,
+    "files": [
+      {
+        "fullName": "InvoicePDFController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\InvoicePDFController.cls",
+        "lineNumber": 28,
+        "columnNumber": 27,
+        "error": "Field is not writeable: Invoice__c.Name (28:27)"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.css"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.html"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js-meta.xml"
+      }
+    ],
+    "zipFileCount": 7,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003iG0yCAE%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

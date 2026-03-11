@@ -1,0 +1,91 @@
+﻿{
+  "status": 0,
+  "result": {
+    "done": true,
+    "fileProperties": [
+      {
+        "createdById": "005f6000003ojmbAAA",
+        "createdByName": "prabhakar yeddula",
+        "createdDate": "2026-02-11T10:35:18.000Z",
+        "fileName": "unpackaged/lwc/attendance/attendance.js",
+        "fullName": "attendance/attendance.js",
+        "id": "0Rdf6000002XUnlCAG",
+        "lastModifiedById": "005f6000003ojmbAAA",
+        "lastModifiedByName": "prabhakar yeddula",
+        "lastModifiedDate": "2026-02-16T05:55:57.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003ojmbAAA",
+        "createdByName": "prabhakar yeddula",
+        "createdDate": "2026-02-11T10:35:18.000Z",
+        "fileName": "unpackaged/lwc/attendance/attendance.css",
+        "fullName": "attendance/attendance.css",
+        "id": "0Rdf6000002XUnmCAG",
+        "lastModifiedById": "005f6000003ojmbAAA",
+        "lastModifiedByName": "prabhakar yeddula",
+        "lastModifiedDate": "2026-02-16T05:55:52.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003ojmbAAA",
+        "createdByName": "prabhakar yeddula",
+        "createdDate": "2026-02-11T10:35:18.000Z",
+        "fileName": "unpackaged/lwc/attendance/attendance.html",
+        "fullName": "attendance/attendance.html",
+        "id": "0Rdf6000002XUnoCAG",
+        "lastModifiedById": "005f6000003ojmbAAA",
+        "lastModifiedByName": "prabhakar yeddula",
+        "lastModifiedDate": "2026-02-16T05:55:52.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-16T11:43:15.180Z",
+        "fileName": "unpackaged/package.xml",
+        "fullName": "unpackaged/package.xml",
+        "id": "",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-16T11:43:15.180Z",
+        "manageableState": "unmanaged",
+        "type": "Package"
+      }
+    ],
+    "id": "09Sf6000000NCN3EAO",
+    "status": "Succeeded",
+    "success": true,
+    "messages": [],
+    "files": [
+      {
+        "fullName": "attendance",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\attendance\\attendance.css"
+      },
+      {
+        "fullName": "attendance",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\attendance\\attendance.html"
+      },
+      {
+        "fullName": "attendance",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\attendance\\attendance.js"
+      },
+      {
+        "fullName": "attendance",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\attendance\\attendance.js-meta.xml"
+      }
+    ]
+  },
+  "warnings": []
+}

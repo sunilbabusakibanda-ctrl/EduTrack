@@ -1,0 +1,280 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-14T16:53:55.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-14T16:53:52.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "columnNumber": 36,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:54.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "lineNumber": 174,
+          "problem": "Invalid type: FeeWrapper",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "columnNumber": 16,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:54.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "lineNumber": 163,
+          "problem": "Invalid constructor name: FeeWrapper",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "columnNumber": 9,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:54.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "lineNumber": 185,
+          "problem": "Invalid type: FeeWrapper",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "columnNumber": 13,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:54.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "lineNumber": 188,
+          "problem": "Invalid type: FeeWrapper",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "columnNumber": 16,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:54.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "lineNumber": 189,
+          "problem": "Variable does not exist: fw",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "columnNumber": 17,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:54.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "lineNumber": 190,
+          "problem": "Variable does not exist: results",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:55.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager/admissionManager.js",
+          "fullName": "admissionManager",
+          "problem": "Unable to find Apex action method referenced as 'AdmissionController.getInvoicePDFUrl'.",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": false,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:55.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionInvoiceController.cls",
+          "fullName": "AdmissionInvoiceController",
+          "id": "01pf6000002Wm5BAAS",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:55.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager",
+          "fullName": "admissionManager",
+          "id": "0Rbf6000000ldM5CAI",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "ApexPage",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:55.000Z",
+          "deleted": false,
+          "fileName": "pages/AdmissionInvoice.page",
+          "fullName": "AdmissionInvoice",
+          "id": "066f6000000rvubAAA",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-14T16:53:55.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003iKB0CAM",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-14T16:53:55.000Z",
+    "numberComponentErrors": 7,
+    "numberComponentsDeployed": 3,
+    "numberComponentsTotal": 10,
+    "numberFiles": "15",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-14T16:53:53.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 16986,
+    "files": [
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls",
+        "lineNumber": 190,
+        "columnNumber": 17,
+        "error": "Variable does not exist: results (190:17)"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls",
+        "lineNumber": 189,
+        "columnNumber": 16,
+        "error": "Variable does not exist: fw (189:16)"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls",
+        "lineNumber": 188,
+        "columnNumber": 13,
+        "error": "Invalid type: FeeWrapper (188:13)"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls",
+        "lineNumber": 185,
+        "columnNumber": 9,
+        "error": "Invalid type: FeeWrapper (185:9)"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls",
+        "lineNumber": 163,
+        "columnNumber": 16,
+        "error": "Invalid constructor name: FeeWrapper (163:16)"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls",
+        "lineNumber": 174,
+        "columnNumber": 36,
+        "error": "Invalid type: FeeWrapper (174:36)"
+      },
+      {
+        "fullName": "AdmissionInvoiceController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionInvoiceController.cls"
+      },
+      {
+        "fullName": "AdmissionInvoiceController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionInvoiceController.cls-meta.xml"
+      },
+      {
+        "fullName": "AdmissionInvoice",
+        "type": "ApexPage",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\pages\\AdmissionInvoice.page"
+      },
+      {
+        "fullName": "AdmissionInvoice",
+        "type": "ApexPage",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\pages\\AdmissionInvoice.page-meta.xml"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js",
+        "error": "Unable to find Apex action method referenced as 'AdmissionController.getInvoicePDFUrl'."
+      }
+    ],
+    "zipFileCount": 11,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003iKB0CAM%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

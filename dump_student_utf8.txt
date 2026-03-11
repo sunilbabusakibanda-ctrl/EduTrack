@@ -1,0 +1,44 @@
+﻿[1m[32mCompiled successfully.[39m[22m
+[1m[32mExecuted successfully.[39m[22m
+
+65.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO
+Execute Anonymous: try {
+Execute Anonymous:     Account student = [SELECT Id, Name, PersonMobilePhone, PersonEmail, BillingStreet, Phone FROM Account WHERE Type = 'Student' ORDER BY CreatedDate DESC LIMIT 1];
+Execute Anonymous:     System.debug('STUDENT_DUMP_BASIC: ' + JSON.serializePretty(student));
+Execute Anonymous: } catch(Exception e) {
+Execute Anonymous:     System.debug('ERROR: ' + e.getMessage());
+Execute Anonymous: }
+21:57:59.55 (55921792)|USER_INFO|[EXTERNAL]|005f6000003oifF|sunil@devorg.com|(GMT+05:30) India Standard Time (Asia/Kolkata)|GMT+05:30
+21:57:59.55 (55966863)|EXECUTION_STARTED
+21:57:59.55 (56048786)|CODE_UNIT_STARTED|[EXTERNAL]|execute_anonymous_apex
+21:57:59.55 (67750081)|USER_DEBUG|[3]|DEBUG|STUDENT_DUMP_BASIC: {
+  "attributes" : {
+    "type" : "Account",
+    "url" : "/services/data/v65.0/sobjects/Account/001f600000NUUY8AAP"
+  },
+  "Id" : "001f600000NUUY8AAP",
+  "Name" : "Sakibanda Sunil Babu",
+  "PersonMobilePhone" : "8374331432",
+  "PersonEmail" : "sakibanda@gmail.com"
+}
+21:57:59.67 (67878294)|CUMULATIVE_LIMIT_USAGE
+21:57:59.67 (67878294)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 1 out of 100
+  Number of query rows: 1 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+21:57:59.67 (67878294)|CUMULATIVE_LIMIT_USAGE_END
+
+21:57:59.55 (67979346)|CODE_UNIT_FINISHED|execute_anonymous_apex
+21:57:59.55 (67996136)|EXECUTION_FINISHED
+

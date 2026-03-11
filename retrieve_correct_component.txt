@@ -1,0 +1,110 @@
+﻿{
+  "status": 0,
+  "result": {
+    "done": true,
+    "fileProperties": [
+      {
+        "createdById": "005f6000003ojzVAAQ",
+        "createdByName": "ShafiUlla Lalsagari",
+        "createdDate": "2026-02-13T11:28:26.000Z",
+        "fileName": "unpackaged/lwc/priceBookSetup/priceBookSetup.js",
+        "fullName": "priceBookSetup/priceBookSetup.js",
+        "id": "0Rdf6000002YZtRCAW",
+        "lastModifiedById": "005f6000003ojzVAAQ",
+        "lastModifiedByName": "ShafiUlla Lalsagari",
+        "lastModifiedDate": "2026-02-16T09:56:09.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003ojzVAAQ",
+        "createdByName": "ShafiUlla Lalsagari",
+        "createdDate": "2026-02-13T11:28:26.000Z",
+        "fileName": "unpackaged/lwc/priceBookSetup/priceBookSetup.html",
+        "fullName": "priceBookSetup/priceBookSetup.html",
+        "id": "0Rdf6000002YZtSCAW",
+        "lastModifiedById": "005f6000003ojzVAAQ",
+        "lastModifiedByName": "ShafiUlla Lalsagari",
+        "lastModifiedDate": "2026-02-16T09:56:07.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003ojzVAAQ",
+        "createdByName": "ShafiUlla Lalsagari",
+        "createdDate": "2026-02-13T11:28:27.000Z",
+        "fileName": "unpackaged/lwc/priceBookSetup/priceBookSetup.css",
+        "fullName": "priceBookSetup/priceBookSetup.css",
+        "id": "0Rdf6000002YZtUCAW",
+        "lastModifiedById": "005f6000003ojzVAAQ",
+        "lastModifiedByName": "ShafiUlla Lalsagari",
+        "lastModifiedDate": "2026-02-16T09:56:07.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003ojzVAAQ",
+        "createdByName": "ShafiUlla Lalsagari",
+        "createdDate": "2026-02-13T11:28:27.000Z",
+        "fileName": "unpackaged/lwc/priceBookSetup/priceBookSetup.svg",
+        "fullName": "priceBookSetup/priceBookSetup.svg",
+        "id": "0Rdf6000002YZtVCAW",
+        "lastModifiedById": "005f6000003ojzVAAQ",
+        "lastModifiedByName": "ShafiUlla Lalsagari",
+        "lastModifiedDate": "2026-02-16T09:56:07.000Z",
+        "manageableState": "unmanaged",
+        "type": "LightningComponentBundle"
+      },
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-16T11:01:11.799Z",
+        "fileName": "unpackaged/package.xml",
+        "fullName": "unpackaged/package.xml",
+        "id": "",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-16T11:01:11.799Z",
+        "manageableState": "unmanaged",
+        "type": "Package"
+      }
+    ],
+    "id": "09Sf6000000NByrEAG",
+    "status": "Succeeded",
+    "success": true,
+    "messages": [],
+    "files": [
+      {
+        "fullName": "priceBookSetup",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\priceBookSetup\\priceBookSetup.css"
+      },
+      {
+        "fullName": "priceBookSetup",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\priceBookSetup\\priceBookSetup.html"
+      },
+      {
+        "fullName": "priceBookSetup",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\priceBookSetup\\priceBookSetup.js"
+      },
+      {
+        "fullName": "priceBookSetup",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\priceBookSetup\\priceBookSetup.svg"
+      },
+      {
+        "fullName": "priceBookSetup",
+        "type": "LightningComponentBundle",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\priceBookSetup\\priceBookSetup.js-meta.xml"
+      }
+    ]
+  },
+  "warnings": []
+}

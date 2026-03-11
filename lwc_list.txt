@@ -1,0 +1,123 @@
+﻿{
+  "status": 0,
+  "result": [
+    {
+      "createdById": "005f6000003ojmbAAA",
+      "createdByName": "prabhakar yeddula",
+      "createdDate": "2026-02-15T16:55:01.000Z",
+      "fileName": "lwc/attendanceReport",
+      "fullName": "attendanceReport",
+      "id": "0Rbf6000000lndBCAQ",
+      "lastModifiedById": "005f6000003ojmbAAA",
+      "lastModifiedByName": "prabhakar yeddula",
+      "lastModifiedDate": "2026-02-16T10:15:23.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003oifFAAQ",
+      "createdByName": "Covenant Synergy",
+      "createdDate": "2026-02-11T17:51:02.000Z",
+      "fileName": "lwc/assignedClasses",
+      "fullName": "assignedClasses",
+      "id": "0Rbf6000000lLx3CAE",
+      "lastModifiedById": "005f6000003oifFAAQ",
+      "lastModifiedByName": "Covenant Synergy",
+      "lastModifiedDate": "2026-02-12T13:15:33.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003oifFAAQ",
+      "createdByName": "Covenant Synergy",
+      "createdDate": "2026-02-11T11:34:47.000Z",
+      "fileName": "lwc/vikasSchoolWelcome",
+      "fullName": "vikasSchoolWelcome",
+      "id": "0Rbf6000000lIO5CAM",
+      "lastModifiedById": "005f6000003oifFAAQ",
+      "lastModifiedByName": "Covenant Synergy",
+      "lastModifiedDate": "2026-02-12T13:15:33.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003ojzVAAQ",
+      "createdByName": "ShafiUlla Lalsagari",
+      "createdDate": "2026-02-11T10:40:29.000Z",
+      "fileName": "lwc/enterMarks",
+      "fullName": "enterMarks",
+      "id": "0Rbf6000000lHILCA2",
+      "lastModifiedById": "005f6000003ojzVAAQ",
+      "lastModifiedByName": "ShafiUlla Lalsagari",
+      "lastModifiedDate": "2026-02-12T18:45:58.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003ojzVAAQ",
+      "createdByName": "ShafiUlla Lalsagari",
+      "createdDate": "2026-02-16T10:08:00.000Z",
+      "fileName": "lwc/studentmanagement",
+      "fullName": "studentmanagement",
+      "id": "0Rbf6000000lxUTCAY",
+      "lastModifiedById": "005f6000003ojzVAAQ",
+      "lastModifiedByName": "ShafiUlla Lalsagari",
+      "lastModifiedDate": "2026-02-16T10:56:34.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003ojmbAAA",
+      "createdByName": "prabhakar yeddula",
+      "createdDate": "2026-02-11T10:35:18.000Z",
+      "fileName": "lwc/attendance",
+      "fullName": "attendance",
+      "id": "0Rbf6000000lHF7CAM",
+      "lastModifiedById": "005f6000003ojmbAAA",
+      "lastModifiedByName": "prabhakar yeddula",
+      "lastModifiedDate": "2026-02-16T05:55:52.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003oifFAAQ",
+      "createdByName": "Covenant Synergy",
+      "createdDate": "2026-02-13T11:13:00.000Z",
+      "fileName": "lwc/admissionManager",
+      "fullName": "admissionManager",
+      "id": "0Rbf6000000ldM5CAI",
+      "lastModifiedById": "005f6000003oifFAAQ",
+      "lastModifiedByName": "Covenant Synergy",
+      "lastModifiedDate": "2026-02-16T10:04:37.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003ojzVAAQ",
+      "createdByName": "ShafiUlla Lalsagari",
+      "createdDate": "2026-02-13T11:28:26.000Z",
+      "fileName": "lwc/priceBookSetup",
+      "fullName": "priceBookSetup",
+      "id": "0Rbf6000000ldSXCAY",
+      "lastModifiedById": "005f6000003ojzVAAQ",
+      "lastModifiedByName": "ShafiUlla Lalsagari",
+      "lastModifiedDate": "2026-02-16T09:56:07.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    },
+    {
+      "createdById": "005f6000003oifFAAQ",
+      "createdByName": "Covenant Synergy",
+      "createdDate": "2026-02-15T16:12:04.000Z",
+      "fileName": "lwc/eduProDashboard",
+      "fullName": "eduProDashboard",
+      "id": "0Rbf6000000lnbZCAQ",
+      "lastModifiedById": "005f6000003oifFAAQ",
+      "lastModifiedByName": "Covenant Synergy",
+      "lastModifiedDate": "2026-02-16T10:58:03.000Z",
+      "manageableState": "unmanaged",
+      "type": "LightningComponentBundle"
+    }
+  ],
+  "warnings": []
+}

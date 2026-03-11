@@ -1,0 +1,73 @@
+﻿[1m[32mCompiled successfully.[39m[22m
+[1m[32mExecuted successfully.[39m[22m
+
+65.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO
+Execute Anonymous: Map<String, String> studentData = new Map<String, String>{
+Execute Anonymous:     'firstName' => 'Test',
+Execute Anonymous:     'lastName' => 'Student',
+Execute Anonymous:     'phone' => '1234567890',
+Execute Anonymous:     'email' => 'test@example.com',
+Execute Anonymous:     'address' => '123 Test Street',
+Execute Anonymous:     'selectedClass' => 'Class-1',
+Execute Anonymous:     'selectedSection' => 'A',
+Execute Anonymous:     'academicYear' => '2024-25'
+Execute Anonymous: };
+Execute Anonymous: List<Id> pbeIds = new List<Id>();
+Execute Anonymous: Map<String, Object> result = AdmissionController.createAdmission(studentData, pbeIds);
+Execute Anonymous: System.debug('CREATION_RESULT: ' + JSON.serializePretty(result));
+Execute Anonymous: 
+Execute Anonymous: Account student = [SELECT Id, Name, PersonMobilePhone, PersonEmail, PersonMailingStreet, Phone FROM Account WHERE Id = :(Id)result.get('accountId')];
+Execute Anonymous: System.debug('CREATED_STUDENT: ' + JSON.serializePretty(student));
+22:44:42.119 (119704302)|USER_INFO|[EXTERNAL]|005f6000003oifF|sunil@devorg.com|(GMT+05:30) India Standard Time (Asia/Kolkata)|GMT+05:30
+22:44:42.119 (119739522)|EXECUTION_STARTED
+22:44:42.119 (119772213)|CODE_UNIT_STARTED|[EXTERNAL]|execute_anonymous_apex
+22:44:42.119 (184056273)|USER_DEBUG|[20]|DEBUG|AdmissionController.createAdmission: studentData={"academicYear":"2024-25","selectedSection":"A","selectedClass":"Class-1","address":"123 Test Street","email":"test@example.com","phone":"1234567890","lastName":"Student","firstName":"Test"}
+22:44:42.119 (184211817)|USER_DEBUG|[22]|DEBUG|Key: firstName Value: Test
+22:44:42.119 (184240537)|USER_DEBUG|[22]|DEBUG|Key: lastName Value: Student
+22:44:42.119 (184260448)|USER_DEBUG|[22]|DEBUG|Key: phone Value: 1234567890
+22:44:42.119 (184290818)|USER_DEBUG|[22]|DEBUG|Key: email Value: test@example.com
+22:44:42.119 (184308829)|USER_DEBUG|[22]|DEBUG|Key: address Value: 123 Test Street
+22:44:42.119 (184328699)|USER_DEBUG|[22]|DEBUG|Key: selectedClass Value: Class-1
+22:44:42.119 (184347159)|USER_DEBUG|[22]|DEBUG|Key: selectedSection Value: A
+22:44:42.119 (184365660)|USER_DEBUG|[22]|DEBUG|Key: academicYear Value: 2024-25
+22:44:42.119 (185532143)|USER_DEBUG|[47]|DEBUG|AdmissionController.createAdmission: student record before insert={"attributes":{"type":"Account"},"RecordTypeId":"012f6000000zlGXAAY","FirstName":"Test","LastName":"Student","PersonMobilePhone":"1234567890","Phone":"1234567890","PersonEmail":"test@example.com","PersonMailingStreet":"123 Test Street","BillingStreet":"123 Test Street","Type":"Student","Active__c":"Yes","Class__c":"Class-1","Section__c":"A"}
+22:44:42.119 (347320465)|USER_DEBUG|[49]|DEBUG|AdmissionController.createAdmission: student record inserted with Id=001f600000NV4F0AAL
+22:44:42.119 (360112164)|USER_DEBUG|[53]|DEBUG|AdmissionController.createAdmission: VERIFIED inserted record={"attributes":{"type":"Account","url":"/services/data/v65.0/sobjects/Account/001f600000NV4F0AAL"},"Id":"001f600000NV4F0AAL","Name":"Test Student","Phone":"1234567890","PersonMobilePhone":"1234567890","PersonEmail":"test@example.com","BillingStreet":"123 Test Street"}
+22:44:42.119 (451631896)|USER_DEBUG|[13]|DEBUG|CREATION_RESULT: {
+  "accountId" : "001f600000NV4F0AAL",
+  "opportunityId" : "006f6000004hy6fAAA",
+  "success" : true
+}
+22:44:42.119 (460149808)|USER_DEBUG|[16]|DEBUG|CREATED_STUDENT: {
+  "attributes" : {
+    "type" : "Account",
+    "url" : "/services/data/v65.0/sobjects/Account/001f600000NV4F0AAL"
+  },
+  "Id" : "001f600000NV4F0AAL",
+  "Name" : "Test Student",
+  "PersonMobilePhone" : "1234567890",
+  "PersonEmail" : "test@example.com",
+  "PersonMailingStreet" : "123 Test Street",
+  "Phone" : "1234567890"
+}
+22:44:42.485 (485719935)|CUMULATIVE_LIMIT_USAGE
+22:44:42.485 (485719935)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 3 out of 100
+  Number of query rows: 3 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 2 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 2 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+22:44:42.485 (485719935)|CUMULATIVE_LIMIT_USAGE_END
+
+22:44:42.119 (485837288)|CODE_UNIT_FINISHED|execute_anonymous_apex
+22:44:42.119 (485863448)|EXECUTION_FINISHED
+

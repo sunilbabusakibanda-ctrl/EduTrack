@@ -1,0 +1,94 @@
+sf :  ??   Warning: @salesforce/cli update 
+available from [92m2.83.7[39m to 
+[92m2.122.6[39m.
+At line:1 char:1
++ sf project deploy start --source-dir 
+force-app/main/default/classes/S ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( ??    
+   Warning: ...2m2.122.6[39m.:String) [], RemoteE  
+  xception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+{
+  "status": 0,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-23T14:42:47.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-23T14:42:46.000Z",
+    "details": {
+      "componentSuccesses": [
+        {
+          "changed": false,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-23T14:42:46.000Z",
+          "deleted": false,
+          "fileName": "classes/StudentController.cls",
+          "fullName": "StudentController",
+          "id": "01pf6000002ZSbNAAW",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-23T14:42:47.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      },
+      "componentFailures": []
+    },
+    "done": true,
+    "id": "0Aff6000003ox3CCAQ",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-23T14:42:47.000Z",
+    "numberComponentErrors": 0,
+    "numberComponentsDeployed": 1,
+    "numberComponentsTotal": 1,
+    "numberFiles": "4",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-23T14:42:46.000Z",
+    "status": "Succeeded",
+    "success": true,
+    "zipSize": 2725,
+    "files": [
+      {
+        "fullName": "StudentController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\StudentController.cls"
+      },
+      {
+        "fullName": "StudentController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\StudentController.cls-meta.xml"
+      }
+    ],
+    "zipFileCount": 3,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003ox3CCAQ%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

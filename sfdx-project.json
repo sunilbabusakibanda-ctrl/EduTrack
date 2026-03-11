@@ -1,0 +1,19 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "EduTrack",
+      "versionName": "Version 1.0",
+      "versionNumber": "1.0.0.NEXT",
+      "definitionFile": "config/project-scratch-def.json"
+    }
+  ],
+  "name": "VikasSchool",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "60.0",
+  "packageAliases": {
+    "EduTrack": "0HoOS00000002LB0AY",
+    "EduTrack@1.0.0-1": "04tOS00000MFB1hYAH"
+  }
+}

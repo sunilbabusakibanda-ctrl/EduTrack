@@ -1,0 +1,14 @@
+﻿{
+  "status": 0,
+  "result": {
+    "success": true,
+    "compiled": true,
+    "compileProblem": "",
+    "exceptionMessage": "",
+    "exceptionStackTrace": "",
+    "line": -1,
+    "column": -1,
+    "logs": "65.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO\nExecute Anonymous: Map<Id, Decimal> oppPaidMap = new Map<Id, Decimal>();\nExecute Anonymous: for (Invoice_Item__c item : [\nExecute Anonymous:     SELECT Amount__c, Invoice__r.Opportunity__c \nExecute Anonymous:     FROM Invoice_Item__c \nExecute Anonymous:     WHERE Invoice__r.Opportunity__c != null\nExecute Anonymous: ]) {\nExecute Anonymous:     Id oppId = item.Invoice__r.Opportunity__c;\nExecute Anonymous:     if (!oppPaidMap.containsKey(oppId)) oppPaidMap.put(oppId, 0);\nExecute Anonymous:     oppPaidMap.put(oppId, oppPaidMap.get(oppId) + (item.Amount__c != null ? item.Amount__c : 0));\nExecute Anonymous: }\nExecute Anonymous: \nExecute Anonymous: List<Opportunity> oppsToUpdate = new List<Opportunity>();\nExecute Anonymous: for (Id oppId : oppPaidMap.keySet()) {\nExecute Anonymous:     oppsToUpdate.add(new Opportunity(\nExecute Anonymous:         Id = oppId,\nExecute Anonymous:         Total_Paid_Amount__c = oppPaidMap.get(oppId)\nExecute Anonymous:     ));\nExecute Anonymous: }\nExecute Anonymous: \nExecute Anonymous: if (!oppsToUpdate.isEmpty()) {\nExecute Anonymous:     update oppsToUpdate;\nExecute Anonymous:     System.debug('Successfully synchronized ' + oppsToUpdate.size() + ' Admission records.');\nExecute Anonymous: } else {\nExecute Anonymous:     System.debug('No records needed synchronization.');\nExecute Anonymous: }\n00:24:46.76 (76819737)|USER_INFO|[EXTERNAL]|005f6000003oifF|sunil@devorg.com|(GMT+05:30) India Standard Time (Asia/Kolkata)|GMT+05:30\n00:24:46.76 (76854048)|EXECUTION_STARTED\n00:24:46.76 (76888028)|CODE_UNIT_STARTED|[EXTERNAL]|execute_anonymous_apex\n00:24:46.76 (256656862)|USER_DEBUG|[22]|DEBUG|Successfully synchronized 2 Admission records.\n00:24:46.279 (279600479)|CUMULATIVE_LIMIT_USAGE\n00:24:46.279 (279600479)|LIMIT_USAGE_FOR_NS|(default)|\n  Number of SOQL queries: 1 out of 100\n  Number of query rows: 6 out of 50000\n  Number of SOSL queries: 0 out of 20\n  Number of DML statements: 1 out of 150\n  Number of Publish Immediate DML: 0 out of 150\n  Number of DML rows: 2 out of 10000\n  Maximum CPU time: 0 out of 10000\n  Maximum heap size: 0 out of 6000000\n  Number of callouts: 0 out of 100\n  Number of Email Invocations: 0 out of 10\n  Number of future calls: 0 out of 50\n  Number of queueable jobs added to the queue: 0 out of 50\n  Number of Mobile Apex push calls: 0 out of 10\n\n00:24:46.279 (279600479)|CUMULATIVE_LIMIT_USAGE_END\n\n00:24:46.76 (279703392)|CODE_UNIT_FINISHED|execute_anonymous_apex\n00:24:46.76 (279737112)|EXECUTION_FINISHED\n"
+  },
+  "warnings": []
+}

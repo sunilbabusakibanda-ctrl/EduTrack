@@ -1,0 +1,47 @@
+﻿{
+  "status": 0,
+  "result": {
+    "done": true,
+    "fileProperties": [
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-13T10:54:27.000Z",
+        "fileName": "unpackaged/layouts/Invoice__c-Invoice Layout.layout",
+        "fullName": "Invoice__c-Invoice Layout",
+        "id": "00hf6000003VDtoAAG",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-13T19:11:31.000Z",
+        "manageableState": "unmanaged",
+        "type": "Layout"
+      },
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-16T11:14:02.612Z",
+        "fileName": "unpackaged/package.xml",
+        "fullName": "unpackaged/package.xml",
+        "id": "",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-16T11:14:02.612Z",
+        "manageableState": "unmanaged",
+        "type": "Package"
+      }
+    ],
+    "id": "09Sf6000000NC6vEAG",
+    "status": "Succeeded",
+    "success": true,
+    "messages": [],
+    "files": [
+      {
+        "fullName": "Invoice__c-Invoice Layout",
+        "type": "Layout",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\layouts\\Invoice__c-Invoice Layout.layout-meta.xml"
+      }
+    ]
+  },
+  "warnings": []
+}

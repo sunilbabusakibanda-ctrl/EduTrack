@@ -1,0 +1,154 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-15T15:10:53.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-15T15:10:49.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-15T15:10:52.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "InvoiceTrigger",
+          "problem": "An object 'InvoiceTrigger' of type ApexTrigger was named in package.xml, but was not found in zipped directory",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-15T15:10:50.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "id": "01pf6000002WJJKAA4",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "ApexTrigger",
+          "created": false,
+          "createdDate": "2026-02-15T15:10:52.000Z",
+          "deleted": false,
+          "fileName": "triggers/InvoiceItemTrigger.trigger",
+          "fullName": "InvoiceItemTrigger",
+          "id": "01qf6000002pWPhAAM",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-15T15:10:52.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager",
+          "fullName": "admissionManager",
+          "id": "0Rbf6000000ldM5CAI",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-15T15:10:52.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003ilcbCAA",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-15T15:10:53.000Z",
+    "numberComponentErrors": 1,
+    "numberComponentsDeployed": 3,
+    "numberComponentsTotal": 4,
+    "numberFiles": "13",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-15T15:10:50.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 17292,
+    "files": [
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls-meta.xml"
+      },
+      {
+        "fullName": "InvoiceItemTrigger",
+        "type": "ApexTrigger",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\triggers\\InvoiceItemTrigger.trigger"
+      },
+      {
+        "fullName": "InvoiceItemTrigger",
+        "type": "ApexTrigger",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\triggers\\InvoiceItemTrigger.trigger-meta.xml"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.css"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.html"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js-meta.xml"
+      }
+    ],
+    "zipFileCount": 9,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003ilcbCAA%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": [
+    ", InvoiceTrigger, returned from org, but not found in the local project"
+  ]
+}

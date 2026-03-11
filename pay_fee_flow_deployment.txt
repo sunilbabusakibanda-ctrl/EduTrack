@@ -1,0 +1,127 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-16T10:04:07.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-16T10:04:05.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-16T10:04:07.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager/admissionManager.js",
+          "fullName": "markup://c:admissionManager",
+          "problem": "[Line: 14, Col: 2] LWC1535: Unexpected plugin compilation error: Plugin - lwc, Hook - transform, Cause - SyntaxError: /home/sfdc/tools/sfdc-lwc-compiler/13.33554432.50331648/admissionManager.js: LWC1102: Invalid 'api' decorator usage. Supported decorators (api, wire, track) should be imported from \"lwc\"\n  12 | import LightningConfirm from 'lightning/confirm';\n  13 | export default class AdmissionManager extends NavigationMixin(LightningElement) {\n> 14 |   @api\n     |   ^\n  15 |   get activeTab() {\n  16 |     return this._activeTab;\n  17 |   }",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-16T10:04:05.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager",
+          "fullName": "admissionManager",
+          "id": "0Rbf6000000ldM5CAI",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-16T10:04:07.000Z",
+          "deleted": false,
+          "fileName": "lwc/eduProDashboard",
+          "fullName": "eduProDashboard",
+          "id": "0Rbf6000000lnbZCAQ",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-16T10:04:07.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003jOywCAE",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-16T10:04:07.000Z",
+    "numberComponentErrors": 1,
+    "numberComponentsDeployed": 2,
+    "numberComponentsTotal": 3,
+    "numberFiles": "12",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-16T10:04:05.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 24397,
+    "files": [
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js",
+        "lineNumber": 14,
+        "columnNumber": 2,
+        "error": "LWC1535: Unexpected plugin compilation error: Plugin - lwc, Hook - transform, Cause - SyntaxError: /home/sfdc/tools/sfdc-lwc-compiler/13.33554432.50331648/admissionManager.js: LWC1102: Invalid 'api' decorator usage. Supported decorators (api, wire, track) should be imported from \"lwc\" (14:2)"
+      },
+      {
+        "fullName": "eduProDashboard",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\eduProDashboard\\eduProDashboard.css"
+      },
+      {
+        "fullName": "eduProDashboard",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\eduProDashboard\\eduProDashboard.html"
+      },
+      {
+        "fullName": "eduProDashboard",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\eduProDashboard\\eduProDashboard.js"
+      },
+      {
+        "fullName": "eduProDashboard",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\eduProDashboard\\eduProDashboard.js-meta.xml"
+      }
+    ],
+    "zipFileCount": 9,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003jOywCAE%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

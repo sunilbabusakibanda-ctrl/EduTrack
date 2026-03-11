@@ -1,0 +1,27 @@
+# Ignore everything by default
+/*
+
+# But keep these standard files/folders
+!force-app/
+!scripts/
+!manifest/
+!sfdx-project.json
+!package.json
+!package-lock.json
+!.gitignore
+!.forceignore
+!Git_Deployment_Workflow.md
+!package_installation_guide.md
+!package_installation_guide.html
+
+# Specifically ignore problematic folders/files
+node_modules/
+.sfdx/
+.sf/
+.vscode/
+
+# Ignore all JSON in root (already covered by /* but to be explicit)
+/*.json
+!/sfdx-project.json
+!/package.json
+!/package-lock.json

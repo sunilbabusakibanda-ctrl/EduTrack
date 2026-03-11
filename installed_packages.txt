@@ -1,0 +1,15 @@
+﻿{
+  "status": 0,
+  "result": [
+    {
+      "Id": "0A3f6000000JcF8CAK",
+      "SubscriberPackageId": "03330000001Ig8MAAS",
+      "SubscriberPackageName": "Salesforce Mobile Apps",
+      "SubscriberPackageNamespace": "sf_chttr_apps",
+      "SubscriberPackageVersionId": "04t4V000001i8c0QAA",
+      "SubscriberPackageVersionName": "Summer 2025",
+      "SubscriberPackageVersionNumber": "1.24.0.1"
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,60 @@
+﻿[1m[32mCompiled successfully.[39m[22m
+[1m[32mExecuted successfully.[39m[22m
+
+65.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO
+Execute Anonymous: Map<String, String> studentData = new Map<String, String>{
+Execute Anonymous:     'firstName' => 'Test',
+Execute Anonymous:     'lastName' => 'Student',
+Execute Anonymous:     'phone' => '1234567890',
+Execute Anonymous:     'email' => 'test@example.com',
+Execute Anonymous:     'address' => '123 Test Street',
+Execute Anonymous:     'selectedClass' => 'Class-1',
+Execute Anonymous:     'selectedSection' => 'A',
+Execute Anonymous:     'academicYear' => '2024-25'
+Execute Anonymous: };
+Execute Anonymous: List<Id> pbeIds = new List<Id>();
+Execute Anonymous: Map<String, Object> result = AdmissionController.createAdmission(studentData, pbeIds);
+Execute Anonymous: System.debug('CREATION_RESULT: ' + JSON.serializePretty(result));
+Execute Anonymous: 
+Execute Anonymous: Account student = [SELECT Id, Name, PersonMobilePhone, PersonEmail, PersonMailingStreet, Phone FROM Account WHERE Id = :(Id)result.get('accountId')];
+Execute Anonymous: System.debug('CREATED_STUDENT: ' + JSON.serializePretty(student));
+22:22:10.83 (83912326)|USER_INFO|[EXTERNAL]|005f6000003oifF|sunil@devorg.com|(GMT+05:30) India Standard Time (Asia/Kolkata)|GMT+05:30
+22:22:10.83 (83972048)|EXECUTION_STARTED
+22:22:10.83 (84016499)|CODE_UNIT_STARTED|[EXTERNAL]|execute_anonymous_apex
+22:22:10.83 (292575105)|USER_DEBUG|[13]|DEBUG|CREATION_RESULT: {
+  "opportunityId" : "006f6000004hf7GAAQ",
+  "accountId" : "001f600000NU0F6AAL",
+  "success" : true
+}
+22:22:10.83 (304858676)|USER_DEBUG|[16]|DEBUG|CREATED_STUDENT: {
+  "attributes" : {
+    "type" : "Account",
+    "url" : "/services/data/v65.0/sobjects/Account/001f600000NU0F6AAL"
+  },
+  "Id" : "001f600000NU0F6AAL",
+  "Name" : "Test Student",
+  "PersonMobilePhone" : "1234567890",
+  "PersonEmail" : "test@example.com",
+  "PersonMailingStreet" : "123 Test Street"
+}
+22:22:10.320 (320544866)|CUMULATIVE_LIMIT_USAGE
+22:22:10.320 (320544866)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 2 out of 100
+  Number of query rows: 2 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 2 out of 150
+  Number of Publish Immediate DML: 0 out of 150
+  Number of DML rows: 2 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+22:22:10.320 (320544866)|CUMULATIVE_LIMIT_USAGE_END
+
+22:22:10.83 (320757071)|CODE_UNIT_FINISHED|execute_anonymous_apex
+22:22:10.83 (320790533)|EXECUTION_FINISHED
+

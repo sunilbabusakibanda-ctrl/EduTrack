@@ -1,0 +1,535 @@
+﻿sf :  ┬╗   Warning: @salesforce/cli update available from 
+[92m2.83.7[39m to [92m2.122.6[39m.
+At line:1 char:1
++ sf project deploy start -d 
+force-app\main\default\classes\AdmissionCo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( ┬╗   Warnin 
+   g: ...2m2.122.6[39m.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+ Γù╝ Preparing
+ Γù╝ Waiting for the org to respond
+ Γù╝ Deploying Metadata
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: -
+ Elapsed Time: 0ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γù╝ Preparing
+ Γù╝ Waiting for the org to respond
+ Γù╝ Deploying Metadata
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: -
+ Elapsed Time: 0ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ - Preparing 0ms
+ Γù╝ Waiting for the org to respond
+ Γù╝ Deploying Metadata
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: -
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 0ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ - Preparing 42ms
+ Γù╝ Waiting for the org to respond
+ Γù╝ Deploying Metadata
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: -
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 138ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ - Preparing 78ms
+ Γù╝ Waiting for the org to respond
+ Γù╝ Deploying Metadata
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: -
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 172ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ - Preparing 112ms
+ Γù╝ Waiting for the org to respond
+ Γù╝ Deploying Metadata
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: \
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 204ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 130ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 0ms
+   Γû╕ Components: 0/2 (0%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 220ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 39ms
+   Γû╕ Components: 0/2 (0%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 274ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 66ms
+   Γû╕ Components: 0/2 (0%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 314ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 110ms
+   Γû╕ Components: 0/2 (0%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 347ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 142ms
+   Γû╕ Components: 0/2 (0%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 378ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ \ Deploying Metadata 186ms
+   Γû╕ Components: 0/2 (0%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 421ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ \ Deploying Metadata 207ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 442ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ \ Deploying Metadata 253ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 498ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ \ Deploying Metadata 294ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 529ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ | Deploying Metadata 326ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 562ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ | Deploying Metadata 357ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 594ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ | Deploying Metadata 390ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 624ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ | Deploying Metadata 422ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 659ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ / Deploying Metadata 451ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 686ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ / Deploying Metadata 451ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 727ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ / Deploying Metadata 529ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 727ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ / Deploying Metadata 561ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 795ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 587ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 818ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 630ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 863ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 659ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 899ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 682ms
+   Γû╕ Components: 1/2 (50%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: In Progress
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 930ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ - Deploying Metadata 720ms
+   Γû╕ Components: 1/7 (14%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: Failed
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 930ms
+
+[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[1A[2K[G
+ ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Deploying Metadata ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ Deploying v60.0 metadata to sunil@devorg.com using the v65.0 SOAP API.
+
+ Γ£ö Preparing 163ms
+ Γù» Waiting for the org to respond - Skipped
+ Γ£ÿ Deploying Metadata 720ms
+   Γû╕ Components: 1/7 (14%)
+ Γù╝ Running Tests
+ Γù╝ Updating Source Tracking
+ Γù╝ Done
+
+ Status: Failed
+ Deploy ID: 0Aff6000003mAacCAE
+ Target Org: sunil@devorg.com
+ Elapsed Time: 930ms
+
+
+[1m[31mComponent Failures [3][39m[22m
+ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+Γöé Type                     Γöé Name                Γöé Problem                                                                                         Γöé Line:Column Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé ApexClass                Γöé AdmissionController Γöé Missing return statement required return type: List<String> (196:32)                            Γöé 196:32      Γöé
+Γöé ApexClass                Γöé AdmissionController Γöé Unexpected token 'public'. (200:5)                                                              Γöé 200:5       Γöé
+Γöé LightningComponentBundle Γöé admissionManager    Γöé Unable to find Apex action method referenced as 'AdmissionController.getAcademicYearOptions'.  Γöé             Γöé
+Γöé                          Γöé                     Γöé Unable to find Apex action method referenced as 'AdmissionController.getDynamicClassOptions'.  ΓöéΓöé
+Γöé                          Γöé                     Γöé Unable to find Apex action method referenced as 'AdmissionController.getDynamicSectionOptions'. ΓöéΓöé
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+
+

@@ -1,0 +1,72 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-16T11:15:31.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-16T11:15:31.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-16T11:15:31.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "Invoice__c-Invoice%20Layout",
+          "problem": "An object 'Invoice__c-Invoice%20Layout' of type Layout was named in package.xml, but was not found in zipped directory",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-16T11:15:31.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003jRvNCAU",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-16T11:15:31.000Z",
+    "numberComponentErrors": 1,
+    "numberComponentsDeployed": 0,
+    "numberComponentsTotal": 1,
+    "numberFiles": "3",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-16T11:15:31.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 1351,
+    "files": [],
+    "zipFileCount": 2,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003jRvNCAU%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": [
+    ", Invoice__c-Invoice%20Layout, returned from org, but not found in the local project"
+  ]
+}

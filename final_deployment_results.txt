@@ -1,0 +1,1082 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-13T17:15:36.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-13T17:15:27.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        },
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal/facultyPortal.js",
+          "fullName": "facultyPortal",
+          "problem": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice_Item__c.object",
+          "fullName": "Invoice_Item__c.Invoice__c",
+          "id": "00Nf600000ChKpOEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice_Item__c.object",
+          "fullName": "Invoice_Item__c.Amount__c",
+          "id": "00Nf600000ChKpPEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice_Item__c.object",
+          "fullName": "Invoice_Item__c.Opportunity_Line_Item_Id__c",
+          "id": "00Nf600000ChKpQEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice_Item__c.object",
+          "fullName": "Invoice_Item__c.Product__c",
+          "id": "00Nf600000ChKpREAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice__c.object",
+          "fullName": "Invoice__c.Invoice_Date__c",
+          "id": "00Nf600000ChKpSEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice__c.object",
+          "fullName": "Invoice__c.Opportunity__c",
+          "id": "00Nf600000ChKpTEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice__c.object",
+          "fullName": "Invoice__c.Status__c",
+          "id": "00Nf600000ChKpUEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice__c.object",
+          "fullName": "Invoice__c.Student__c",
+          "id": "00Nf600000ChKpVEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Opportunity.object",
+          "fullName": "Opportunity.Academic_Year__c",
+          "id": "00Nf600000ChKpWEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Opportunity.object",
+          "fullName": "Opportunity.Class__c",
+          "id": "00Nf600000ChKpXEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Opportunity.object",
+          "fullName": "Opportunity.Section__c",
+          "id": "00Nf600000ChKpYEAV",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Additional_Comments__c",
+          "id": "00Nf600000CePQbEAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Class_Performance__c",
+          "id": "00Nf600000CePQcEAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Completion_Time__c",
+          "id": "00Nf600000CcGKzEAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Homework_Assigned__c",
+          "id": "00Nf600000CePQdEAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Is_Completed__c",
+          "id": "00Nf600000CcGL0EAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Teaching_Notes__c",
+          "id": "00Nf600000CePQeEAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "CustomField",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c.Topic_Discussed__c",
+          "id": "00Nf600000CcGL1EAN",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "classes/AdmissionController.cls",
+          "fullName": "AdmissionController",
+          "id": "01pf6000002WJJKAA4",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "classes/MarksheetController.cls",
+          "fullName": "MarksheetController",
+          "id": "01pf6000002VWX7AAO",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "ApexClass",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:31.000Z",
+          "deleted": false,
+          "fileName": "classes/VikasSchoolController.cls",
+          "fullName": "VikasSchoolController",
+          "id": "01pf6000002VPdhAAG",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/admissionManager",
+          "fullName": "admissionManager",
+          "id": "0Rbf6000000ldM5CAI",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/assignedClasses",
+          "fullName": "assignedClasses",
+          "id": "0Rbf6000000lLx3CAE",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": true,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/facultyPortal",
+          "fullName": "facultyPortal",
+          "id": "0Rbf6000000lgWrCAI",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "lwc/vikasSchoolWelcome",
+          "fullName": "vikasSchoolWelcome",
+          "id": "0Rbf6000000lIO5CAM",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "CustomObject",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice_Item__c.object",
+          "fullName": "Invoice_Item__c",
+          "id": "01If6000001DFiFEAW",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "CustomObject",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "objects/Invoice__c.object",
+          "fullName": "Invoice__c",
+          "id": "01If6000001DFiGEAW",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "CustomObject",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "objects/Period__c.object",
+          "fullName": "Period__c",
+          "id": "01If6000001CNUDEA4",
+          "success": true
+        },
+        {
+          "changed": false,
+          "componentType": "PermissionSet",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "permissionsets/PersonAccountAccess.permissionset",
+          "fullName": "PersonAccountAccess",
+          "id": "0PSf6000003mcPRGAY",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-13T17:15:36.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003hQDfCAM",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-13T17:15:36.000Z",
+    "numberComponentErrors": 38,
+    "numberComponentsDeployed": 29,
+    "numberComponentsTotal": 67,
+    "numberFiles": "35",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-13T17:15:28.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 87446,
+    "files": [
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls"
+      },
+      {
+        "fullName": "AdmissionController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\AdmissionController.cls-meta.xml"
+      },
+      {
+        "fullName": "MarksheetController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\MarksheetController.cls"
+      },
+      {
+        "fullName": "MarksheetController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\MarksheetController.cls-meta.xml"
+      },
+      {
+        "fullName": "VikasSchoolController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\VikasSchoolController.cls"
+      },
+      {
+        "fullName": "VikasSchoolController",
+        "type": "ApexClass",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\classes\\VikasSchoolController.cls-meta.xml"
+      },
+      {
+        "fullName": "Invoice_Item__c.Amount__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice_Item__c\\fields\\Amount__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice_Item__c.Invoice__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice_Item__c\\fields\\Invoice__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice_Item__c.Opportunity_Line_Item_Id__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice_Item__c\\fields\\Opportunity_Line_Item_Id__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice_Item__c.Product__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice_Item__c\\fields\\Product__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice__c.Invoice_Date__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice__c\\fields\\Invoice_Date__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice__c.Opportunity__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice__c\\fields\\Opportunity__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice__c.Status__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice__c\\fields\\Status__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice__c.Student__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice__c\\fields\\Student__c.field-meta.xml"
+      },
+      {
+        "fullName": "Opportunity.Academic_Year__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Opportunity\\fields\\Academic_Year__c.field-meta.xml"
+      },
+      {
+        "fullName": "Opportunity.Class__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Opportunity\\fields\\Class__c.field-meta.xml"
+      },
+      {
+        "fullName": "Opportunity.Section__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Opportunity\\fields\\Section__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Additional_Comments__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Additional_Comments__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Class_Performance__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Class_Performance__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Completion_Time__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Completion_Time__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Homework_Assigned__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Homework_Assigned__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Is_Completed__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Is_Completed__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Teaching_Notes__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Teaching_Notes__c.field-meta.xml"
+      },
+      {
+        "fullName": "Period__c.Topic_Discussed__c",
+        "type": "CustomField",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\fields\\Topic_Discussed__c.field-meta.xml"
+      },
+      {
+        "fullName": "Invoice_Item__c",
+        "type": "CustomObject",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice_Item__c\\Invoice_Item__c.object-meta.xml"
+      },
+      {
+        "fullName": "Invoice__c",
+        "type": "CustomObject",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Invoice__c\\Invoice__c.object-meta.xml"
+      },
+      {
+        "fullName": "Period__c",
+        "type": "CustomObject",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\objects\\Period__c\\Period__c.object-meta.xml"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.css"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.html"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js"
+      },
+      {
+        "fullName": "admissionManager",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\admissionManager\\admissionManager.js-meta.xml"
+      },
+      {
+        "fullName": "assignedClasses",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\assignedClasses\\assignedClasses.css"
+      },
+      {
+        "fullName": "assignedClasses",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\assignedClasses\\assignedClasses.html"
+      },
+      {
+        "fullName": "assignedClasses",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\assignedClasses\\assignedClasses.js"
+      },
+      {
+        "fullName": "assignedClasses",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\assignedClasses\\assignedClasses.js-meta.xml"
+      },
+      {
+        "fullName": "facultyPortal",
+        "type": "LightningComponentBundle",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\facultyPortal\\facultyPortal.js",
+        "error": "Unable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action class referenced as 'ParentPortalController'.\nUnable to find Apex action method referenced as 'MarksheetController.getMonthlyAttendanceReport'.\nUnable to find Apex action method referenced as 'MarksheetController"
+      },
+      {
+        "fullName": "vikasSchoolWelcome",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\vikasSchoolWelcome\\vikasSchoolWelcome.css"
+      },
+      {
+        "fullName": "vikasSchoolWelcome",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\vikasSchoolWelcome\\vikasSchoolWelcome.html"
+      },
+      {
+        "fullName": "vikasSchoolWelcome",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\vikasSchoolWelcome\\vikasSchoolWelcome.js"
+      },
+      {
+        "fullName": "vikasSchoolWelcome",
+        "type": "LightningComponentBundle",
+        "state": "Changed",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\vikasSchoolWelcome\\vikasSchoolWelcome.js-meta.xml"
+      },
+      {
+        "fullName": "PersonAccountAccess",
+        "type": "PermissionSet",
+        "state": "Unchanged",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\permissionsets\\PersonAccountAccess.permissionset-meta.xml"
+      }
+    ],
+    "zipFileCount": 27,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003hQDfCAM%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

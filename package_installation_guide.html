@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Installation & Setup Guide</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+            background: #f1f5f9;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: var(--secondary);
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+        }
+
+        .step-count {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+
+        .alert-important {
+            background: #fffbeb;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        .link-button {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .link-button:hover {
+            background: #1d4ed8;
+        }
+
+        ol,
+        ul {
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 40px 0;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>EduTrack Installation Guide</h1>
+        <p>A comprehensive step-by-step manual for the EduTrack School Management System.</p>
+
+        <hr>
+
+        <h2><span class="step-count">1</span> Enable Person Accounts</h2>
+        <p><strong>Required Prerequisite:</strong> Person Accounts must be enabled before installing the package.</p>
+        <ol>
+            <li>Log in to your Salesforce Org as a <strong>System Administrator</strong>.</li>
+            <li>Go to <strong>Setup</strong>.</li>
+            <li>In the Quick Find box, enter <strong>Account Settings</strong>.</li>
+            <li>Check if <strong>Allow Customer Support to enable Person Accounts</strong> is available.</li>
+            <li>Proceed to enable Person Accounts via the <strong>Enable</strong> button.</li>
+        </ol>
+        <div class="alert alert-important">
+            <strong>IMPORTANT:</strong> Person Accounts enablement is permanent and cannot be undone. Always verify you
+            are in the correct environment (Production or Sandbox).
+        </div>
+
+        <h2><span class="step-count">2</span> Package Installation</h2>
+        <p>Once Person Accounts are active, install the EduTrack managed package.</p>
+        <ol>
+            <li>Use the following installation link:</li>
+            <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04tOS00000MFB1hYAH"
+                class="link-button">Install EduTrack Package (v1.0.0-1)</a>
+            <li>Choose <strong>Install for All Users</strong>.</li>
+            <li>Click <strong>Install</strong>.</li>
+            <li>Wait for the confirmation email from Salesforce.</li>
+        </ol>
+
+        <h2><span class="step-count">3</span> Initial Configuration</h2>
+        <p>Configure the system to reflect your school's branding and operational structure.</p>
+
+        <h3>3.1 Permissions Assignment</h3>
+        <ul>
+            <li>Go to <strong>Setup > Permission Sets</strong>.</li>
+            <li>Select <strong>EduTrack Full Access</strong>.</li>
+            <li>Click <strong>Manage Assignments</strong> and assign to relevant users.</li>
+        </ul>
+
+        <h3>3.2 Setup Wizard</h3>
+        <ol>
+            <li>Open the <strong>EduPro Dashboard</strong> app from the App Launcher.</li>
+            <li>Complete the <strong>School Setup</strong> form.</li>
+            <li>Required fields: <code>School Name</code>, <code>Logo</code>, <code>Email</code>, <code>UPI IDs</code>.
+            </li>
+            <li>Click <strong>Save Setup</strong>.</li>
+        </ol>
+
+        <h3>3.3 Operational Setup</h3>
+        <ul>
+            <li><strong>Academic Year:</strong> Define the current academic cycle (e.g., 2025-2026).</li>
+            <li><strong>Classes & Sections:</strong> Create your primary class structures.</li>
+            <li><strong>Bank Accounts:</strong> Add payment collection accounts for automated invoicing.</li>
+        </ul>
+
+        <hr>
+
+        <div class="footer">
+            &copy; 2026 EduTrack Systems. All rights reserved.
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+﻿{
+  "status": 0,
+  "result": {
+    "success": true,
+    "compiled": true,
+    "compileProblem": "",
+    "exceptionMessage": "",
+    "exceptionStackTrace": "",
+    "line": -1,
+    "column": -1,
+    "logs": "65.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO\nExecute Anonymous: Account a = [SELECT Id, Name, (SELECT Id FROM Contacts) FROM Account WHERE Name LIKE '%SAKIBANDA%' ORDER BY CreatedDate DESC LIMIT 1];\nExecute Anonymous: Map<String, Object> fields = a.getPopulatedFieldsAsMap();\nExecute Anonymous: System.debug('Account Fields: ' + JSON.serializePretty(fields));\nExecute Anonymous: if (a.Contacts.size() > 0) {\nExecute Anonymous:     Contact c = [SELECT Id, Name FROM Contact WHERE Id = :a.Contacts[0].Id];\nExecute Anonymous:     System.debug('Contact Fields: ' + JSON.serializePretty(c.getPopulatedFieldsAsMap()));\nExecute Anonymous: }\n23:17:29.40 (40231180)|USER_INFO|[EXTERNAL]|005f6000003oifF|sunil@devorg.com|(GMT+05:30) India Standard Time (Asia/Kolkata)|GMT+05:30\n23:17:29.40 (40253031)|EXECUTION_STARTED\n23:17:29.40 (40278741)|CODE_UNIT_STARTED|[EXTERNAL]|execute_anonymous_apex\n23:17:29.40 (72033042)|USER_DEBUG|[3]|DEBUG|Account Fields: {\n  \"Contacts\" : [ {\n    \"attributes\" : {\n      \"type\" : \"Contact\",\n      \"url\" : \"/services/data/v65.0/sobjects/Contact/003f60000096cv3AAA\"\n    },\n    \"AccountId\" : \"001f600000NV56DAAT\",\n    \"Id\" : \"003f60000096cv3AAA\"\n  } ],\n  \"Name\" : \"SAKIBANDA SUNIL BABU\",\n  \"Id\" : \"001f600000NV56DAAT\"\n}\n23:17:29.40 (81789242)|USER_DEBUG|[6]|DEBUG|Contact Fields: {\n  \"Name\" : \"SAKIBANDA SUNIL BABU\",\n  \"Id\" : \"003f60000096cv3AAA\"\n}\n23:17:29.81 (81884904)|CUMULATIVE_LIMIT_USAGE\n23:17:29.81 (81884904)|LIMIT_USAGE_FOR_NS|(default)|\n  Number of SOQL queries: 2 out of 100\n  Number of query rows: 3 out of 50000\n  Number of SOSL queries: 0 out of 20\n  Number of DML statements: 0 out of 150\n  Number of Publish Immediate DML: 0 out of 150\n  Number of DML rows: 0 out of 10000\n  Maximum CPU time: 0 out of 10000\n  Maximum heap size: 0 out of 6000000\n  Number of callouts: 0 out of 100\n  Number of Email Invocations: 0 out of 10\n  Number of future calls: 0 out of 50\n  Number of queueable jobs added to the queue: 0 out of 50\n  Number of Mobile Apex push calls: 0 out of 10\n\n23:17:29.81 (81884904)|CUMULATIVE_LIMIT_USAGE_END\n\n23:17:29.40 (81957516)|CODE_UNIT_FINISHED|execute_anonymous_apex\n23:17:29.40 (81973446)|EXECUTION_FINISHED\n"
+  },
+  "warnings": []
+}

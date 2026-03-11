@@ -1,0 +1,92 @@
+﻿{
+  "status": 1,
+  "result": {
+    "checkOnly": false,
+    "completedDate": "2026-02-15T16:42:02.000Z",
+    "createdBy": "005f6000003oifF",
+    "createdByName": "Covenant Synergy",
+    "createdDate": "2026-02-15T16:42:01.000Z",
+    "details": {
+      "componentFailures": [
+        {
+          "changed": false,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-15T16:42:02.000Z",
+          "deleted": false,
+          "fileName": "lwc/eduProDashboard/eduProDashboard.html",
+          "fullName": "markup://c:eduProDashboard",
+          "problem": "[Line: 726, Col: 1] LWC1058: Invalid HTML syntax: closing-of-element-with-open-child-elements. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-closing-of-element-with-open-child-elements",
+          "problemType": "Error",
+          "success": false
+        }
+      ],
+      "componentSuccesses": [
+        {
+          "changed": true,
+          "componentType": "LightningComponentBundle",
+          "created": false,
+          "createdDate": "2026-02-15T16:42:02.000Z",
+          "deleted": false,
+          "fileName": "lwc/eduProDashboard",
+          "fullName": "eduProDashboard",
+          "id": "0Rbf6000000lnbZCAQ",
+          "success": true
+        },
+        {
+          "changed": true,
+          "componentType": "",
+          "created": false,
+          "createdDate": "2026-02-15T16:42:02.000Z",
+          "deleted": false,
+          "fileName": "package.xml",
+          "fullName": "package.xml",
+          "success": true
+        }
+      ],
+      "runTestResult": {
+        "numFailures": 0,
+        "numTestsRun": 0,
+        "totalTime": 0,
+        "codeCoverage": [],
+        "codeCoverageWarnings": [],
+        "failures": [],
+        "flowCoverage": [],
+        "flowCoverageWarnings": [],
+        "successes": []
+      }
+    },
+    "done": true,
+    "id": "0Aff6000003inCzCAI",
+    "ignoreWarnings": false,
+    "lastModifiedDate": "2026-02-15T16:42:02.000Z",
+    "numberComponentErrors": 1,
+    "numberComponentsDeployed": 1,
+    "numberComponentsTotal": 2,
+    "numberFiles": "7",
+    "numberTestErrors": 0,
+    "numberTestsCompleted": 0,
+    "numberTestsTotal": 0,
+    "rollbackOnError": true,
+    "runTestsEnabled": false,
+    "startDate": "2026-02-15T16:42:01.000Z",
+    "status": "Failed",
+    "success": false,
+    "zipSize": 11951,
+    "files": [
+      {
+        "fullName": "eduProDashboard",
+        "type": "LightningComponentBundle",
+        "state": "Failed",
+        "problemType": "Error",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\lwc\\eduProDashboard\\eduProDashboard.html",
+        "lineNumber": 726,
+        "columnNumber": 1,
+        "error": "LWC1058: Invalid HTML syntax: closing-of-element-with-open-child-elements. For more information, please visit https://html.spec.whatwg.org/multipage/parsing.html#parse-error-closing-of-element-with-open-child-elements (726:1)"
+      }
+    ],
+    "zipFileCount": 5,
+    "deployUrl": "https://developmentorg3-dev-ed.develop.my.salesforce.com/lightning/setup/DeployStatus/page?address=%2Fchangemgmt%2FmonitorDeploymentsDetails.apexp%3FasyncId%3D0Aff6000003inCzCAI%26retURL%3D%252Fchangemgmt%252FmonitorDeployment.apexp"
+  },
+  "warnings": []
+}

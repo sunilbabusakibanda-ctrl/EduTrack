@@ -1,0 +1,201 @@
+<template>
+    <div class="attendance-container">
+        
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-content">
+                <div>
+                    <h1 class="page-title">{titleLabel}</h1>
+                    <p class="page-subtitle">{subtitleLabel}</p>
+                </div>
+                <button class="btn-report" onclick={handleToggleReport}>
+                    <lightning-icon icon-name={reportBtnIcon} 
+                                    size="small" 
+                                    variant="inverse"
+                                    class="slds-m-right_x-small"></lightning-icon>
+                    {reportBtnLabel}
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Tracker View -->
+        <template if:false={showReport}>
+            <!-- Controls Card -->
+
+        <div class="controls-card">
+            <div class="control-group date-group">
+                <label>Date</label>
+                <input type="date" 
+                       class="modern-input" 
+                       value={selectedDate} 
+                       max={todayDate}
+                       onchange={handleDateChange}>
+            </div>
+            
+            <div class="control-group class-group">
+                <label>Class</label>
+                <lightning-combobox
+                    name="class"
+                    value={selectedClass}
+                    placeholder="Select Class"
+                    options={classOptions}
+                    onchange={handleClassChange}
+                    variant="label-hidden"
+                    class="modern-combobox">
+                </lightning-combobox>
+            </div>
+
+            <div class="control-group section-group">
+                <label>Section</label>
+                <lightning-combobox
+                    name="section"
+                    value={selectedSection}
+                    placeholder="Select Section"
+                    options={sectionOptions}
+                    onchange={handleSectionChange}
+                    variant="label-hidden"
+                    class="modern-combobox"
+                    disabled={isSectionDisabled}>
+                </lightning-combobox>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <template lwc:if={loading}>
+            <div class="loading-container">
+                <lightning-spinner alternative-text="Loading..." size="medium" variant="brand"></lightning-spinner>
+                <p>Loading data...</p>
+            </div>
+        </template>
+
+        <!-- Success Card (Summary View) -->
+        <template lwc:if={isSuccess}>
+            <div class="success-card">
+                <span class="success-icon">🎉</span>
+                <h2 class="success-title">Attendance Submitted!</h2>
+                <p class="success-subtitle">{formattedSelectedClass} • {formattedSelectedSection} • {selectedDate}</p>
+                
+                <div class="summary-stats">
+                    <div class="summary-stat present">
+                        <span class="summary-value">{stats.present}</span>
+                        <span class="summary-label">Present</span>
+                    </div>
+                    <div class="summary-stat absent">
+                        <span class="summary-value">{stats.absent}</span>
+                        <span class="summary-label">Absent</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <template lwc:if={isReadOnly}>
+                        <p class="read-only-msg">Attendance for past dates cannot be edited.</p>
+                        <button class="btn-action secondary" onclick={handleViewAttendance}>View Attendance</button>
+                    </template>
+                    <template lwc:else>
+                        <button class="btn-action" onclick={handleUpdateAttendance}>Update Attendance</button>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- Student List (Edit/View Mode) -->
+        <template lwc:else>
+            <template lwc:if={hasStudents}>
+                <!-- Stats Summary (Filter Mode) -->
+                <div class="stats-grid">
+                    <div class={totalCardClass} onclick={handleFilterClick} data-filter="All" title="Show All Students">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total</span>
+                            <span class="stat-value">{stats.total}</span>
+                        </div>
+                    </div>
+                    <div class={presentCardClass} onclick={handleFilterClick} data-filter="Present" title="Show Present Only">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Present</span>
+                            <span class="stat-value">{stats.present}</span>
+                        </div>
+                    </div>
+                    <div class={absentCardClass} onclick={handleFilterClick} data-filter="Absent" title="Show Absent Only">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Absent</span>
+                            <span class="stat-value">{stats.absent}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="student-list-container">
+                    <div class="list-header">
+                        <div class="header-left">
+                            <h2>Student List</h2>
+                            <span class="list-subtitle">{listSubtitle}</span>
+                        </div>
+                        <template lwc:if={sessionExists}>
+                            <button class="btn-close" onclick={handleCloseList} title="Close & Return to Summary">X</button>
+                        </template>
+                    </div>
+                    
+                    <div class="students-grid">
+                        <template for:each={displayedStudents} for:item="student">
+                            <div key={student.id} 
+                                 class={student.cardClass} 
+                                 data-id={student.id} 
+                                 onclick={handleStudentClick}>
+                                
+                                <div class="student-avatar">
+                                    <span class="initials">{student.initials}</span>
+                                </div>
+                                
+                                <div class="student-info">
+                                    <h3 class="student-name">{student.name}</h3>
+                                    <p class="student-roll">Roll No: {student.rollNumber}</p>
+                                </div>
+
+                                <template lwc:if={showStatusBadge}>
+                                    <div class="status-badge">
+                                        {student.status}
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Submit Action (Hidden if ReadOnly) -->
+                        <div class="action-footer">
+                            <template lwc:if={isReadOnly}>
+                                <div class="read-only-notice">
+                                    <lightning-icon icon-name="utility:lock" size="x-small" variant="warning" class="slds-m-right_x-small"></lightning-icon>
+                                    <span>Historical records are in Read-Only mode.</span>
+                                </div>
+                            </template>
+                            <template lwc:else>
+                                <button class="btn-submit" onclick={handleSubmit} disabled={isSubmitDisabled}>
+                                    {submitLabel}
+                                </button>
+                            </template>
+                        </div>
+                </div>
+            </template>
+            
+            <!-- Empty State -->
+            <template lwc:if={showEmptyState}>
+                <div class="empty-state">
+                    <div class="empty-illustration">📚</div>
+                    <h3>No Students Found</h3>
+                    <p>Select a Class and Section to view students.</p>
+                </div>
+            </template>
+        </template> <!-- End of Else (List Mode) -->
+
+        </template>
+
+        <!-- Report View -->
+        <template if:true={showReport}>
+            <div class="report-view">
+                <c-attendance-report></c-attendance-report>
+            </div>
+        </template>
+    </div>
+</template>

@@ -1,0 +1,47 @@
+﻿{
+  "status": 0,
+  "result": {
+    "done": true,
+    "fileProperties": [
+      {
+        "createdById": "005f6000003oewdAAA",
+        "createdByName": "salesforce.com, inc.",
+        "createdDate": "2026-02-10T12:43:04.000Z",
+        "fileName": "unpackaged/layouts/Invoice-Invoice Layout.layout",
+        "fullName": "Invoice-Invoice Layout",
+        "id": "00hf6000003SNMkAAO",
+        "lastModifiedById": "005f6000003oewdAAA",
+        "lastModifiedByName": "salesforce.com, inc.",
+        "lastModifiedDate": "2026-02-10T12:43:04.000Z",
+        "manageableState": "unmanaged",
+        "type": "Layout"
+      },
+      {
+        "createdById": "005f6000003oifFAAQ",
+        "createdByName": "Covenant Synergy",
+        "createdDate": "2026-02-16T11:13:13.519Z",
+        "fileName": "unpackaged/package.xml",
+        "fullName": "unpackaged/package.xml",
+        "id": "",
+        "lastModifiedById": "005f6000003oifFAAQ",
+        "lastModifiedByName": "Covenant Synergy",
+        "lastModifiedDate": "2026-02-16T11:13:13.519Z",
+        "manageableState": "unmanaged",
+        "type": "Package"
+      }
+    ],
+    "id": "09Sf6000000NC5JEAW",
+    "status": "Succeeded",
+    "success": true,
+    "messages": [],
+    "files": [
+      {
+        "fullName": "Invoice-Invoice Layout",
+        "type": "Layout",
+        "state": "Created",
+        "filePath": "C:\\Users\\sunil\\VikasSchool\\force-app\\main\\default\\layouts\\Invoice-Invoice Layout.layout-meta.xml"
+      }
+    ]
+  },
+  "warnings": []
+}
