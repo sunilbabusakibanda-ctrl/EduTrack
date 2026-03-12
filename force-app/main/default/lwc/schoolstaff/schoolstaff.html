@@ -1,97 +1,86 @@
 <template>
-    <div class="v3-root">
+    <div class="ss-wrap">
 
-        <!-- ════════ MASTHEAD ════════ -->
-        <header class="masthead">
-            <div class="masthead-left">
-                <div class="masthead-kicker">
-                    <span class="kicker-line"></span>
-                    <span class="kicker-text">STAFF DIRECTORY</span>
-                    <span class="kicker-line"></span>
-                </div>
-                <h1 class="masthead-title">
-                    School <em>Staff</em>
-                </h1>
-                <p class="masthead-meta">
-                    {totalStaffCount} members &nbsp;·&nbsp; {teachingCount} teaching
-                    &nbsp;·&nbsp; {nonTeachingCount} non-teaching
-                    &nbsp;·&nbsp; Payroll {totalMonthlySalary}/mo
-                </p>
+        <!-- ══ LOADING SPINNER ══ -->
+        <template lwc:if={isLoading}>
+            <div class="ss-loading-overlay">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
             </div>
-            <div class="masthead-right">
-                <button class="v3-btn outline-btn" onclick={handleExportStaff}>
-                    Export
-                </button>
-                <button class="v3-btn solid-btn" onclick={handleAddStaff}>
-                    + Add Member
-                </button>
-            </div>
-        </header>
+        </template>
 
-        <!-- ════════ SCOREBAND ════════ -->
-        <div class="scoreband">
-            <div class="score-block" data-color="forest">
-                <div class="sb-number">{totalStaffCount}</div>
-                <div class="sb-label">Total Staff</div>
-                <div class="sb-bar" style="width:100%"></div>
+        <!-- ══ PAGE HEADER ══ -->
+        <div class="page-header">
+            <div class="page-title">
+                <h2>School Staff</h2>
+                <span class="feature-tag new">👥 Staff Directory</span>
             </div>
-            <div class="score-divider"></div>
-            <div class="score-block" data-color="gold">
-                <div class="sb-number">{teachingCount}</div>
-                <div class="sb-label">Teaching</div>
-                <div class="sb-bar" style={teachingBarStyle}></div>
-            </div>
-            <div class="score-divider"></div>
-            <div class="score-block" data-color="clay">
-                <div class="sb-number">{nonTeachingCount}</div>
-                <div class="sb-label">Non-Teaching</div>
-                <div class="sb-bar" style={nonTeachingBarStyle}></div>
-            </div>
-            <div class="score-divider"></div>
-            <div class="score-block" data-color="forest">
-                <div class="sb-number">{paidCount}</div>
-                <div class="sb-label">Salary Paid</div>
-                <div class="sb-bar" style={paidBarStyle}></div>
-            </div>
-            <div class="score-divider"></div>
-            <div class="score-block" data-color="rust">
-                <div class="sb-number">{pendingCount}</div>
-                <div class="sb-label">Pending</div>
-                <div class="sb-bar" style={pendingBarStyle}></div>
-            </div>
-            <div class="score-divider"></div>
-            <div class="score-block payroll-block">
-                <div class="sb-number payroll-num">{totalMonthlySalary}</div>
-                <div class="sb-label">Monthly Payroll</div>
-                <div class="sb-bar" style="width:100%;background:var(--forest)"></div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick={handleExportStaff}>
+                    <span>📤</span> Export
+                </button>
+                <button class="btn btn-secondary" onclick={handleAddStaff}>
+                    <span>➕</span> Add Staff
+                </button>
             </div>
         </div>
 
-        <!-- ════════ SEGMENT BAR ════════ -->
-        <div class="segment-bar">
-            <div class="segments">
-                <button class={allSegClass} data-tab="all" onclick={handleTabChange}>
-                    All
-                </button>
-                <button class={teachingSegClass} data-tab="teaching" onclick={handleTabChange}>
-                    Teaching
-                </button>
-                <button class={nonTeachingSegClass} data-tab="non-teaching" onclick={handleTabChange}>
-                    Non-Teaching
-                </button>
-                <button class={salarySegClass} data-tab="salary" onclick={handleTabChange}>
-                    Payroll
-                </button>
+        <!-- ══ STATS GRID ══ -->
+        <div class="stats-grid animate-in">
+            <div class="stat-card blue">
+                <div class="stat-header">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-trend up"><span>↑</span>{totalStaffCount}</div>
+                </div>
+                <div class="stat-value">{totalStaffCount}</div>
+                <div class="stat-label">Total Staff</div>
+                <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-header">
+                    <div class="stat-icon">👩‍🏫</div>
+                    <div class="stat-trend up"><span>↑</span>{teachingCount}</div>
+                </div>
+                <div class="stat-value">{teachingCount}</div>
+                <div class="stat-label">Teaching Staff</div>
+                <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-header">
+                    <div class="stat-icon">🧹</div>
+                    <div class="stat-trend up"><span>↑</span>{nonTeachingCount}</div>
+                </div>
+                <div class="stat-value">{nonTeachingCount}</div>
+                <div class="stat-label">Non-Teaching Staff</div>
+                <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-header">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-trend up"><span>↑</span>{paidCount} paid</div>
+                </div>
+                <div class="stat-value">{totalMonthlySalary}</div>
+                <div class="stat-label">Monthly Payroll</div>
+                <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+            </div>
+        </div>
+
+        <!-- ══ TABS ══ -->
+        <div class="ss-tabs-row">
+            <div class="tabs">
+                <button class={allTabClass}         data-tab="all"          onclick={handleTabChange}>All Staff</button>
+                <button class={teachingTabClass}    data-tab="teaching"     onclick={handleTabChange}>👩‍🏫 Teaching</button>
+                <button class={nonTeachingTabClass} data-tab="non-teaching" onclick={handleTabChange}>🧹 Non-Teaching</button>
+                <button class={salaryTabClass}      data-tab="salary"       onclick={handleTabChange}>💳 Payroll</button>
             </div>
 
             <template lwc:if={isStaffListView}>
-                <div class="seg-right">
-                    <div class="search-editorial">
-                        <span class="se-label">SEARCH</span>
-                        <input type="text" placeholder="Name, role, subject…"
+                <div class="ss-filter-row">
+                    <div class="ss-search-box">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Search staff…"
                             value={searchTerm} oninput={handleSearchChange} />
                     </div>
-                    <select class="seg-select" onchange={handleDeptFilter}>
+                    <select class="ss-select" onchange={handleDeptFilter}>
                         <option value="">All Departments</option>
                         <option value="Science">Science</option>
                         <option value="Mathematics">Mathematics</option>
@@ -106,7 +95,7 @@
                         <option value="Transport">Transport</option>
                         <option value="Canteen">Canteen</option>
                     </select>
-                    <select class="seg-select" onchange={handleStatusFilter}>
+                    <select class="ss-select" onchange={handleStatusFilter}>
                         <option value="">All Status</option>
                         <option value="Active">Active</option>
                         <option value="On Leave">On Leave</option>
@@ -116,281 +105,268 @@
             </template>
         </div>
 
-        <!-- ════════ STAFF ROSTER ════════ -->
+        <!-- ══ STAFF CARDS ══ -->
         <template lwc:if={isStaffListView}>
             <template lwc:if={hasFilteredStaff}>
-                <div class="roster-grid">
+                <div class="staff-cards-grid animate-in">
                     <template for:each={filteredStaff} for:item="member">
-                        <article key={member.id} class="roster-card"
-                            data-id={member.id} onclick={handleStaffCardClick}>
-
-                            <!-- left color tab -->
-                            <div class={member.tabClass}></div>
-
-                            <div class="rc-body">
-                                <!-- Top row -->
-                                <div class="rc-top">
-                                    <div class={member.monogramClass}>
-                                        {member.initials}
+                        <div key={member.id} class="staff-card" data-id={member.id}
+                            onclick={handleStaffCardClick}>
+                            <div class={member.cardBandClass}></div>
+                            <div class="scard-body">
+                                <div class="scard-top">
+                                    <div class="scard-avatar-wrap">
+                                        <div class={member.avatarClass}>{member.initials}</div>
+                                        <span class={member.statusDotClass}></span>
                                     </div>
-                                    <div class="rc-id-tag">{member.employeeId}</div>
-                                    <div class={member.statusDotClass}></div>
+                                    <div class="scard-emp-id">{member.employeeId}</div>
                                 </div>
-
-                                <!-- Name block -->
-                                <div class="rc-name-block">
-                                    <div class="rc-name">{member.name}</div>
-                                    <div class="rc-title">{member.designation}</div>
-                                </div>
-
-                                <!-- Dept rule -->
-                                <div class="rc-dept-rule">
-                                    <span class="rc-dept-text">{member.department}</span>
-                                    <span class="rc-rule-line"></span>
-                                </div>
-
-                                <!-- Detail rows -->
-                                <div class="rc-details">
-                                    <div class="rc-detail-row">
-                                        <span class="rc-detail-key">EMAIL</span>
-                                        <span class="rc-detail-val">{member.email}</span>
+                                <div class="scard-name">{member.name}</div>
+                                <div class="scard-role">{member.designation}</div>
+                                <div class="scard-dept-tag">{member.department}</div>
+                                <div class="scard-info">
+                                    <div class="scard-info-row">
+                                        <span>📧</span>
+                                        <span class="scard-info-val">{member.email}</span>
                                     </div>
-                                    <div class="rc-detail-row">
-                                        <span class="rc-detail-key">PHONE</span>
-                                        <span class="rc-detail-val">{member.phone}</span>
+                                    <div class="scard-info-row">
+                                        <span>📱</span>
+                                        <span class="scard-info-val">{member.phone}</span>
                                     </div>
                                     <template lwc:if={member.subject}>
-                                        <div class="rc-detail-row">
-                                            <span class="rc-detail-key">SUBJECT</span>
-                                            <span class="rc-detail-val">{member.subject}</span>
+                                        <div class="scard-info-row">
+                                            <span>📚</span>
+                                            <span class="scard-info-val">{member.subject}</span>
                                         </div>
                                     </template>
-                                    <div class="rc-detail-row">
-                                        <span class="rc-detail-key">JOINED</span>
-                                        <span class="rc-detail-val">{member.joiningDate}</span>
+                                    <div class="scard-info-row">
+                                        <span>📅</span>
+                                        <span class="scard-info-val">Joined {member.joiningDate}</span>
                                     </div>
                                 </div>
-
-                                <!-- Footer -->
-                                <div class="rc-footer">
-                                    <span class={member.typeLabelClass}>{member.staffType}</span>
-                                    <span class="rc-net-salary">{member.netSalaryFmt} / mo</span>
+                                <div class="scard-footer">
+                                    <span class={member.typeBadgeClass}>{member.staffType}</span>
+                                    <span class={member.statusBadgeClass}>{member.status}</span>
+                                    <span class="scard-salary">{member.netSalaryFmt}/mo</span>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                     </template>
                 </div>
             </template>
             <template lwc:else>
-                <div class="v3-empty">
-                    <div class="ve-glyph">◎</div>
-                    <h3>No staff members found</h3>
-                    <p>Refine your search or add the first staff member.</p>
-                    <button class="v3-btn solid-btn" onclick={handleAddStaff}>+ Add Staff Member</button>
+                <div class="card ss-empty animate-in">
+                    <div class="ss-empty-icon">👥</div>
+                    <h3>No Staff Found</h3>
+                    <p>No staff members match your current filters.</p>
+                    <button class="btn btn-secondary" onclick={handleAddStaff}>
+                        <span>➕</span> Add First Staff Member
+                    </button>
                 </div>
             </template>
         </template>
 
-        <!-- ════════ PAYROLL LEDGER ════════ -->
+        <!-- ══ PAYROLL VIEW ══ -->
         <template lwc:if={isSalaryView}>
-            <div class="payroll-ledger">
-
-                <!-- Control strip -->
-                <div class="ledger-controls">
-                    <div class="lc-left">
-                        <span class="lc-label">PERIOD</span>
-                        <select class="ledger-select" onchange={handleMonthChange}>
-                            <option value="Jan 2025">January 2025</option>
-                            <option value="Feb 2025">February 2025</option>
-                            <option value="Mar 2025">March 2025</option>
-                            <option value="Apr 2025">April 2025</option>
-                            <option value="May 2025">May 2025</option>
-                            <option value="Jun 2025">June 2025</option>
-                            <option value="Jul 2025">July 2025</option>
-                            <option value="Aug 2025">August 2025</option>
-                            <option value="Sep 2025">September 2025</option>
-                            <option value="Oct 2025">October 2025</option>
-                            <option value="Nov 2025">November 2025</option>
-                            <option value="Dec 2025">December 2025</option>
-                            <option value="Jan 2026">January 2026</option>
-                            <option value="Feb 2026">February 2026</option>
-                            <option value="Mar 2026" selected>March 2026</option>
-                        </select>
+            <div class="stats-grid animate-in" style="margin-bottom:24px;">
+                <div class="stat-card blue">
+                    <div class="stat-header">
+                        <div class="stat-icon">💼</div>
+                        <div class="stat-trend up"><span>↑</span>Monthly</div>
                     </div>
-                    <div class="lc-right">
-                        <button class="v3-btn outline-btn sm" onclick={handleGeneratePayslips}>
-                            Generate Payslips
-                        </button>
-                        <button class="v3-btn solid-btn sm" onclick={handleProcessPayroll}>
-                            Process All Salaries
-                        </button>
-                    </div>
+                    <div class="stat-value">{totalMonthlySalary}</div>
+                    <div class="stat-label">Total Payroll</div>
+                    <div class="stat-footer"><strong>Real-time</strong> from Org</div>
                 </div>
-
-                <!-- Ledger heading row -->
-                <div class="ledger-heading">
-                    <div class="lh-title">Salary Ledger</div>
-                    <div class="lh-period">— {selectedPayrollMonth}</div>
-                </div>
-
-                <!-- Ledger rows -->
-                <div class="ledger-table">
-                    <div class="lt-header">
-                        <span class="lth-cell wide">Staff Member</span>
-                        <span class="lth-cell">Type</span>
-                        <span class="lth-cell num">Basic</span>
-                        <span class="lth-cell num">Allowances</span>
-                        <span class="lth-cell num">Deductions</span>
-                        <span class="lth-cell num bold">Net Salary</span>
-                        <span class="lth-cell">Status</span>
-                        <span class="lth-cell center">Action</span>
+                <div class="stat-card green">
+                    <div class="stat-header">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-trend up"><span>↑</span>Paid</div>
                     </div>
+                    <div class="stat-value">{paidCount}</div>
+                    <div class="stat-label">Salaries Paid</div>
+                    <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-header">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-trend down"><span>↓</span>Pending</div>
+                    </div>
+                    <div class="stat-value">{pendingCount}</div>
+                    <div class="stat-label">Pending Salaries</div>
+                    <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-header">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-trend up"><span>↑</span>Annual</div>
+                    </div>
+                    <div class="stat-value">{totalAnnualSalary}</div>
+                    <div class="stat-label">Annual Budget</div>
+                    <div class="stat-footer"><strong>Real-time</strong> from Org</div>
+                </div>
+            </div>
 
-                    <template for:each={salaryRecords} for:item="rec">
-                        <div key={rec.id} class="lt-row">
-                            <div class="ltc-cell wide">
-                                <div class={rec.monogramClass}>{rec.initials}</div>
-                                <div class="ltc-info">
-                                    <div class="ltc-name">{rec.name}</div>
-                                    <div class="ltc-role">{rec.designation}</div>
-                                </div>
-                            </div>
-                            <div class="ltc-cell">
-                                <span class={rec.typeLabelClass}>{rec.staffType}</span>
-                            </div>
-                            <div class="ltc-cell num">{rec.basicSalary}</div>
-                            <div class="ltc-cell num green-amt">{rec.allowances}</div>
-                            <div class="ltc-cell num red-amt">{rec.deductions}</div>
-                            <div class="ltc-cell num bold-amt">{rec.netSalary}</div>
-                            <div class="ltc-cell">
-                                <span class={rec.salaryStatusClass}>{rec.salaryStatus}</span>
-                            </div>
-                            <div class="ltc-cell center">
-                                <button class={rec.actionBtnClass} data-id={rec.id}
-                                    onclick={handlePaySalary}>{rec.actionLabel}</button>
-                            </div>
+            <div class="card animate-in">
+                <div class="card-header">
+                    <div class="card-title"><span>💳</span> Payroll Management</div>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <div class="payroll-period-wrap">
+                            <span class="period-label">Period:</span>
+                            <select class="ss-select" onchange={handleMonthChange}>
+                                <option value="Jan 2025">Jan 2025</option>
+                                <option value="Feb 2025">Feb 2025</option>
+                                <option value="Mar 2025">Mar 2025</option>
+                                <option value="Apr 2025">Apr 2025</option>
+                                <option value="May 2025">May 2025</option>
+                                <option value="Jun 2025">Jun 2025</option>
+                                <option value="Jul 2025">Jul 2025</option>
+                                <option value="Aug 2025">Aug 2025</option>
+                                <option value="Sep 2025">Sep 2025</option>
+                                <option value="Oct 2025">Oct 2025</option>
+                                <option value="Nov 2025">Nov 2025</option>
+                                <option value="Dec 2025">Dec 2025</option>
+                                <option value="Jan 2026">Jan 2026</option>
+                                <option value="Feb 2026">Feb 2026</option>
+                                <option value="Mar 2026" selected>Mar 2026</option>
+                            </select>
                         </div>
-                    </template>
+                        <button class="btn btn-secondary" onclick={handleGeneratePayslips}>
+                            <span>📄</span> Generate Payslips
+                        </button>
+                        <button class="btn btn-secondary" onclick={handleProcessPayroll}>
+                            <span>⚡</span> Process All
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Ledger total footer -->
-                <div class="ledger-total">
-                    <span class="lt-label">TOTAL MONTHLY PAYROLL</span>
-                    <span class="lt-amount">{totalMonthlySalary}</span>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Type</th>
+                                <th>Basic</th>
+                                <th>Allowances</th>
+                                <th>Deductions</th>
+                                <th>Net Salary</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={salaryRecords} for:item="rec">
+                                <tr key={rec.staffId}>
+                                    <td>
+                                        <div class="student-info">
+                                            <div class={rec.avatarClass}>{rec.initials}</div>
+                                            <div class="student-details">
+                                                <div class="name">{rec.staffName}</div>
+                                                <div class="id">{rec.designation}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class={rec.typeBadgeClass}>{rec.staffType}</span></td>
+                                    <td style="font-weight:600;">{rec.basicSalary}</td>
+                                    <td style="font-weight:600;color:var(--success);">{rec.allowances}</td>
+                                    <td style="font-weight:600;color:var(--danger);">{rec.deductions}</td>
+                                    <td style="font-weight:800;color:var(--primary);font-size:15px;">{rec.netSalary}</td>
+                                    <td><span class={rec.salaryStatusClass}>{rec.salaryStatus}</span></td>
+                                    <td>
+                                        <button class={rec.actionBtnClass} data-id={rec.staffId}
+                                            onclick={handlePaySalary}>{rec.actionLabel}</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </template>
 
-        <!-- ════════ ADD / EDIT MODAL ════════ -->
+        <!-- ══ ADD/EDIT MODAL ══ -->
         <template lwc:if={showStaffModal}>
-            <div class="v3-overlay" onclick={handleModalOverlayClick}>
-                <div class="v3-drawer" onclick={stopPropagation}>
-
-                    <div class="drawer-header">
-                        <div class="dh-left">
-                            <div class="dh-tag">
-                                <span class="dh-tag-line"></span>
-                                <span>{modalEyebrow}</span>
-                            </div>
-                            <h2 class="dh-title">{modalTitle}</h2>
-                        </div>
-                        <button class="v3-close-btn" onclick={handleCloseModal}>✕</button>
+            <div class="ss-modal-overlay" onclick={handleModalOverlayClick}>
+                <div class="ss-modal" onclick={stopPropagation}>
+                    <div class="ss-modal-header">
+                        <div class="card-title"><span>👤</span> {modalTitle}</div>
+                        <button class="ss-close-btn" onclick={handleCloseModal}>✕</button>
                     </div>
+                    <div class="ss-modal-body">
 
-                    <div class="drawer-body">
-
-                        <!-- Type toggle -->
-                        <div class="v3-type-toggle">
+                        <!-- Teaching / Non-Teaching toggle -->
+                        <div class="ss-type-toggle">
                             <button class={teachingToggleClass} data-type="Teaching"
-                                onclick={handleStaffTypeChange}>
-                                Teaching Staff
-                            </button>
+                                onclick={handleStaffTypeChange}>👩‍🏫 Teaching Staff</button>
                             <button class={nonTeachingToggleClass} data-type="Non-Teaching"
-                                onclick={handleStaffTypeChange}>
-                                Non-Teaching
-                            </button>
+                                onclick={handleStaffTypeChange}>🧹 Non-Teaching</button>
                         </div>
 
-                        <!-- PERSONAL -->
-                        <div class="drawer-section">
-                            <div class="ds-heading">
-                                <span class="ds-num">01</span>
-                                <span class="ds-label">Personal Information</span>
-                            </div>
-                            <div class="v3-form-grid">
-                                <div class="v3-fg">
-                                    <label>First Name *</label>
-                                    <input type="text" class="v3-input"
-                                        placeholder="e.g. Ramesh" data-field="firstName"
-                                        value={formData.firstName} oninput={handleFormInput} />
+                        <!-- Personal -->
+                        <div class="ss-form-section">
+                            <div class="ss-section-heading">Personal Information</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">First Name *</label>
+                                    <input type="text" class="form-input" placeholder="First Name"
+                                        data-field="firstName" value={formData.firstName} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Last Name *</label>
-                                    <input type="text" class="v3-input"
-                                        placeholder="e.g. Kumar" data-field="lastName"
-                                        value={formData.lastName} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">Last Name *</label>
+                                    <input type="text" class="form-input" placeholder="Last Name"
+                                        data-field="lastName" value={formData.lastName} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Gender</label>
-                                    <select class="v3-input" data-field="gender" onchange={handleFormInput}>
+                                <div class="form-group">
+                                    <label class="form-label">Gender</label>
+                                    <select class="form-input" data-field="gender" onchange={handleFormInput}>
                                         <option value="">Select</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Date of Birth</label>
-                                    <input type="date" class="v3-input" data-field="dob"
+                                <div class="form-group">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-input" data-field="dob"
                                         value={formData.dob} oninput={handleFormInput} />
                                 </div>
                             </div>
                         </div>
 
-                        <!-- CONTACT -->
-                        <div class="drawer-section">
-                            <div class="ds-heading">
-                                <span class="ds-num">02</span>
-                                <span class="ds-label">Contact Details</span>
-                            </div>
-                            <div class="v3-form-grid">
-                                <div class="v3-fg">
-                                    <label>Email *</label>
-                                    <input type="email" class="v3-input"
-                                        placeholder="name@school.com" data-field="email"
-                                        value={formData.email} oninput={handleFormInput} />
+                        <!-- Contact -->
+                        <div class="ss-form-section">
+                            <div class="ss-section-heading">Contact Details</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" class="form-input" placeholder="email@school.com"
+                                        data-field="email" value={formData.email} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Phone *</label>
-                                    <input type="tel" class="v3-input"
-                                        placeholder="+91 9XXXXXXXXX" data-field="phone"
-                                        value={formData.phone} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">Phone *</label>
+                                    <input type="tel" class="form-input" placeholder="+91 9XXXXXXXXX"
+                                        data-field="phone" value={formData.phone} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg v3-fg-full">
-                                    <label>Address</label>
-                                    <input type="text" class="v3-input"
-                                        placeholder="Full address" data-field="address"
-                                        value={formData.address} oninput={handleFormInput} />
+                                <div class="form-group ss-full-col">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" class="form-input" placeholder="Full Address"
+                                        data-field="address" value={formData.address} oninput={handleFormInput} />
                                 </div>
                             </div>
                         </div>
 
-                        <!-- PROFESSIONAL -->
-                        <div class="drawer-section">
-                            <div class="ds-heading">
-                                <span class="ds-num">03</span>
-                                <span class="ds-label">Professional Details</span>
-                            </div>
-                            <div class="v3-form-grid">
-                                <div class="v3-fg">
-                                    <label>Employee ID</label>
-                                    <input type="text" class="v3-input v3-readonly"
-                                        readonly data-field="employeeId"
-                                        value={formData.employeeId} />
+                        <!-- Professional -->
+                        <div class="ss-form-section">
+                            <div class="ss-section-heading">Professional Details</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Employee ID</label>
+                                    <input type="text" class="form-input" readonly
+                                        data-field="employeeId" value={formData.employeeId} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Designation *</label>
-                                    <select class="v3-input" data-field="designation" onchange={handleFormInput}>
+                                <div class="form-group">
+                                    <label class="form-label">Designation *</label>
+                                    <select class="form-input" data-field="designation" onchange={handleFormInput}>
                                         <option value="">Select</option>
                                         <template lwc:if={isTeachingType}>
                                             <option value="Principal">Principal</option>
@@ -414,9 +390,9 @@
                                         </template>
                                     </select>
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Department *</label>
-                                    <select class="v3-input" data-field="department" onchange={handleFormInput}>
+                                <div class="form-group">
+                                    <label class="form-label">Department *</label>
+                                    <select class="form-input" data-field="department" onchange={handleFormInput}>
                                         <option value="">Select</option>
                                         <template lwc:if={isTeachingType}>
                                             <option value="Science">Science</option>
@@ -438,173 +414,178 @@
                                         </template>
                                     </select>
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Joining Date *</label>
-                                    <input type="date" class="v3-input" data-field="joiningDate"
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-input" data-field="status" onchange={handleFormInput}>
+                                        <option value="Active">Active</option>
+                                        <option value="On Leave">On Leave</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Joining Date *</label>
+                                    <input type="date" class="form-input" data-field="joiningDate"
                                         value={formData.joiningDate} oninput={handleFormInput} />
                                 </div>
                                 <template lwc:if={isTeachingType}>
-                                    <div class="v3-fg">
-                                        <label>Subject Taught</label>
-                                        <input type="text" class="v3-input"
-                                            placeholder="e.g. Physics" data-field="subject"
-                                            value={formData.subject} oninput={handleFormInput} />
+                                    <div class="form-group">
+                                        <label class="form-label">Subject Taught</label>
+                                        <input type="text" class="form-input" placeholder="e.g. Physics"
+                                            data-field="subject" value={formData.subject} oninput={handleFormInput} />
                                     </div>
-                                    <div class="v3-fg">
-                                        <label>Qualification</label>
-                                        <input type="text" class="v3-input"
-                                            placeholder="e.g. M.Sc, B.Ed" data-field="qualification"
-                                            value={formData.qualification} oninput={handleFormInput} />
+                                    <div class="form-group">
+                                        <label class="form-label">Qualification</label>
+                                        <input type="text" class="form-input" placeholder="e.g. M.Sc, B.Ed"
+                                            data-field="qualification" value={formData.qualification}
+                                            oninput={handleFormInput} />
                                     </div>
                                 </template>
                             </div>
                         </div>
 
-                        <!-- SALARY -->
-                        <div class="drawer-section">
-                            <div class="ds-heading">
-                                <span class="ds-num">04</span>
-                                <span class="ds-label">Salary Structure</span>
-                            </div>
-                            <div class="v3-form-grid three-col">
-                                <div class="v3-fg">
-                                    <label>Basic Salary (₹) *</label>
-                                    <input type="number" class="v3-input"
-                                        placeholder="35000" data-field="basicSalary"
-                                        value={formData.basicSalary} oninput={handleFormInput} />
+                        <!-- Salary -->
+                        <div class="ss-form-section">
+                            <div class="ss-section-heading">Salary Structure</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Basic Salary (₹) *</label>
+                                    <input type="number" class="form-input" placeholder="35000"
+                                        data-field="basicSalary" value={formData.basicSalary} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>HRA (₹)</label>
-                                    <input type="number" class="v3-input"
-                                        placeholder="5000" data-field="hra"
-                                        value={formData.hra} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">HRA (₹)</label>
+                                    <input type="number" class="form-input" placeholder="5000"
+                                        data-field="hra" value={formData.hra} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>DA / Allowances (₹)</label>
-                                    <input type="number" class="v3-input"
-                                        placeholder="3000" data-field="da"
-                                        value={formData.da} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">DA / Allowances (₹)</label>
+                                    <input type="number" class="form-input" placeholder="3000"
+                                        data-field="da" value={formData.da} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>PF Deduction (₹)</label>
-                                    <input type="number" class="v3-input"
-                                        placeholder="2000" data-field="pf"
-                                        value={formData.pf} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">PF Deduction (₹)</label>
+                                    <input type="number" class="form-input" placeholder="2000"
+                                        data-field="pf" value={formData.pf} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>Account Number</label>
-                                    <input type="text" class="v3-input"
-                                        placeholder="Bank Account" data-field="accountNumber"
-                                        value={formData.accountNumber} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">Account Number</label>
+                                    <input type="text" class="form-input" placeholder="Bank Account No."
+                                        data-field="accountNumber" value={formData.accountNumber} oninput={handleFormInput} />
                                 </div>
-                                <div class="v3-fg">
-                                    <label>IFSC Code</label>
-                                    <input type="text" class="v3-input"
-                                        placeholder="SBIN0001234" data-field="ifsc"
-                                        value={formData.ifsc} oninput={handleFormInput} />
+                                <div class="form-group">
+                                    <label class="form-label">IFSC Code</label>
+                                    <input type="text" class="form-input" placeholder="SBIN0001234"
+                                        data-field="ifsc" value={formData.ifsc} oninput={handleFormInput} />
                                 </div>
                             </div>
-
-                            <!-- Salary ledger preview -->
-                            <div class="salary-ledger-preview">
-                                <div class="slp-row">
-                                    <span class="slp-key">Basic Salary</span>
-                                    <span class="slp-rule"></span>
-                                    <span class="slp-val">₹{formData.basicSalary}</span>
+                            <div class="ss-salary-preview">
+                                <div class="payment-item">
+                                    <div class="payment-info">
+                                        <div class="payment-icon" style="background:#E8EEFF;">💼</div>
+                                        <div class="payment-details"><div class="title">Basic Salary</div></div>
+                                    </div>
+                                    <div class="payment-amount"><div class="price">₹{formData.basicSalary}</div></div>
                                 </div>
-                                <div class="slp-row addend">
-                                    <span class="slp-key">+ HRA</span>
-                                    <span class="slp-rule"></span>
-                                    <span class="slp-val">₹{formData.hra}</span>
+                                <div class="payment-item">
+                                    <div class="payment-info">
+                                        <div class="payment-icon" style="background:#E6FAF5;">➕</div>
+                                        <div class="payment-details">
+                                            <div class="title">HRA + DA</div>
+                                            <div class="subtitle">Allowances</div>
+                                        </div>
+                                    </div>
+                                    <div class="payment-amount">
+                                        <div class="price" style="color:var(--success);">+ ₹{totalAllowances}</div>
+                                    </div>
                                 </div>
-                                <div class="slp-row addend">
-                                    <span class="slp-key">+ DA &amp; Allowances</span>
-                                    <span class="slp-rule"></span>
-                                    <span class="slp-val">₹{formData.da}</span>
+                                <div class="payment-item">
+                                    <div class="payment-info">
+                                        <div class="payment-icon" style="background:#FFE8EC;">➖</div>
+                                        <div class="payment-details"><div class="title">PF Deduction</div></div>
+                                    </div>
+                                    <div class="payment-amount">
+                                        <div class="price" style="color:var(--danger);">− ₹{formData.pf}</div>
+                                    </div>
                                 </div>
-                                <div class="slp-row deduct">
-                                    <span class="slp-key">− PF Deduction</span>
-                                    <span class="slp-rule"></span>
-                                    <span class="slp-val">₹{formData.pf}</span>
-                                </div>
-                                <div class="slp-total">
-                                    <span>Net Monthly Salary</span>
-                                    <span class="slp-net">₹{computedNetSalary}</span>
+                                <div class="payment-total">
+                                    <div class="label">Net Monthly Salary</div>
+                                    <div class="amount">₹{computedNetSalary}</div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <div class="drawer-footer">
-                        <button class="v3-btn outline-btn" onclick={handleCloseModal}>Cancel</button>
-                        <button class="v3-btn solid-btn" onclick={handleSaveStaff}>{saveButtonLabel}</button>
+                    <div class="ss-modal-footer">
+                        <button class="btn btn-secondary" onclick={handleCloseModal}>Cancel</button>
+                        <button class="btn btn-primary" onclick={handleSaveStaff}>{saveButtonLabel}</button>
                     </div>
                 </div>
             </div>
         </template>
 
-        <!-- ════════ DETAIL MODAL ════════ -->
+        <!-- ══ DETAIL MODAL ══ -->
         <template lwc:if={showDetailModal}>
-            <div class="v3-overlay" onclick={handleCloseDetail}>
-                <div class="v3-profile-panel" onclick={stopPropagation}>
-
-                    <div class="vpp-banner">
-                        <div class={selectedStaff.monogramClass}
-                            style="width:80px;height:80px;font-size:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;">
-                            {selectedStaff.initials}
-                        </div>
-                        <div class="vpp-banner-info">
-                            <div class="vpp-emp-id">{selectedStaff.employeeId}</div>
-                            <h2 class="vpp-name">{selectedStaff.name}</h2>
-                            <p class="vpp-role">{selectedStaff.designation} — {selectedStaff.department}</p>
-                            <div class="vpp-labels">
-                                <span class={selectedStaff.typeLabelClass}>{selectedStaff.staffType}</span>
-                                <span class={selectedStaff.statusLabelClass}>{selectedStaff.status}</span>
+            <div class="ss-modal-overlay" onclick={handleCloseDetail}>
+                <div class="ss-modal ss-detail-modal" onclick={stopPropagation}>
+                    <div class="ss-modal-header">
+                        <div class="card-title"><span>👤</span> Staff Profile</div>
+                        <button class="ss-close-btn" onclick={handleCloseDetail}>✕</button>
+                    </div>
+                    <div class="ss-modal-body">
+                        <div class="ss-profile-banner">
+                            <div class={selectedStaff.avatarClass}
+                                style="width:72px;height:72px;font-size:26px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;flex-shrink:0;">
+                                {selectedStaff.initials}
+                            </div>
+                            <div class="spb-info">
+                                <h3>{selectedStaff.name}</h3>
+                                <p>{selectedStaff.designation} · {selectedStaff.department}</p>
+                                <div class="spb-badges">
+                                    <span class={selectedStaff.typeBadgeClass}>{selectedStaff.staffType}</span>
+                                    <span class={selectedStaff.statusBadgeClass}>{selectedStaff.status}</span>
+                                    <span class="badge-status badge-partial">{selectedStaff.employeeId}</span>
+                                </div>
                             </div>
                         </div>
-                        <button class="v3-close-btn" onclick={handleCloseDetail}>✕</button>
-                    </div>
-
-                    <div class="vpp-grid">
-                        <div class="vpp-section">
-                            <div class="vpp-sec-title">Personal</div>
-                            <div class="vpp-row"><span>Gender</span><strong>{selectedStaff.gender}</strong></div>
-                            <div class="vpp-row"><span>Date of Birth</span><strong>{selectedStaff.dob}</strong></div>
-                            <div class="vpp-row"><span>Joining Date</span><strong>{selectedStaff.joiningDate}</strong></div>
-                            <div class="vpp-row"><span>Qualification</span><strong>{selectedStaff.qualification}</strong></div>
-                        </div>
-                        <div class="vpp-section">
-                            <div class="vpp-sec-title">Contact</div>
-                            <div class="vpp-row"><span>Email</span><strong>{selectedStaff.email}</strong></div>
-                            <div class="vpp-row"><span>Phone</span><strong>{selectedStaff.phone}</strong></div>
-                            <div class="vpp-row"><span>Address</span><strong>{selectedStaff.address}</strong></div>
-                        </div>
-                        <div class="vpp-section vpp-salary-sec">
-                            <div class="vpp-sec-title">Salary Breakdown</div>
-                            <div class="vpp-row"><span>Basic</span><strong>{selectedStaff.basicSalaryFmt}</strong></div>
-                            <div class="vpp-row green-row"><span>+ Allowances</span><strong>{selectedStaff.allowancesFmt}</strong></div>
-                            <div class="vpp-row red-row"><span>− Deductions</span><strong>{selectedStaff.deductionsFmt}</strong></div>
-                            <div class="vpp-net">
-                                <span>Net / Month</span>
-                                <strong>{selectedStaff.netSalaryFmt}</strong>
+                        <div class="ss-detail-grid">
+                            <div class="ss-detail-section">
+                                <div class="card-title" style="font-size:14px;margin-bottom:14px;">📋 Personal Info</div>
+                                <div class="ss-detail-row"><span>Gender</span><strong>{selectedStaff.gender}</strong></div>
+                                <div class="ss-detail-row"><span>Date of Birth</span><strong>{selectedStaff.dob}</strong></div>
+                                <div class="ss-detail-row"><span>Joining Date</span><strong>{selectedStaff.joiningDate}</strong></div>
+                                <div class="ss-detail-row"><span>Qualification</span><strong>{selectedStaff.qualification}</strong></div>
+                            </div>
+                            <div class="ss-detail-section">
+                                <div class="card-title" style="font-size:14px;margin-bottom:14px;">📞 Contact</div>
+                                <div class="ss-detail-row"><span>Email</span><strong>{selectedStaff.email}</strong></div>
+                                <div class="ss-detail-row"><span>Phone</span><strong>{selectedStaff.phone}</strong></div>
+                                <div class="ss-detail-row"><span>Address</span><strong>{selectedStaff.address}</strong></div>
+                            </div>
+                            <div class="ss-detail-section">
+                                <div class="card-title" style="font-size:14px;margin-bottom:14px;">💰 Salary</div>
+                                <div class="ss-detail-row"><span>Basic</span><strong>{selectedStaff.basicSalaryFmt}</strong></div>
+                                <div class="ss-detail-row success-row"><span>+ Allowances</span><strong>{selectedStaff.allowancesFmt}</strong></div>
+                                <div class="ss-detail-row danger-row"><span>− Deductions</span><strong>{selectedStaff.deductionsFmt}</strong></div>
+                                <div class="ss-net-row">
+                                    <span>Net / Month</span>
+                                    <strong>{selectedStaff.netSalaryFmt}</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="vpp-footer">
-                        <button class="v3-btn outline-btn" onclick={handleEditFromDetail}>Edit Profile</button>
-                        <button class="v3-btn danger-btn" onclick={handleDeleteStaff}>Remove Staff</button>
+                    <div class="ss-modal-footer">
+                        <button class="btn btn-secondary" onclick={handleEditFromDetail}>✏️ Edit Profile</button>
+                        <button class="btn ss-danger-btn" onclick={handleDeleteStaff}>🗑️ Remove</button>
                     </div>
                 </div>
             </div>
         </template>
 
-        <!-- ════════ TOAST ════════ -->
+        <!-- ══ TOAST ══ -->
         <template lwc:if={showToast}>
             <div class={toastClass}>
-                <span class="v3-toast-bar"></span>
-                <span class="v3-toast-msg">{toastMessage}</span>
+                <span class="toast-icon">{toastIcon}</span>
+                <span>{toastMessage}</span>
             </div>
         </template>
 

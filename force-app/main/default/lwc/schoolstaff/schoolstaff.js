@@ -1,199 +1,116 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track, wire } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { refreshApex } from '@salesforce/apex';
 
-export default class Schoolstaff extends LightningElement {
+import getAllStaff        from '@salesforce/apex/SchoolStaffController.getAllStaff';
+import getPayrollRecords  from '@salesforce/apex/SchoolStaffController.getPayrollRecords';
+import upsertStaff        from '@salesforce/apex/SchoolStaffController.upsertStaff';
+import deleteStaff        from '@salesforce/apex/SchoolStaffController.deleteStaff';
+import paySalary          from '@salesforce/apex/SchoolStaffController.paySalary';
+import processAllPayroll  from '@salesforce/apex/SchoolStaffController.processAllPayroll';
 
-    @track activeTab = 'all';
-    @track searchTerm = '';
-    @track deptFilter = '';
-    @track statusFilter = '';
-    @track showStaffModal = false;
-    @track showDetailModal = false;
-    @track isEditMode = false;
-    @track selectedStaff = {};
+export default class SchoolStaff extends LightningElement {
+
+    /* ── STATE ── */
+    @track activeTab            = 'all';
+    @track searchTerm           = '';
+    @track deptFilter           = '';
+    @track statusFilter         = '';
+    @track showStaffModal       = false;
+    @track showDetailModal      = false;
+    @track isEditMode           = false;
+    @track selectedStaff        = {};
     @track selectedPayrollMonth = 'Mar 2026';
-    @track showToast = false;
-    @track toastMessage = '';
-    @track toastClass = 'v3-toast toast-success';
+    @track showToast            = false;
+    @track toastMessage         = '';
+    @track toastIcon            = '✅';
+    @track toastClass           = 'ss-toast toast-success';
+    @track isLoading            = false;
 
-    @track formData = this.emptyForm();
+    @track formData = this._emptyForm();
 
-    @track staffList = [
-        {
-            id: 'STF-001', employeeId: 'STF-001',
-            firstName: 'Ramesh', lastName: 'Kumar', name: 'Ramesh Kumar', initials: 'RK',
-            gender: 'Male', dob: '1985-06-15',
-            email: 'ramesh.kumar@school.com', phone: '+91 98765 43210',
-            address: '12 MG Road, Kurnool, AP',
-            designation: 'Senior Teacher', department: 'Mathematics',
-            staffType: 'Teaching', subject: 'Mathematics', qualification: 'M.Sc, B.Ed',
-            joiningDate: '2015-07-01', status: 'Active',
-            basicSalary: 40000, hra: 8000, da: 4000, pf: 3000,
-            accountNumber: '1234567890', ifsc: 'SBI0001234', salaryStatus: 'Paid',
-            tabClass: 'rc-tab tab-forest',
-            monogramClass: 'v3-monogram mono-forest',
-            typeLabelClass: 'v3-label label-teaching',
-            statusDotClass: 'v3-dot dot-active',
-            statusLabelClass: 'v3-label label-active'
-        },
-        {
-            id: 'STF-002', employeeId: 'STF-002',
-            firstName: 'Priya', lastName: 'Sharma', name: 'Priya Sharma', initials: 'PS',
-            gender: 'Female', dob: '1990-03-22',
-            email: 'priya.sharma@school.com', phone: '+91 87654 32109',
-            address: '45 Nehru Nagar, Kurnool, AP',
-            designation: 'Teacher', department: 'Science',
-            staffType: 'Teaching', subject: 'Physics', qualification: 'B.Sc, B.Ed',
-            joiningDate: '2018-06-15', status: 'Active',
-            basicSalary: 32000, hra: 6000, da: 3000, pf: 2400,
-            accountNumber: '9876543210', ifsc: 'HDFC0002345', salaryStatus: 'Pending',
-            tabClass: 'rc-tab tab-gold',
-            monogramClass: 'v3-monogram mono-gold',
-            typeLabelClass: 'v3-label label-teaching',
-            statusDotClass: 'v3-dot dot-active',
-            statusLabelClass: 'v3-label label-active'
-        },
-        {
-            id: 'STF-003', employeeId: 'STF-003',
-            firstName: 'Suresh', lastName: 'Babu', name: 'Suresh Babu', initials: 'SB',
-            gender: 'Male', dob: '1978-11-10',
-            email: 'suresh.babu@school.com', phone: '+91 76543 21098',
-            address: '8 Gandhi Colony, Kurnool, AP',
-            designation: 'Accountant', department: 'Finance',
-            staffType: 'Non-Teaching', subject: '', qualification: 'B.Com',
-            joiningDate: '2012-01-10', status: 'Active',
-            basicSalary: 25000, hra: 4000, da: 2000, pf: 1800,
-            accountNumber: '5678901234', ifsc: 'ICIC0003456', salaryStatus: 'Paid',
-            tabClass: 'rc-tab tab-clay',
-            monogramClass: 'v3-monogram mono-clay',
-            typeLabelClass: 'v3-label label-nonteaching',
-            statusDotClass: 'v3-dot dot-active',
-            statusLabelClass: 'v3-label label-active'
-        },
-        {
-            id: 'STF-004', employeeId: 'STF-004',
-            firstName: 'Lakshmi', lastName: 'Devi', name: 'Lakshmi Devi', initials: 'LD',
-            gender: 'Female', dob: '1992-08-05',
-            email: 'lakshmi.devi@school.com', phone: '+91 65432 10987',
-            address: '23 Srinagar Colony, Kurnool, AP',
-            designation: 'Teacher', department: 'English',
-            staffType: 'Teaching', subject: 'English', qualification: 'M.A, B.Ed',
-            joiningDate: '2020-07-20', status: 'On Leave',
-            basicSalary: 30000, hra: 5500, da: 2500, pf: 2200,
-            accountNumber: '3456789012', ifsc: 'AXIS0004567', salaryStatus: 'Pending',
-            tabClass: 'rc-tab tab-rust',
-            monogramClass: 'v3-monogram mono-rust',
-            typeLabelClass: 'v3-label label-teaching',
-            statusDotClass: 'v3-dot dot-leave',
-            statusLabelClass: 'v3-label label-leave'
-        },
-        {
-            id: 'STF-005', employeeId: 'STF-005',
-            firstName: 'Raju', lastName: 'Patel', name: 'Raju Patel', initials: 'RP',
-            gender: 'Male', dob: '1980-02-28',
-            email: 'raju.patel@school.com', phone: '+91 54321 09876',
-            address: '67 Sundaraiah Nagar, Kurnool, AP',
-            designation: 'Security Guard', department: 'Security',
-            staffType: 'Non-Teaching', subject: '', qualification: '10th Pass',
-            joiningDate: '2016-03-01', status: 'Active',
-            basicSalary: 15000, hra: 2000, da: 1000, pf: 900,
-            accountNumber: '7890123456', ifsc: 'PNB0005678', salaryStatus: 'Paid',
-            tabClass: 'rc-tab tab-forest',
-            monogramClass: 'v3-monogram mono-forest',
-            typeLabelClass: 'v3-label label-nonteaching',
-            statusDotClass: 'v3-dot dot-active',
-            statusLabelClass: 'v3-label label-active'
-        },
-        {
-            id: 'STF-006', employeeId: 'STF-006',
-            firstName: 'Anjali', lastName: 'Rao', name: 'Anjali Rao', initials: 'AR',
-            gender: 'Female', dob: '1988-12-01',
-            email: 'anjali.rao@school.com', phone: '+91 43210 98765',
-            address: '34 Laxmi Nagar, Kurnool, AP',
-            designation: 'Teacher', department: 'Social Studies',
-            staffType: 'Teaching', subject: 'Social Studies', qualification: 'M.A, B.Ed',
-            joiningDate: '2019-06-01', status: 'Active',
-            basicSalary: 28000, hra: 5000, da: 2000, pf: 2000,
-            accountNumber: '2345678901', ifsc: 'BOI0006789', salaryStatus: 'Paid',
-            tabClass: 'rc-tab tab-gold',
-            monogramClass: 'v3-monogram mono-gold',
-            typeLabelClass: 'v3-label label-teaching',
-            statusDotClass: 'v3-dot dot-active',
-            statusLabelClass: 'v3-label label-active'
+    /* ── WIRED DATA ── */
+    _wiredStaffResult;
+    @wire(getAllStaff)
+    wiredStaff(result) {
+        this._wiredStaffResult = result;
+        if (result.data) {
+            this._rawStaffList = result.data.map(s => this._decorate(s));
+        } else if (result.error) {
+            this._showPlatformToast('error', 'Error', result.error.body?.message || 'Failed to load staff.');
         }
-    ];
-
-    emptyForm() {
-        return {
-            employeeId: '', firstName: '', lastName: '', gender: '', dob: '',
-            email: '', phone: '', address: '',
-            designation: '', department: '', staffType: 'Teaching',
-            subject: '', qualification: '', joiningDate: '',
-            basicSalary: 0, hra: 0, da: 0, pf: 0,
-            accountNumber: '', ifsc: ''
-        };
     }
 
-    // ── COMPUTED WIDTHS FOR SCOREBAND BARS ──
-    get teachingBarStyle() {
-        const pct = this.staffList.length ? Math.round((this.teachingCount / this.staffList.length) * 100) : 0;
-        return `width:${pct}%;background:var(--gold)`;
-    }
-    get nonTeachingBarStyle() {
-        const pct = this.staffList.length ? Math.round((this.nonTeachingCount / this.staffList.length) * 100) : 0;
-        return `width:${pct}%;background:var(--clay)`;
-    }
-    get paidBarStyle() {
-        const pct = this.staffList.length ? Math.round((this.paidCount / this.staffList.length) * 100) : 0;
-        return `width:${pct}%;background:var(--forest)`;
-    }
-    get pendingBarStyle() {
-        const pct = this.staffList.length ? Math.round((this.pendingCount / this.staffList.length) * 100) : 0;
-        return `width:${pct}%;background:var(--rust)`;
+    _wiredPayrollResult;
+    @wire(getPayrollRecords, { invoiceMonth: '$selectedPayrollMonth' })
+    wiredPayroll(result) {
+        this._wiredPayrollResult = result;
+        if (result.data) {
+            this._rawPayrollList = result.data.map(r => this._decoratePayroll(r));
+        } else if (result.error) {
+            this._showPlatformToast('error', 'Error', result.error.body?.message || 'Failed to load payroll.');
+        }
     }
 
-    // ── TAB CLASSES ──
-    get allSegClass()          { return `seg-btn ${this.activeTab === 'all' ? 'seg-active' : ''}`; }
-    get teachingSegClass()     { return `seg-btn ${this.activeTab === 'teaching' ? 'seg-active' : ''}`; }
-    get nonTeachingSegClass()  { return `seg-btn ${this.activeTab === 'non-teaching' ? 'seg-active' : ''}`; }
-    get salarySegClass()       { return `seg-btn ${this.activeTab === 'salary' ? 'seg-active' : ''}`; }
+    _rawStaffList  = [];
+    _rawPayrollList = [];
+
+    /* ══════════════════════════════════════════
+       GETTERS – TABS & VIEWS
+    ══════════════════════════════════════════ */
+    get allTabClass()         { return `tab ${this.activeTab === 'all'          ? 'active' : ''}`; }
+    get teachingTabClass()    { return `tab ${this.activeTab === 'teaching'     ? 'active' : ''}`; }
+    get nonTeachingTabClass() { return `tab ${this.activeTab === 'non-teaching' ? 'active' : ''}`; }
+    get salaryTabClass()      { return `tab ${this.activeTab === 'salary'       ? 'active' : ''}`; }
 
     get isStaffListView() { return this.activeTab !== 'salary'; }
     get isSalaryView()    { return this.activeTab === 'salary'; }
     get isTeachingType()  { return this.formData.staffType === 'Teaching'; }
 
-    get teachingToggleClass()    { return `v3-toggle-btn ${this.formData.staffType === 'Teaching' ? 'vtb-active' : ''}`; }
-    get nonTeachingToggleClass() { return `v3-toggle-btn ${this.formData.staffType === 'Non-Teaching' ? 'vtb-active' : ''}`; }
+    get teachingToggleClass()    { return `ss-toggle-btn ${this.formData.staffType === 'Teaching'     ? 'ss-toggle-active' : ''}`; }
+    get nonTeachingToggleClass() { return `ss-toggle-btn ${this.formData.staffType === 'Non-Teaching' ? 'ss-toggle-active' : ''}`; }
 
-    get modalTitle()     { return this.isEditMode ? 'Edit Staff Member' : 'New Staff Member'; }
-    get modalEyebrow()   { return this.isEditMode ? 'EDITING RECORD' : 'NEW RECORD'; }
-    get saveButtonLabel(){ return this.isEditMode ? 'Update Record' : 'Save Member'; }
+    get modalTitle()      { return this.isEditMode ? 'Edit Staff Member' : 'Add New Staff Member'; }
+    get saveButtonLabel() { return this.isEditMode ? '💾 Update Staff' : '✅ Save Staff'; }
 
-    // ── COUNTS ──
-    get totalStaffCount()  { return this.staffList.length; }
-    get teachingCount()    { return this.staffList.filter(s => s.staffType === 'Teaching').length; }
-    get nonTeachingCount() { return this.staffList.filter(s => s.staffType === 'Non-Teaching').length; }
-    get paidCount()        { return this.staffList.filter(s => s.salaryStatus === 'Paid').length; }
-    get pendingCount()     { return this.staffList.filter(s => s.salaryStatus !== 'Paid').length; }
+    /* ══════════════════════════════════════════
+       GETTERS – COUNTS & TOTALS
+    ══════════════════════════════════════════ */
+    get totalStaffCount()  { return this._rawStaffList.length; }
+    get teachingCount()    { return this._rawStaffList.filter(s => s.staffType === 'Teaching').length; }
+    get nonTeachingCount() { return this._rawStaffList.filter(s => s.staffType === 'Non-Teaching').length; }
+    get paidCount()        { return this._rawPayrollList.filter(r => r.salaryStatus === 'Paid').length; }
+    get pendingCount()     { return this._rawPayrollList.filter(r => r.salaryStatus !== 'Paid').length; }
 
     get totalMonthlySalary() {
-        const t = this.staffList.reduce((s, m) =>
+        const t = this._rawStaffList.reduce((s, m) =>
             s + Number(m.basicSalary) + Number(m.hra) + Number(m.da) - Number(m.pf), 0);
-        return t >= 100000 ? `₹${(t / 100000).toFixed(1)}L` : `₹${t.toLocaleString()}`;
+        return t >= 100000 ? `₹${(t / 100000).toFixed(1)}L` : `₹${t.toLocaleString('en-IN')}`;
+    }
+    get totalAnnualSalary() {
+        const t = this._rawStaffList.reduce((s, m) =>
+            s + Number(m.basicSalary) + Number(m.hra) + Number(m.da) - Number(m.pf), 0) * 12;
+        return t >= 100000 ? `₹${(t / 100000).toFixed(1)}L` : `₹${t.toLocaleString('en-IN')}`;
     }
 
+    get totalAllowances() {
+        return (Number(this.formData.hra || 0) + Number(this.formData.da || 0)).toLocaleString('en-IN');
+    }
     get computedNetSalary() {
         const n = Number(this.formData.basicSalary || 0)
-            + Number(this.formData.hra || 0)
-            + Number(this.formData.da || 0)
-            - Number(this.formData.pf || 0);
-        return n.toLocaleString();
+                + Number(this.formData.hra          || 0)
+                + Number(this.formData.da           || 0)
+                - Number(this.formData.pf           || 0);
+        return n.toLocaleString('en-IN');
     }
 
-    // ── FILTERED LIST ──
+    /* ══════════════════════════════════════════
+       GETTERS – FILTERED LISTS
+    ══════════════════════════════════════════ */
     get filteredStaff() {
-        let list = this.staffList.map(s => ({
+        let list = this._rawStaffList.map(s => ({
             ...s,
-            netSalaryFmt: `₹${(Number(s.basicSalary) + Number(s.hra) + Number(s.da) - Number(s.pf)).toLocaleString()}`
+            netSalaryFmt: `₹${(Number(s.basicSalary) + Number(s.hra) + Number(s.da) - Number(s.pf)).toLocaleString('en-IN')}`
         }));
         if (this.activeTab === 'teaching')     list = list.filter(s => s.staffType === 'Teaching');
         if (this.activeTab === 'non-teaching') list = list.filter(s => s.staffType === 'Non-Teaching');
@@ -201,7 +118,7 @@ export default class Schoolstaff extends LightningElement {
             const t = this.searchTerm.toLowerCase();
             list = list.filter(s =>
                 s.name.toLowerCase().includes(t) ||
-                s.employeeId.toLowerCase().includes(t) ||
+                (s.employeeId && s.employeeId.toLowerCase().includes(t)) ||
                 (s.subject && s.subject.toLowerCase().includes(t)) ||
                 s.designation.toLowerCase().includes(t)
             );
@@ -212,71 +129,64 @@ export default class Schoolstaff extends LightningElement {
     }
     get hasFilteredStaff() { return this.filteredStaff.length > 0; }
 
-    // ── SALARY RECORDS ──
-    get salaryRecords() {
-        return this.staffList.map(s => {
-            const net = Number(s.basicSalary) + Number(s.hra) + Number(s.da) - Number(s.pf);
-            const paid = s.salaryStatus === 'Paid';
-            return {
-                id: s.id, name: s.name, initials: s.initials,
-                designation: s.designation, staffType: s.staffType,
-                monogramClass: s.monogramClass,
-                typeLabelClass: s.typeLabelClass,
-                basicSalary:  `₹${Number(s.basicSalary).toLocaleString()}`,
-                allowances:   `₹${(Number(s.hra) + Number(s.da)).toLocaleString()}`,
-                deductions:   `₹${Number(s.pf).toLocaleString()}`,
-                netSalary:    `₹${net.toLocaleString()}`,
-                salaryStatus: s.salaryStatus || 'Pending',
-                salaryStatusClass: paid ? 'v3-label label-paid' : 'v3-label label-pending',
-                actionLabel:  paid ? 'Download Slip' : 'Pay Salary',
-                actionBtnClass: paid ? 'ledger-action-btn btn-slip' : 'ledger-action-btn btn-pay'
-            };
-        });
-    }
+    get salaryRecords() { return this._rawPayrollList; }
 
-    // ── HANDLERS ──
-    handleTabChange(e)      { this.activeTab = e.currentTarget.dataset.tab; }
-    handleSearchChange(e)   { this.searchTerm = e.target.value; }
-    handleDeptFilter(e)     { this.deptFilter = e.target.value; }
-    handleStatusFilter(e)   { this.statusFilter = e.target.value; }
-    handleMonthChange(e)    { this.selectedPayrollMonth = e.target.value; }
+    /* ══════════════════════════════════════════
+       HANDLERS – TABS / FILTERS
+    ══════════════════════════════════════════ */
+    handleTabChange(e)    { this.activeTab    = e.currentTarget.dataset.tab; }
+    handleSearchChange(e) { this.searchTerm   = e.target.value; }
+    handleDeptFilter(e)   { this.deptFilter   = e.target.value; }
+    handleStatusFilter(e) { this.statusFilter = e.target.value; }
+    handleMonthChange(e)  { this.selectedPayrollMonth = e.target.value; }
 
+    /* ══════════════════════════════════════════
+       HANDLERS – ADD / EDIT / DELETE
+    ══════════════════════════════════════════ */
     handleAddStaff() {
-        this.isEditMode = false;
-        this.formData = { ...this.emptyForm(), employeeId: this.genId() };
+        this.isEditMode  = false;
+        this.formData    = { ...this._emptyForm() };
         this.showStaffModal = true;
     }
 
     handleStaffCardClick(e) {
         const id = e.currentTarget.dataset.id;
-        const s = this.staffList.find(x => x.id === id);
+        const s  = this._rawStaffList.find(x => x.id === id);
         if (!s) return;
         this.selectedStaff = {
             ...s,
-            basicSalaryFmt:  `₹${Number(s.basicSalary).toLocaleString()}`,
-            allowancesFmt:   `₹${(Number(s.hra) + Number(s.da)).toLocaleString()}`,
-            deductionsFmt:   `₹${Number(s.pf).toLocaleString()}`,
-            netSalaryFmt:    `₹${(Number(s.basicSalary)+Number(s.hra)+Number(s.da)-Number(s.pf)).toLocaleString()}`
+            basicSalaryFmt : `₹${Number(s.basicSalary).toLocaleString('en-IN')}`,
+            allowancesFmt  : `₹${(Number(s.hra) + Number(s.da)).toLocaleString('en-IN')}`,
+            deductionsFmt  : `₹${Number(s.pf).toLocaleString('en-IN')}`,
+            netSalaryFmt   : `₹${(Number(s.basicSalary)+Number(s.hra)+Number(s.da)-Number(s.pf)).toLocaleString('en-IN')}`
         };
         this.showDetailModal = true;
     }
 
     handleEditFromDetail() {
         this.showDetailModal = false;
-        this.isEditMode = true;
-        this.formData = { ...this.selectedStaff };
-        this.showStaffModal = true;
+        this.isEditMode      = true;
+        this.formData        = { ...this.selectedStaff };
+        this.showStaffModal  = true;
     }
 
-    handleDeleteStaff() {
-        this.staffList = this.staffList.filter(s => s.id !== this.selectedStaff.id);
-        this.showDetailModal = false;
-        this.toast(`${this.selectedStaff.name} has been removed.`, 'success');
+    async handleDeleteStaff() {
+        try {
+            this.isLoading = true;
+            await deleteStaff({ staffId: this.selectedStaff.id });
+            await refreshApex(this._wiredStaffResult);
+            this.showDetailModal = false;
+            this._showToastMsg('✅', `${this.selectedStaff.name} removed successfully.`, 'success');
+        } catch (err) {
+            this._showToastMsg('❌', err.body?.message || 'Delete failed.', 'error');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
-    handleCloseModal()        { this.showStaffModal = false; }
-    handleCloseDetail()       { this.showDetailModal = false; }
-    handleModalOverlayClick() { this.showStaffModal = false; }
+    handleCloseModal()        { this.showStaffModal   = false; }
+    handleCloseDetail()       { this.showDetailModal  = false; }
+    handleModalOverlayClick() { this.showStaffModal   = false; }
     stopPropagation(e)        { e.stopPropagation(); }
 
     handleStaffTypeChange(e) {
@@ -284,85 +194,212 @@ export default class Schoolstaff extends LightningElement {
         this.formData = { ...this.formData, staffType: e.currentTarget.dataset.type, designation: '', department: '' };
     }
 
+    // Handles BOTH <input oninput> and <select onchange> — reads value from the event target
     handleFormInput(e) {
-        this.formData = { ...this.formData, [e.currentTarget.dataset.field]: e.target.value };
+        const field = e.currentTarget.dataset.field || e.target.dataset.field;
+        const value = e.target.value;
+        if (field) {
+            this.formData = { ...this.formData, [field]: value };
+        }
     }
 
-    handleSaveStaff() {
+    async handleSaveStaff() {
+        // Read values directly from DOM to bypass any LWC binding cache issues
+        const allInputs = this.template.querySelectorAll('[data-field]');
+        const liveFormData = { ...this.formData };
+        allInputs.forEach(el => {
+            const field = el.dataset.field;
+            if (field && el.value !== undefined && el.value !== null && !el.readOnly) {
+                liveFormData[field] = el.value;
+            }
+        });
+        this.formData = { ...liveFormData };
+
         const { firstName, lastName, email, phone, basicSalary } = this.formData;
-        if (!firstName || !lastName || !email || !phone) {
-            this.toast('Please fill all required fields.', 'warning'); return;
+
+        if (!firstName || !firstName.trim()) {
+            this._showToastMsg('⚠️', 'First Name is required.', 'warning'); return;
+        }
+        if (!lastName || !lastName.trim()) {
+            this._showToastMsg('⚠️', 'Last Name is required.', 'warning'); return;
+        }
+        if (!email || !email.trim()) {
+            this._showToastMsg('⚠️', 'Email is required.', 'warning'); return;
+        }
+        if (!phone || !phone.trim()) {
+            this._showToastMsg('⚠️', 'Phone is required.', 'warning'); return;
         }
         if (!basicSalary || Number(basicSalary) <= 0) {
-            this.toast('Please enter a valid basic salary.', 'warning'); return;
+            this._showToastMsg('⚠️', 'Please enter a valid basic salary.', 'warning'); return;
         }
 
-        const fullName = `${firstName} ${lastName}`;
-        const initials = (firstName[0] + lastName[0]).toUpperCase();
-        const palettes = [
-            { tab: 'rc-tab tab-forest', mono: 'v3-monogram mono-forest' },
-            { tab: 'rc-tab tab-gold',   mono: 'v3-monogram mono-gold' },
-            { tab: 'rc-tab tab-clay',   mono: 'v3-monogram mono-clay' },
-            { tab: 'rc-tab tab-rust',   mono: 'v3-monogram mono-rust' },
-        ];
-        const p = palettes[this.staffList.length % palettes.length];
-        const isT = this.formData.staffType === 'Teaching';
-
-        const rec = {
-            ...this.formData,
-            id: this.isEditMode ? this.formData.id : this.formData.employeeId,
-            name: fullName, initials,
-            tabClass: p.tab,
-            monogramClass: p.mono,
-            typeLabelClass: isT ? 'v3-label label-teaching' : 'v3-label label-nonteaching',
-            statusDotClass: 'v3-dot dot-active',
-            statusLabelClass: 'v3-label label-active',
-            status: 'Active', salaryStatus: 'Pending'
+        // Build a clean plain object — avoids Apex receiving Proxy wrapper
+        const payload = {
+            id            : this.formData.id           || null,
+            employeeId    : this.formData.employeeId   || '',
+            firstName     : this.formData.firstName.trim(),
+            lastName      : this.formData.lastName.trim(),
+            gender        : this.formData.gender       || '',
+            dob           : this.formData.dob          || '',
+            email         : this.formData.email.trim(),
+            phone         : this.formData.phone.trim(),
+            address       : this.formData.address      || '',
+            staffType     : this.formData.staffType    || 'Teaching',
+            designation   : this.formData.designation  || '',
+            department    : this.formData.department   || '',
+            subject       : this.formData.subject      || '',
+            qualification : this.formData.qualification|| '',
+            joiningDate   : this.formData.joiningDate  || '',
+            status        : this.formData.status       || 'Active',
+            basicSalary   : Number(this.formData.basicSalary) || 0,
+            hra           : Number(this.formData.hra)          || 0,
+            da            : Number(this.formData.da)           || 0,
+            pf            : Number(this.formData.pf)           || 0,
+            accountNumber : this.formData.accountNumber|| '',
+            ifsc          : this.formData.ifsc         || ''
         };
 
-        if (this.isEditMode) {
-            this.staffList = this.staffList.map(s => s.id === rec.id ? rec : s);
-            this.toast(`${fullName}'s record has been updated.`, 'success');
-        } else {
-            this.staffList = [...this.staffList, rec];
-            this.toast(`${fullName} added to staff directory.`, 'success');
+        try {
+            this.isLoading = true;
+            await upsertStaff({ data: payload });
+            await refreshApex(this._wiredStaffResult);
+            this.showStaffModal = false;
+            const msg = this.isEditMode
+                ? `${payload.firstName} ${payload.lastName} updated successfully!`
+                : `${payload.firstName} ${payload.lastName} added to staff directory!`;
+            this._showToastMsg('✅', msg, 'success');
+        } catch (err) {
+            const errMsg = err.body?.message || err.message || 'Save failed. Please try again.';
+            this._showToastMsg('❌', errMsg, 'error');
+        } finally {
+            this.isLoading = false;
         }
-        this.showStaffModal = false;
     }
 
-    handlePaySalary(e) {
+    /* ══════════════════════════════════════════
+       HANDLERS – PAYROLL
+    ══════════════════════════════════════════ */
+    async handlePaySalary(e) {
         e.stopPropagation();
         const id = e.currentTarget.dataset.id;
-        const s = this.staffList.find(x => x.id === id);
-        if (!s) return;
-        if (s.salaryStatus === 'Paid') {
-            this.toast(`Payslip for ${s.name} downloaded.`, 'success'); return;
+        const rec = this._rawPayrollList.find(x => x.staffId === id);
+        if (!rec) return;
+
+        if (rec.salaryStatus === 'Paid') {
+            this._showToastMsg('📄', `Payslip downloaded for ${rec.staffName}.`, 'success');
+            return;
         }
-        this.staffList = this.staffList.map(x => x.id === id ? { ...x, salaryStatus: 'Paid' } : x);
-        this.toast(`Salary disbursed to ${s.name}.`, 'success');
+
+        try {
+            this.isLoading = true;
+            await paySalary({ staffId: id, invoiceMonth: this.selectedPayrollMonth });
+            await refreshApex(this._wiredPayrollResult);
+            this._showToastMsg('💳', `Salary paid to ${rec.staffName} for ${this.selectedPayrollMonth}.`, 'success');
+        } catch (err) {
+            this._showToastMsg('❌', err.body?.message || 'Payment failed.', 'error');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
-    handleProcessPayroll() {
-        this.staffList = this.staffList.map(s => ({ ...s, salaryStatus: 'Paid' }));
-        this.toast(`All salaries processed for ${this.selectedPayrollMonth}.`, 'success');
+    async handleProcessPayroll() {
+        try {
+            this.isLoading = true;
+            await processAllPayroll({ invoiceMonth: this.selectedPayrollMonth });
+            await refreshApex(this._wiredPayrollResult);
+            this._showToastMsg('⚡', `All salaries processed for ${this.selectedPayrollMonth}!`, 'success');
+        } catch (err) {
+            this._showToastMsg('❌', err.body?.message || 'Payroll processing failed.', 'error');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     handleGeneratePayslips() {
-        this.toast(`Payslips generated for ${this.selectedPayrollMonth}.`, 'success');
+        this._showToastMsg('📄', `Payslips generated for ${this.selectedPayrollMonth}!`, 'success');
     }
 
     handleExportStaff() {
-        this.toast('Staff directory exported successfully.', 'success');
+        this._showToastMsg('📤', 'Staff data exported successfully!', 'success');
     }
 
-    genId() {
-        return `STF-${String(this.staffList.length + 1).padStart(3, '0')}`;
+    /* ══════════════════════════════════════════
+       PRIVATE HELPERS
+    ══════════════════════════════════════════ */
+    _emptyForm() {
+        return {
+            id: null,
+            employeeId: '', firstName: '', lastName: '', gender: '', dob: '',
+            email: '', phone: '', address: '',
+            designation: '', department: '', staffType: 'Teaching',
+            subject: '', qualification: '', joiningDate: '', status: 'Active',
+            basicSalary: 0, hra: 0, da: 0, pf: 0,
+            accountNumber: '', ifsc: ''
+        };
     }
 
-    toast(msg, type) {
+    _colorVariants = [
+        { av: 'ss-avatar av-blue',   band: 'scard-band band-blue' },
+        { av: 'ss-avatar av-purple', band: 'scard-band band-purple' },
+        { av: 'ss-avatar av-green',  band: 'scard-band band-green' },
+        { av: 'ss-avatar av-orange', band: 'scard-band band-orange' }
+    ];
+
+    _decorate(s, idx) {
+        const v = this._colorVariants[(idx || 0) % this._colorVariants.length];
+        const isTeaching = s.staffType === 'Teaching';
+        const statusMap  = {
+            'Active'   : { badge: 'badge-status badge-active',  dot: 'ss-status-dot dot-active' },
+            'On Leave' : { badge: 'badge-status badge-pending', dot: 'ss-status-dot dot-leave' },
+            'Inactive' : { badge: 'badge-status badge-inactive',dot: 'ss-status-dot dot-inactive' }
+        };
+        const sm = statusMap[s.status] || statusMap['Active'];
+        const fi = (s.firstName || '').charAt(0).toUpperCase();
+        const li = (s.lastName  || '').charAt(0).toUpperCase();
+        return {
+            ...s,
+            initials       : fi + li,
+            avatarClass    : v.av,
+            cardBandClass  : v.band,
+            typeBadgeClass : isTeaching ? 'badge-status badge-active' : 'badge-status badge-inactive',
+            statusBadgeClass: sm.badge,
+            statusDotClass : sm.dot,
+            netSalaryFmt   : `₹${(Number(s.basicSalary)+Number(s.hra)+Number(s.da)-Number(s.pf)).toLocaleString('en-IN')}`
+        };
+    }
+
+    _decoratePayroll(r) {
+        const isTeaching = r.staffType === 'Teaching';
+        const paid       = r.salaryStatus === 'Paid';
+        const fi = (r.staffName || '').split(' ')[0]?.charAt(0).toUpperCase() || '';
+        const li = (r.staffName || '').split(' ')[1]?.charAt(0).toUpperCase() || '';
+        const v  = this._colorVariants[0];  // default; pass index if needed
+        return {
+            ...r,
+            id             : r.staffId,    // for data-id binding on Pay button
+            initials       : fi + li,
+            avatarClass    : v.av,
+            typeBadgeClass : isTeaching ? 'badge-status badge-active' : 'badge-status badge-inactive',
+            basicSalary    : `₹${Number(r.basicSalary).toLocaleString('en-IN')}`,
+            allowances     : `₹${Number(r.allowances).toLocaleString('en-IN')}`,
+            deductions     : `₹${Number(r.deductions).toLocaleString('en-IN')}`,
+            netSalary      : `₹${Number(r.netSalary).toLocaleString('en-IN')}`,
+            salaryStatusClass: paid ? 'badge-status badge-paid' : 'badge-status badge-pending',
+            actionLabel    : paid ? '📄 Payslip' : '💳 Pay Now',
+            actionBtnClass : paid ? 'ss-action-btn btn-slip' : 'ss-action-btn btn-pay'
+        };
+    }
+
+    _showToastMsg(icon, msg, type) {
+        this.toastIcon    = icon;
         this.toastMessage = msg;
-        this.toastClass = `v3-toast toast-${type}`;
-        this.showToast = true;
-        setTimeout(() => { this.showToast = false; }, 3800);
+        this.toastClass   = `ss-toast toast-${type}`;
+        this.showToast    = true;
+        // eslint-disable-next-line @lwc/lwc/no-async-operation
+        setTimeout(() => { this.showToast = false; }, 3500);
+    }
+
+    _showPlatformToast(variant, title, message) {
+        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
 }
