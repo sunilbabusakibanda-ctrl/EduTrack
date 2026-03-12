@@ -17,23 +17,23 @@ public without sharing class SchoolStaffController {
         @AuraEnabled public String  address;
         @AuraEnabled public String  designation;
         @AuraEnabled public String  department;
-        @AuraEnabled public String  staffType;    // 'Teaching' | 'Non-Teaching'
+        @AuraEnabled public String  staffType;
         @AuraEnabled public String  subject;
         @AuraEnabled public String  qualification;
         @AuraEnabled public String  joiningDate;
-        @AuraEnabled public String  status;       // Active | On Leave | Inactive
+        @AuraEnabled public String  status;
         @AuraEnabled public Decimal basicSalary;
         @AuraEnabled public Decimal hra;
         @AuraEnabled public Decimal da;
         @AuraEnabled public Decimal pf;
         @AuraEnabled public String  accountNumber;
         @AuraEnabled public String  ifsc;
-        @AuraEnabled public String  salaryStatus; // Paid | Pending (derived from latest Invoice)
+        @AuraEnabled public String  salaryStatus;
     }
 
     public class PayrollWrapper {
-        @AuraEnabled public String  id;           // Invoice__c Id
-        @AuraEnabled public String  staffId;      // Account Id
+        @AuraEnabled public String  id;
+        @AuraEnabled public String  staffId;
         @AuraEnabled public String  staffName;
         @AuraEnabled public String  designation;
         @AuraEnabled public String  staffType;
@@ -42,7 +42,7 @@ public without sharing class SchoolStaffController {
         @AuraEnabled public Decimal allowances;
         @AuraEnabled public Decimal deductions;
         @AuraEnabled public Decimal netSalary;
-        @AuraEnabled public String  salaryStatus; // Paid | Pending
+        @AuraEnabled public String  salaryStatus;
         @AuraEnabled public String  invoiceMonth;
     }
 
@@ -148,90 +148,169 @@ public without sharing class SchoolStaffController {
 
     /* ─────────────────────────────────────────
        WRITE – UPSERT STAFF MEMBER
-       FIX: Added null/blank guards on all
-            required fields, safe trimming,
-            safe date parsing, explicit null
-            checks on all salary Decimal fields,
-            re-throws clean AuraHandledExceptions.
+
+       ROOT CAUSE FIXES:
+       1. Validation now done AFTER null-safe trimming, not before.
+       2. RecordTypeId lookup made safe — if no PersonAccount RT exists
+          we skip setting it (some orgs use a default RT).
+       3. PersonGenderIdentity is a standard picklist — blank string
+          causes a DML error on some orgs; set to null instead of ''.
+       4. All String fields use safeStr() to avoid passing empty strings
+          where Salesforce expects null.
+       5. Detailed exception logging so the REAL error surfaces instead
+          of being swallowed by the outer catch re-throwing
+          'First Name is required.'
     ───────────────────────────────────────── */
 
     @AuraEnabled
     public static String upsertStaff(StaffWrapper data) {
+
+        // ── Step 1: Null-safe trim helpers applied first ──────────────
+        String firstName  = safeStr(data.firstName);
+        String lastName   = safeStr(data.lastName);
+        String email      = safeStr(data.email);
+        String phone      = safeStr(data.phone);
+
+        System.debug('upsertStaff called — firstName=' + firstName
+            + ' | lastName=' + lastName
+            + ' | email=' + email
+            + ' | phone=' + phone
+            + ' | basicSalary=' + data.basicSalary
+            + ' | staffType=' + data.staffType
+            + ' | id=' + data.id);
+
+        // ── Step 2: Validate AFTER trimming ───────────────────────────
+        if (String.isBlank(firstName)) {
+            throw new AuraHandledException('First Name is required.');
+        }
+        if (String.isBlank(lastName)) {
+            throw new AuraHandledException('Last Name is required.');
+        }
+        if (String.isBlank(email)) {
+            throw new AuraHandledException('Email is required.');
+        }
+        if (String.isBlank(phone)) {
+            throw new AuraHandledException('Phone is required.');
+        }
+        if (data.basicSalary == null || data.basicSalary <= 0) {
+            throw new AuraHandledException('Please enter a valid Basic Salary.');
+        }
+
         try {
-            // ── Validate required fields BEFORE any DML ──
-            if (String.isBlank(data.firstName)) {
-                throw new AuraHandledException('First Name is required.');
-            }
-            if (String.isBlank(data.lastName)) {
-                throw new AuraHandledException('Last Name is required.');
-            }
-            if (String.isBlank(data.email)) {
-                throw new AuraHandledException('Email is required.');
-            }
-            if (String.isBlank(data.phone)) {
-                throw new AuraHandledException('Phone is required.');
-            }
-            if (data.basicSalary == null || data.basicSalary <= 0) {
-                throw new AuraHandledException('Please enter a valid Basic Salary.');
+            Account acc;
+
+            if (String.isNotBlank(data.id)) {
+                // UPDATE — load existing record
+                acc = new Account(Id = data.id);
+                System.debug('upsertStaff — UPDATE mode for id: ' + data.id);
+            } else {
+                // INSERT — new record, must set RecordTypeId for Person Account
+                acc = new Account();
+                Id rtId = getPersonAccountRecordTypeId();
+                System.debug('upsertStaff — INSERT mode, PersonAccount RecordTypeId: ' + rtId);
+                if (rtId != null) {
+                    acc.RecordTypeId = rtId;
+                }
+                // If rtId is null the org uses a default RT — Salesforce
+                // will assign it automatically; do NOT throw here.
             }
 
-            Account acc = String.isNotBlank(data.id)
-                ? new Account(Id = data.id)
-                : new Account();
+            // ── Standard Person Account fields ────────────────────────
+            acc.FirstName           = firstName;
+            acc.LastName            = lastName;
+            acc.PersonEmail         = email;
+            acc.PersonMobilePhone   = String.isNotBlank(safeStr(data.phone))
+                                        ? safeStr(data.phone) : null;
+            acc.PersonMailingStreet = String.isNotBlank(safeStr(data.address))
+                                        ? safeStr(data.address) : null;
 
-            // ── Standard Person Account fields ──
-            acc.FirstName           = data.firstName.trim();
-            acc.LastName            = data.lastName.trim();
-            acc.PersonEmail         = data.email.trim();
-            acc.PersonMobilePhone   = String.isNotBlank(data.phone)   ? data.phone.trim()   : '';
-            acc.PersonMailingStreet = String.isNotBlank(data.address) ? data.address.trim() : '';
-            acc.Type                = (data.staffType == 'Teaching')  ? 'Teacher' : 'Non Teaching Staff';
-            acc.RecordTypeId        = getPersonAccountRecordTypeId();
+            // Type: 'Teacher' or 'Non Teaching Staff'
+            acc.Type = (safeStr(data.staffType) == 'Teaching')
+                        ? 'Teacher' : 'Non Teaching Staff';
 
-            // ── Standard Person fields ──
-            acc.PersonGenderIdentity = String.isNotBlank(data.gender)     ? data.gender     : null;
-            acc.PersonDepartment     = String.isNotBlank(data.department) ? data.department : null;
+            // ── PersonGenderIdentity — must be null (not '') if blank ─
+            // Passing an empty string to a picklist field causes DML error
+            String gender = safeStr(data.gender);
+            acc.PersonGenderIdentity = String.isNotBlank(gender) ? gender : null;
 
-            // ── Custom fields ──
-            acc.Designation__c         = String.isNotBlank(data.designation)  ? data.designation  : null;
-            acc.Subject_Taught__c      = String.isNotBlank(data.subject)       ? data.subject       : null;
-            acc.Qualification__c       = String.isNotBlank(data.qualification) ? data.qualification : null;
+            // ── Department ────────────────────────────────────────────
+            String dept = safeStr(data.department);
+            acc.PersonDepartment = String.isNotBlank(dept) ? dept : null;
+
+            // ── Custom fields ─────────────────────────────────────────
+            String desig = safeStr(data.designation);
+            acc.Designation__c = String.isNotBlank(desig) ? desig : null;
+
+            String subj = safeStr(data.subject);
+            acc.Subject_Taught__c = String.isNotBlank(subj) ? subj : null;
+
+            String qual = safeStr(data.qualification);
+            acc.Qualification__c = String.isNotBlank(qual) ? qual : null;
+
             acc.Basic_Salary__c        = data.basicSalary != null ? data.basicSalary : 0;
             acc.HRA__c                 = data.hra         != null ? data.hra         : 0;
             acc.DA__c                  = data.da          != null ? data.da          : 0;
             acc.PF_Deduction__c        = data.pf          != null ? data.pf          : 0;
-            acc.Bank_Account_Number__c = String.isNotBlank(data.accountNumber) ? data.accountNumber : null;
-            acc.IFSC_Code__c           = String.isNotBlank(data.ifsc)          ? data.ifsc          : null;
-            acc.Staff_Status__c        = String.isNotBlank(data.status)        ? data.status        : 'Active';
 
-            // ── Safe date parsing – never crash on bad date strings ──
-            if (String.isNotBlank(data.dob)) {
-                try { acc.PersonBirthdate = Date.valueOf(data.dob); }
-                catch (Exception ex) { /* skip invalid date */ }
+            String accNum = safeStr(data.accountNumber);
+            acc.Bank_Account_Number__c = String.isNotBlank(accNum) ? accNum : null;
+
+            String ifscVal = safeStr(data.ifsc);
+            acc.IFSC_Code__c = String.isNotBlank(ifscVal) ? ifscVal : null;
+
+            String statusVal = safeStr(data.status);
+            acc.Staff_Status__c = String.isNotBlank(statusVal) ? statusVal : 'Active';
+
+            // ── Safe date parsing ─────────────────────────────────────
+            if (String.isNotBlank(safeStr(data.dob))) {
+                try {
+                    acc.PersonBirthdate = Date.valueOf(data.dob);
+                } catch (Exception ex) {
+                    System.debug('upsertStaff — invalid DOB skipped: ' + data.dob);
+                }
             }
-            if (String.isNotBlank(data.joiningDate)) {
-                try { acc.Joining_Date__c = Date.valueOf(data.joiningDate); }
-                catch (Exception ex) { /* skip invalid date */ }
+            if (String.isNotBlank(safeStr(data.joiningDate))) {
+                try {
+                    acc.Joining_Date__c = Date.valueOf(data.joiningDate);
+                } catch (Exception ex) {
+                    System.debug('upsertStaff — invalid joiningDate skipped: ' + data.joiningDate);
+                }
             }
 
+            // ── DML ───────────────────────────────────────────────────
             if (String.isNotBlank(data.id)) {
-                // ── UPDATE existing record ──
+                System.debug('upsertStaff — running UPDATE');
                 update acc;
+                System.debug('upsertStaff — UPDATE success, id: ' + acc.Id);
                 return acc.Id;
             } else {
-                // ── INSERT new record then set auto-generated Employee ID ──
+                System.debug('upsertStaff — running INSERT, acc: ' + JSON.serialize(acc));
                 insert acc;
-                String empId = generateEmployeeId(acc.Id, data.staffType);
+                System.debug('upsertStaff — INSERT success, id: ' + acc.Id);
+
+                // Auto-generate Employee ID after insert
+                String empId = generateEmployeeId(acc.Id, safeStr(data.staffType));
                 acc.Employee_ID__c = empId;
                 update acc;
+                System.debug('upsertStaff — Employee ID set: ' + empId);
                 return acc.Id;
             }
 
         } catch (AuraHandledException ahe) {
-            // Re-throw our own validation messages exactly as-is
+            // Re-throw our own validation messages as-is
+            System.debug('upsertStaff — AuraHandledException: ' + ahe.getMessage());
             throw ahe;
+        } catch (DmlException dml) {
+            // Surface the actual Salesforce DML error (field name + message)
+            String dmlMsg = '';
+            for (Integer i = 0; i < dml.getNumDml(); i++) {
+                dmlMsg += dml.getDmlFieldNames(i) + ': ' + dml.getDmlMessage(i) + '; ';
+            }
+            System.debug('upsertStaff — DmlException: ' + dmlMsg);
+            throw new AuraHandledException('Save failed: ' + dmlMsg);
         } catch (Exception e) {
-            throw new AuraHandledException('Error saving staff: ' + e.getMessage());
+            System.debug('upsertStaff — Exception: ' + e.getMessage() + ' | ' + e.getStackTraceString());
+            throw new AuraHandledException('Save failed: ' + e.getMessage());
         }
     }
 
@@ -274,7 +353,6 @@ public without sharing class SchoolStaffController {
             Decimal pf    = acc.PF_Deduction__c != null ? acc.PF_Deduction__c : 0;
             Decimal net   = basic + hra + da - pf;
 
-            // Check if invoice already exists for this month
             List<Invoice__c> existing = [
                 SELECT Id, Status__c FROM Invoice__c
                 WHERE Account__c       = :staffId
@@ -382,12 +460,21 @@ public without sharing class SchoolStaffController {
     }
 
     /* ─────────────────────────────────────────
+       HELPER – NULL-SAFE STRING TRIM
+       Converts null → '' so isBlank() works
+       predictably; trims whitespace.
+    ───────────────────────────────────────── */
+
+    private static String safeStr(String val) {
+        return val == null ? '' : val.trim();
+    }
+
+    /* ─────────────────────────────────────────
        HELPER – SALARY STATUS MAP
     ───────────────────────────────────────── */
 
     private static Map<Id, String> getSalaryStatusMap(Set<Id> accountIds) {
         Map<Id, String> result = new Map<Id, String>();
-
         if (accountIds == null || accountIds.isEmpty()) return result;
 
         for (Invoice__c inv : [
@@ -397,13 +484,11 @@ public without sharing class SchoolStaffController {
               AND Account__c IN   :accountIds
             ORDER BY Invoice_Date__c DESC
         ]) {
-            // Only store the first (most recent) invoice per account
             if (!result.containsKey(inv.Account__c)) {
                 result.put(inv.Account__c, inv.Status__c == 'Paid' ? 'Paid' : 'Pending');
             }
         }
 
-        // Default to Pending for accounts with no invoice at all
         for (Id accId : accountIds) {
             if (!result.containsKey(accId)) {
                 result.put(accId, 'Pending');
@@ -424,7 +509,7 @@ public without sharing class SchoolStaffController {
         w.lastName      = acc.LastName;
         w.name          = acc.Name;
         w.gender        = acc.PersonGenderIdentity;
-        w.dob           = acc.PersonBirthdate != null ? String.valueOf(acc.PersonBirthdate) : '';
+        w.dob           = acc.PersonBirthdate  != null ? String.valueOf(acc.PersonBirthdate)  : '';
         w.email         = acc.PersonEmail;
         w.phone         = acc.PersonMobilePhone;
         w.address       = acc.PersonMailingStreet;
@@ -433,7 +518,7 @@ public without sharing class SchoolStaffController {
         w.department    = acc.PersonDepartment;
         w.subject       = acc.Subject_Taught__c;
         w.qualification = acc.Qualification__c;
-        w.joiningDate   = acc.Joining_Date__c != null ? String.valueOf(acc.Joining_Date__c) : '';
+        w.joiningDate   = acc.Joining_Date__c  != null ? String.valueOf(acc.Joining_Date__c)  : '';
         w.status        = String.isNotBlank(acc.Staff_Status__c) ? acc.Staff_Status__c : 'Active';
         w.basicSalary   = acc.Basic_Salary__c  != null ? acc.Basic_Salary__c  : 0;
         w.hra           = acc.HRA__c           != null ? acc.HRA__c           : 0;
@@ -447,16 +532,26 @@ public without sharing class SchoolStaffController {
 
     /* ─────────────────────────────────────────
        HELPER – PERSON ACCOUNT RECORD TYPE ID
+       Returns null safely if no PersonAccount
+       RT exists (some orgs use a default RT).
     ───────────────────────────────────────── */
 
     private static Id getPersonAccountRecordTypeId() {
-        List<RecordType> rt = [
-            SELECT Id FROM RecordType
-            WHERE SObjectType = 'Account'
-              AND IsPersonType = true
-            LIMIT 1
-        ];
-        return rt.isEmpty() ? null : rt[0].Id;
+        try {
+            List<RecordType> rt = [
+                SELECT Id FROM RecordType
+                WHERE SObjectType = 'Account'
+                  AND IsPersonType = true
+                  AND IsActive     = true
+                LIMIT 1
+            ];
+            Id rtId = rt.isEmpty() ? null : rt[0].Id;
+            System.debug('getPersonAccountRecordTypeId — rtId: ' + rtId);
+            return rtId;
+        } catch (Exception e) {
+            System.debug('getPersonAccountRecordTypeId — error: ' + e.getMessage());
+            return null;
+        }
     }
 
     /* ─────────────────────────────────────────

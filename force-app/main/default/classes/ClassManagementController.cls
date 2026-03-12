@@ -40,6 +40,138 @@ public without sharing class ClassManagementController {
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       GET CLASSES  (used by class management modal)
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled(cacheable=false)
+    public static List<Map<String, Object>> getClasses() {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+        for (Class__c c : [
+            SELECT Id, Name, Is_Active__c
+            FROM Class__c
+            ORDER BY Name
+        ]) {
+            result.add(new Map<String, Object>{
+                'id'       => c.Id,
+                'name'     => c.Name,
+                'isActive' => c.Is_Active__c
+            });
+        }
+        return result;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CREATE CLASS
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static Map<String, Object> createClass(String className) {
+        if (String.isBlank(className)) {
+            throw new AuraHandledException('Class Name is required.');
+        }
+        // duplicate check
+        List<Class__c> existing = [
+            SELECT Id FROM Class__c WHERE Name = :className LIMIT 1
+        ];
+        if (!existing.isEmpty()) {
+            throw new AuraHandledException('A class named "' + className + '" already exists.');
+        }
+        Class__c c = new Class__c(
+            Name         = className,
+            Is_Active__c = true
+        );
+        insert c;
+        return new Map<String, Object>{
+            'id'   => c.Id,
+            'name' => c.Name
+        };
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DELETE CLASS
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static void deleteClass(String classId) {
+        if (String.isBlank(classId)) {
+            throw new AuraHandledException('Class ID is required.');
+        }
+        // Check if any Class_Section__c references this class
+        List<Class_Section__c> linked = [
+            SELECT Id FROM Class_Section__c WHERE Class__c = :classId LIMIT 1
+        ];
+        if (!linked.isEmpty()) {
+            throw new AuraHandledException(
+                'Cannot delete this class because it is linked to one or more class sections.'
+            );
+        }
+        delete [SELECT Id FROM Class__c WHERE Id = :classId LIMIT 1];
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GET SECTIONS  (used by section management modal)
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled(cacheable=false)
+    public static List<Map<String, Object>> getSections() {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+        for (Section__c s : [
+            SELECT Id, Name, Is_Active__c
+            FROM Section__c
+            ORDER BY Name
+        ]) {
+            result.add(new Map<String, Object>{
+                'id'       => s.Id,
+                'name'     => s.Name,
+                'isActive' => s.Is_Active__c
+            });
+        }
+        return result;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CREATE SECTION
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static Map<String, Object> createSection(String sectionName) {
+        if (String.isBlank(sectionName)) {
+            throw new AuraHandledException('Section Name is required.');
+        }
+        // duplicate check
+        List<Section__c> existing = [
+            SELECT Id FROM Section__c WHERE Name = :sectionName LIMIT 1
+        ];
+        if (!existing.isEmpty()) {
+            throw new AuraHandledException('A section named "' + sectionName + '" already exists.');
+        }
+        Section__c s = new Section__c(
+            Name         = sectionName,
+            Is_Active__c = true
+        );
+        insert s;
+        return new Map<String, Object>{
+            'id'   => s.Id,
+            'name' => s.Name
+        };
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DELETE SECTION
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static void deleteSection(String sectionId) {
+        if (String.isBlank(sectionId)) {
+            throw new AuraHandledException('Section ID is required.');
+        }
+        // Check if any Class_Section__c references this section
+        List<Class_Section__c> linked = [
+            SELECT Id FROM Class_Section__c WHERE Section__c = :sectionId LIMIT 1
+        ];
+        if (!linked.isEmpty()) {
+            throw new AuraHandledException(
+                'Cannot delete this section because it is linked to one or more class sections.'
+            );
+        }
+        delete [SELECT Id FROM Section__c WHERE Id = :sectionId LIMIT 1];
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        GET ALL ACTIVE SUBJECTS
        ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled(cacheable=true)
@@ -51,6 +183,260 @@ public without sharing class ClassManagementController {
             ORDER BY Name
         ]);
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CREATE SINGLE SUBJECT
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static Map<String, Object> createSubject(
+        String subjectName,
+        String subjectCode,
+        String description
+    ) {
+        if (String.isBlank(subjectName)) {
+            throw new AuraHandledException('Subject Name is required.');
+        }
+        List<Subject__c> existing = [
+            SELECT Id FROM Subject__c WHERE Name = :subjectName LIMIT 1
+        ];
+        if (!existing.isEmpty()) {
+            throw new AuraHandledException('A subject with the name "' + subjectName + '" already exists.');
+        }
+        Subject__c s = new Subject__c(
+            Name         = subjectName,
+            Is_Active__c = true
+        );
+        insert s;
+        return new Map<String, Object>{
+            'id'   => s.Id,
+            'name' => s.Name
+        };
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BULK CREATE SUBJECTS (from CSV/Excel import)
+       ═══════════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static Map<String, Object> bulkCreateSubjects(
+        List<Map<String, Object>> subjectsData
+    ) {
+        if (subjectsData == null || subjectsData.isEmpty()) {
+            throw new AuraHandledException('No subject data provided.');
+        }
+
+        Set<String> incomingNames = new Set<String>();
+        for (Map<String, Object> row : subjectsData) {
+            String n = (String) row.get('name');
+            if (String.isNotBlank(n)) incomingNames.add(n.trim().toLowerCase());
+        }
+
+        Set<String> existingNames = new Set<String>();
+        for (Subject__c s : [SELECT Name FROM Subject__c WHERE Is_Active__c = true]) {
+            existingNames.add(s.Name.toLowerCase());
+        }
+
+        List<Subject__c> toInsert  = new List<Subject__c>();
+        List<String>     skipped   = new List<String>();
+        List<String>     errorRows = new List<String>();
+        Integer rowNum = 1;
+
+        for (Map<String, Object> row : subjectsData) {
+            String name = row.get('name') != null ? ((String) row.get('name')).trim() : '';
+            if (String.isBlank(name)) {
+                errorRows.add('Row ' + rowNum + ': Subject name is required.');
+                rowNum++;
+                continue;
+            }
+            if (existingNames.contains(name.toLowerCase())) {
+                skipped.add(name);
+                rowNum++;
+                continue;
+            }
+            Subject__c s = new Subject__c(Name = name, Is_Active__c = true);
+            toInsert.add(s);
+            existingNames.add(name.toLowerCase());
+            rowNum++;
+        }
+
+        Integer created = 0;
+        if (!toInsert.isEmpty()) {
+            Database.SaveResult[] results = Database.insert(toInsert, false);
+            for (Integer i = 0; i < results.size(); i++) {
+                if (results[i].isSuccess()) {
+                    created++;
+                } else {
+                    errorRows.add(toInsert[i].Name + ': ' + results[i].getErrors()[0].getMessage());
+                }
+            }
+        }
+
+        return new Map<String, Object>{
+            'created'      => created,
+            'skipped'      => skipped.size(),
+            'errors'       => errorRows.size(),
+            'errorDetails' => errorRows,
+            'skippedNames' => skipped
+        };
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BULK CREATE TEACHERS (from CSV/Excel import)
+       ═══════════════════════════════════════════════════════════════ */
+@AuraEnabled
+public static Map<String, Object> bulkCreateTeachers(
+    List<Map<String, Object>> teachersData
+) {
+    if (teachersData == null || teachersData.isEmpty()) {
+        throw new AuraHandledException('No teacher data provided.');
+    }
+
+    Set<String> incomingEmails = new Set<String>();
+    for (Map<String, Object> row : teachersData) {
+        String e = (String) row.get('email');
+        if (String.isNotBlank(e)) incomingEmails.add(e.trim().toLowerCase());
+    }
+
+    Set<String> existingEmails = new Set<String>();
+    for (Account a : [
+        SELECT PersonEmail FROM Account
+        WHERE PersonEmail IN :incomingEmails AND IsPersonAccount = true
+    ]) {
+        if (String.isNotBlank(a.PersonEmail)) existingEmails.add(a.PersonEmail.toLowerCase());
+    }
+
+    Id personRtId;
+    try {
+        personRtId = [
+            SELECT Id FROM RecordType
+            WHERE SObjectType = 'Account' AND IsPersonType = true LIMIT 1
+        ].Id;
+    } catch (Exception ex) {
+        throw new AuraHandledException('Person Account record type not found.');
+    }
+
+    // Build subject name → Id map (lowercase, trimmed)
+    Map<String, Id> subjectNameToId = new Map<String, Id>();
+    for (Subject__c s : [SELECT Id, Name FROM Subject__c WHERE Is_Active__c = true]) {
+        subjectNameToId.put(s.Name.toLowerCase().trim(), s.Id);
+    }
+
+    List<Account>             toInsert       = new List<Account>();
+    // parallel list: index matches toInsert index
+    List<List<Map<String,String>>> skillMatrix = new List<List<Map<String,String>>>();
+    List<String>              skipped        = new List<String>();
+    List<String>              errorRows      = new List<String>();
+    Integer rowNum = 1;
+
+    for (Map<String, Object> row : teachersData) {
+        String firstName = row.get('firstName')     != null ? ((String)row.get('firstName')).trim()     : '';
+        String lastName  = row.get('lastName')      != null ? ((String)row.get('lastName')).trim()      : '';
+        String email     = row.get('email')         != null ? ((String)row.get('email')).trim()         : '';
+        String phone     = row.get('phone')         != null ? ((String)row.get('phone')).trim()         : '';
+        String qual      = row.get('qualification') != null ? ((String)row.get('qualification')).trim() : '';
+
+        if (String.isBlank(firstName) || String.isBlank(lastName)) {
+            errorRows.add('Row ' + rowNum + ': First Name and Last Name are required.');
+            rowNum++; continue;
+        }
+        if (String.isBlank(email)) {
+            errorRows.add('Row ' + rowNum + ' (' + firstName + ' ' + lastName + '): Email is required.');
+            rowNum++; continue;
+        }
+        if (existingEmails.contains(email.toLowerCase())) {
+            skipped.add(firstName + ' ' + lastName + ' (' + email + ')');
+            rowNum++; continue;
+        }
+
+        // Collect up to 5 skills from the row
+        List<Map<String,String>> rowSkills = new List<Map<String,String>>();
+        for (Integer i = 1; i <= 5; i++) {
+            String subjectName = row.get('subject'    + i) != null ? ((String)row.get('subject'    + i)).trim() : '';
+            String skillLevel  = row.get('skillLevel' + i) != null ? ((String)row.get('skillLevel' + i)).trim() : '';
+            if (String.isNotBlank(subjectName) && String.isNotBlank(skillLevel)) {
+                rowSkills.add(new Map<String,String>{
+                    'subjectName' => subjectName,
+                    'level'       => skillLevel
+                });
+            }
+        }
+
+        Account a = new Account(
+            FirstName    = firstName,
+            LastName     = lastName,
+            PersonEmail  = email,
+            Type         = 'Teacher',
+            RecordTypeId = personRtId
+        );
+        if (String.isNotBlank(phone)) a.Phone       = phone;
+        if (String.isNotBlank(qual))  a.Description = qual;
+
+        toInsert.add(a);
+        skillMatrix.add(rowSkills);
+        existingEmails.add(email.toLowerCase());
+        rowNum++;
+    }
+
+    Integer created      = 0;
+    Integer skillsCreated = 0;
+    List<Teacher_Skill__c> skillRecords = new List<Teacher_Skill__c>();
+
+    if (!toInsert.isEmpty()) {
+        Database.SaveResult[] results = Database.insert(toInsert, false);
+
+        for (Integer i = 0; i < results.size(); i++) {
+            if (results[i].isSuccess()) {
+                created++;
+                Id     accountId = results[i].getId();
+                String fullName  = toInsert[i].FirstName + ' ' + toInsert[i].LastName;
+
+                for (Map<String,String> sk : skillMatrix[i]) {
+                    String lookupKey = sk.get('subjectName').toLowerCase().trim();
+                    Id subjectId = subjectNameToId.get(lookupKey);
+
+                    // Partial match fallback
+                    if (subjectId == null) {
+                        for (String key : subjectNameToId.keySet()) {
+                            if (key.contains(lookupKey) || lookupKey.contains(key)) {
+                                subjectId = subjectNameToId.get(key);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (subjectId != null) {
+                        skillRecords.add(new Teacher_Skill__c(
+                            Name           = fullName + ' - ' + sk.get('subjectName'),
+                            Teacher__c     = accountId,
+                            Subject__c     = subjectId,
+                            Skill_Level__c = sk.get('level')
+                        ));
+                    }
+                }
+            } else {
+                errorRows.add(
+                    toInsert[i].FirstName + ' ' + toInsert[i].LastName + ': ' +
+                    results[i].getErrors()[0].getMessage()
+                );
+            }
+        }
+    }
+
+    if (!skillRecords.isEmpty()) {
+        Database.SaveResult[] skillResults = Database.insert(skillRecords, false);
+        for (Database.SaveResult sr : skillResults) {
+            if (sr.isSuccess()) skillsCreated++;
+        }
+    }
+
+    return new Map<String, Object>{
+        'created'       => created,
+        'skipped'       => skipped.size(),
+        'errors'        => errorRows.size(),
+        'errorDetails'  => errorRows,
+        'skippedNames'  => skipped,
+        'skillsCreated' => skillsCreated
+    };
+}
 
     /* ═══════════════════════════════════════════════════════════════
        GET PERIOD TIMINGS FROM CUSTOM OBJECT
@@ -231,16 +617,16 @@ public without sharing class ClassManagementController {
                     String teacherId   = (String) teacherIds[i];
                     String teacherName = teacherNameMap.containsKey((Id) teacherId)
                         ? teacherNameMap.get((Id) teacherId) : teacherId;
-                    Integer periods    = 5;
+                    Integer periods = 5;
                     if (periodValues != null && i < periodValues.size() && periodValues[i] != null) {
                         periods = Integer.valueOf(String.valueOf(periodValues[i]));
                     }
                     assignments.add(new Teacher_Assignment__c(
-                        Name             = className + ' ' + sectionName + ' - ' + subjectName + ' - ' + teacherName,
-                        Class_Section__c = cs.Id,
-                        Subject__c       = subjectId,
-                        Teacher__c       = teacherId,
-                        Academic_Year__c = academicYearId,
+                        Name                = className + ' ' + sectionName + ' - ' + subjectName + ' - ' + teacherName,
+                        Class_Section__c    = cs.Id,
+                        Subject__c          = subjectId,
+                        Teacher__c          = teacherId,
+                        Academic_Year__c    = academicYearId,
                         Periods_Per_Week__c = periods
                     ));
                 }
@@ -600,11 +986,11 @@ public without sharing class ClassManagementController {
                     : (ta.Periods_Per_Week__c != null ? Integer.valueOf(ta.Periods_Per_Week__c) : 0);
 
                 subjList.add(new Map<String, Object>{
-                    'assignmentId'    => ta.Id,
-                    'subjectId'       => ta.Subject__c,
-                    'subjectName'     => ta.Subject__r.Name,
-                    'periodsPerWeek'  => periodsToShow,
-                    'fromTimetable'   => (timetableCount != null)
+                    'assignmentId'   => ta.Id,
+                    'subjectId'      => ta.Subject__c,
+                    'subjectName'    => ta.Subject__r.Name,
+                    'periodsPerWeek' => periodsToShow,
+                    'fromTimetable'  => (timetableCount != null)
                 });
             }
 
@@ -866,8 +1252,6 @@ public without sharing class ClassManagementController {
 
     /* ═══════════════════════════════════════════════════════════════
        GET PERIODS FOR CLASS SECTION — FIXED
-       Properly handles leaser periods so substitute teachers appear
-       in the class timetable card just like in the teacher workload.
        ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled(cacheable=false)
     public static List<Map<String, Object>> getPeriodsForClassSection(String classSectionId) {
@@ -876,7 +1260,6 @@ public without sharing class ClassManagementController {
         }
 
         try {
-            // ── Fetch periods, including Substitute_Teacher__c if the field exists ──
             List<Period__c> periods;
             try {
                 periods = [
@@ -895,7 +1278,6 @@ public without sharing class ClassManagementController {
                     ORDER BY Day__c, Period_Number__c
                 ];
             } catch (Exception queryEx) {
-                // Substitute_Teacher__c field may not exist — fall back without it
                 periods = [
                     SELECT Id, Day__c, Period_Number__c,
                            Subjects__c, Subjects__r.Name,
@@ -912,8 +1294,6 @@ public without sharing class ClassManagementController {
                 ];
             }
 
-            // ── Build regular-teacher map: subjectId → (teacherId, teacherName) ──
-            // "Regular" = the teacher officially assigned via Teacher_Assignment__c
             Map<Id, Id>     regularTeacherById   = new Map<Id, Id>();
             Map<Id, String> regularTeacherByName = new Map<Id, String>();
 
@@ -934,7 +1314,6 @@ public without sharing class ClassManagementController {
             for (Period__c p : periods) {
                 Map<String, Object> row = new Map<String, Object>();
 
-                // ── Base fields ──
                 row.put('periodId',       p.Id);
                 row.put('day',            p.Day__c);
                 row.put('periodNumber',   p.Period_Number__c);
@@ -945,7 +1324,6 @@ public without sharing class ClassManagementController {
                 row.put('endDate',        p.End_Date__c   != null ? String.valueOf(p.End_Date__c)   : '');
                 row.put('frequency',      p.Frequency__c);
 
-                // ── Time formatting ──
                 if (p.Start_Time__c != null) {
                     row.put('startTime', DateTime.newInstance(Date.today(), p.Start_Time__c).format('h:mm a'));
                 } else {
@@ -957,7 +1335,6 @@ public without sharing class ClassManagementController {
                     row.put('endTime', '');
                 }
 
-                // ── Subject resolution ──
                 Id subjectId = null;
                 if (p.Subjects__c != null) {
                     subjectId = p.Subjects__c;
@@ -973,29 +1350,6 @@ public without sharing class ClassManagementController {
                     row.put('subjectName', '—');
                 }
 
-                // ══════════════════════════════════════════════════════════════
-                //  LEASER / SUBSTITUTE DETECTION
-                //
-                //  CASE 1 (Is_Leaser__c = true):
-                //    The period's Assigned_Teacher__c is the SUBSTITUTE covering.
-                //    The regular teacher (Teacher_Assignment__c) is ON LEAVE.
-                //    If Substitute_Teacher__c lookup is also filled, prefer that.
-                //
-                //  CASE 2 (Substitute_Teacher__c lookup filled, no leaser flag):
-                //    Substitute_Teacher__c = who is covering.
-                //    Assigned_Teacher__c   = original (on leave).
-                //
-                //  CASE 3 (implicit sub — assigned teacher ≠ regular assignment):
-                //    Assigned_Teacher__c is acting as substitute.
-                //    Regular assignment teacher is on leave.
-                //
-                //  For the UI card we expose:
-                //    isSubstitute         = true in any of the above cases
-                //    substituteTeacherName = person physically present in the class
-                //    originalTeacherName   = person on leave
-                //    teacherName           = substituteTeacherName if sub, else regular
-                // ══════════════════════════════════════════════════════════════
-
                 Boolean isLeaser     = (p.Is_Leaser__c == true);
                 Boolean isSubstitute = false;
                 String  substituteTeacherName = null;
@@ -1005,7 +1359,6 @@ public without sharing class ClassManagementController {
                 Id     regularTeacherId   = (subjectId != null) ? regularTeacherById.get(subjectId)   : null;
                 String regularTeacherName = (subjectId != null) ? regularTeacherByName.get(subjectId) : null;
 
-                // Check if the Substitute_Teacher__c field was fetched (it may not exist)
                 Id     subTeacherId   = null;
                 String subTeacherName = null;
                 try {
@@ -1013,15 +1366,11 @@ public without sharing class ClassManagementController {
                     subTeacherName = subTeacherId != null
                         ? (String) p.getSObject('Substitute_Teacher__r').get('Name')
                         : null;
-                } catch (Exception fieldEx) {
-                    // field doesn't exist on this org — ignore
-                }
+                } catch (Exception fieldEx) {}
 
                 if (isLeaser) {
-                    // ── CASE 1 ──
                     isSubstitute = true;
                     if (subTeacherId != null) {
-                        // Explicit Substitute_Teacher__c lookup filled
                         substituteTeacherName = subTeacherName;
                         originalTeacherName   = p.Assigned_Teacher__r != null
                                                   ? p.Assigned_Teacher__r.Name
@@ -1029,12 +1378,10 @@ public without sharing class ClassManagementController {
                     } else if (p.Assigned_Teacher__c != null
                                && regularTeacherId != null
                                && p.Assigned_Teacher__c != regularTeacherId) {
-                        // Period's assigned teacher IS the sub
                         substituteTeacherName = p.Assigned_Teacher__r != null
                                                   ? p.Assigned_Teacher__r.Name : null;
                         originalTeacherName   = regularTeacherName;
                     } else {
-                        // Leaser but same teacher (self-leaser / no sub data)
                         substituteTeacherName = p.Assigned_Teacher__r != null
                                                   ? p.Assigned_Teacher__r.Name : null;
                         originalTeacherName   = regularTeacherName;
@@ -1043,7 +1390,6 @@ public without sharing class ClassManagementController {
                                           ? substituteTeacherName : 'Sub TBD';
 
                 } else if (subTeacherId != null) {
-                    // ── CASE 2 ──
                     isSubstitute          = true;
                     substituteTeacherName = subTeacherName;
                     originalTeacherName   = p.Assigned_Teacher__r != null
@@ -1055,7 +1401,6 @@ public without sharing class ClassManagementController {
                            && p.Assigned_Teacher__c != null
                            && regularTeacherId != null
                            && p.Assigned_Teacher__c != regularTeacherId) {
-                    // ── CASE 3 — implicit substitute ──
                     isSubstitute          = true;
                     substituteTeacherName = p.Assigned_Teacher__r != null
                                               ? p.Assigned_Teacher__r.Name : null;
@@ -1063,7 +1408,6 @@ public without sharing class ClassManagementController {
                     teacherNameForCard    = substituteTeacherName;
 
                 } else {
-                    // Normal period
                     teacherNameForCard = p.Assigned_Teacher__r != null
                                           ? p.Assigned_Teacher__r.Name : 'Unassigned';
                 }
@@ -1140,14 +1484,6 @@ public without sharing class ClassManagementController {
         }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       GET TIMETABLE FOR CLASS — WITH LEAVE / SUBSTITUTE DETECTION
-       Returns isOnLeave, onLeaveTeacherName, substituteTeacherId,
-       substituteTeacherName per cell so the timetable grid can:
-         • Highlight cells where the assigned teacher is on leave
-         • Show "On Leave" badge + leave teacher name
-         • Allow assigning a substitute with one click
-       ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled
     public static Map<String, Object> getTimetableForClass(
         Id     classSectionId,
@@ -1160,7 +1496,6 @@ public without sharing class ClassManagementController {
             Date sDate = String.isNotBlank(startDate) ? Date.valueOf(startDate) : null;
             Date eDate = String.isNotBlank(endDate)   ? Date.valueOf(endDate)   : null;
 
-            // Query periods — try with Substitute_Teacher__c first, fall back if field missing
             List<Period__c> periods;
             try {
                 periods = [
@@ -1189,7 +1524,6 @@ public without sharing class ClassManagementController {
                 ];
             }
 
-            // Regular teacher map: subjectId → teacherId / teacherName
             Map<Id, Id>     regularTeacherById   = new Map<Id, Id>();
             Map<Id, String> regularTeacherByName = new Map<Id, String>();
             for (Teacher_Assignment__c ta : [
@@ -1209,7 +1543,6 @@ public without sharing class ClassManagementController {
                 if (p.Day__c == null || p.Period_Number__c == null) continue;
                 String key = p.Day__c + '_' + p.Period_Number__c;
 
-                // Resolve subject ID
                 Id subjectId = null;
                 if (p.Subjects__c != null) {
                     subjectId = p.Subjects__c;
@@ -1217,7 +1550,6 @@ public without sharing class ClassManagementController {
                     subjectId = subjectNameToId.get(p.Subject__c.toLowerCase());
                 }
 
-                // Regular teacher for this subject in this class
                 Id     regularId   = subjectId != null ? regularTeacherById.get(subjectId)   : null;
                 String regularName = subjectId != null ? regularTeacherByName.get(subjectId) : null;
 
@@ -1227,7 +1559,6 @@ public without sharing class ClassManagementController {
                 String  substituteTeacherIdStr = null;
                 String  substituteTeacherName = null;
 
-                // Try Substitute_Teacher__c explicit lookup
                 Id subTeacherId = null;
                 String subTeacherName = null;
                 try {
@@ -1239,27 +1570,22 @@ public without sharing class ClassManagementController {
                 } catch (Exception fieldEx) {}
 
                 if (isLeaser) {
-                    // CASE 1: Is_Leaser__c = true → regular teacher is on leave
                     isOnLeave          = true;
                     onLeaveTeacherName = regularName != null ? regularName
                                         : (p.Assigned_Teacher__r != null ? p.Assigned_Teacher__r.Name : 'On Leave');
                     if (subTeacherId != null) {
-                        // Explicit Substitute_Teacher__c field populated
                         substituteTeacherIdStr = String.valueOf(subTeacherId);
                         substituteTeacherName  = subTeacherName;
                     } else if (p.Assigned_Teacher__c != null && regularId != null && p.Assigned_Teacher__c != regularId) {
-                        // Assigned_Teacher__c is the substitute (different from regular)
                         substituteTeacherIdStr = String.valueOf(p.Assigned_Teacher__c);
                         substituteTeacherName  = p.Assigned_Teacher__r != null ? p.Assigned_Teacher__r.Name : null;
                     }
                 } else if (subTeacherId != null) {
-                    // CASE 2: Substitute_Teacher__c populated but Is_Leaser__c not flagged
                     isOnLeave              = true;
                     onLeaveTeacherName     = p.Assigned_Teacher__r != null ? p.Assigned_Teacher__r.Name : regularName;
                     substituteTeacherIdStr = String.valueOf(subTeacherId);
                     substituteTeacherName  = subTeacherName;
                 } else if (subjectId != null && p.Assigned_Teacher__c != null && regularId != null && p.Assigned_Teacher__c != regularId) {
-                    // CASE 3: Implicit — assigned teacher differs from regular teacher for this subject
                     isOnLeave              = true;
                     onLeaveTeacherName     = regularName;
                     substituteTeacherIdStr = String.valueOf(p.Assigned_Teacher__c);
@@ -1287,27 +1613,19 @@ public without sharing class ClassManagementController {
         }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       SAVE SUBSTITUTE TEACHER FOR A PERIOD
-       Called when user clicks a leave-highlighted timetable cell
-       and assigns a substitute teacher from the modal.
-       ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled
     public static void saveSubstituteForPeriod(String periodId, String substituteTeacherId) {
         if (String.isBlank(periodId)) throw new AuraHandledException('Period ID is required.');
         try {
             Period__c p = [SELECT Id, Assigned_Teacher__c, Is_Leaser__c FROM Period__c WHERE Id = :periodId LIMIT 1];
             if (String.isNotBlank(substituteTeacherId)) {
-                // Try Substitute_Teacher__c lookup first (preferred)
                 try {
                     p.put('Substitute_Teacher__c', (Id) substituteTeacherId);
                 } catch (Exception lookupEx) {
-                    // Field doesn't exist — use Assigned_Teacher__c as substitute
                     p.Assigned_Teacher__c = (Id) substituteTeacherId;
                 }
                 p.Is_Leaser__c = true;
             } else {
-                // Clearing substitute
                 try { p.put('Substitute_Teacher__c', null); } catch (Exception ex) {}
                 p.Is_Leaser__c = false;
             }
