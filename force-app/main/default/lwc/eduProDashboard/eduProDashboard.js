@@ -112,6 +112,7 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
 
     // Navigation Getters
     get isDashboardPage() { return this.currentPage === 'dashboard'; }
+    get isStaffPage() { return this.currentPage === 'staff'; }
     get isAdmissionPage() { return this.currentPage === 'admission'; }
     get isPriceBookPage() { return this.currentPage === 'pricebook'; }
     get isAttendancePage() { return this.currentPage === 'attendance'; }
@@ -136,6 +137,9 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
     }
     get attendanceNavClass() {
         return `nav-item ${this.currentNav === 'attendance' ? 'active' : ''}`;
+    }
+    get staffNavClass() {
+        return `nav-item ${this.currentNav === 'staff' ? 'active' : ''}`;
     }
     get attendanceReportNavClass() {
         return `nav-item ${this.currentNav === 'attendance_report' ? 'active' : ''}`;
@@ -238,6 +242,13 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
         this.selectedStudentIdFromSearch = null;
         this.currentPage = 'student';
         this.currentNav = 'student';
+        this.closeSidebar();
+    }
+
+    handleStaffClick(event) {
+        if (event) event.preventDefault();
+        this.currentPage = 'staff';
+        this.currentNav = 'staff';
         this.closeSidebar();
     }
 

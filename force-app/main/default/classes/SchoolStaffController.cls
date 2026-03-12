@@ -6,29 +6,29 @@ public without sharing class SchoolStaffController {
 
     public class StaffWrapper {
         @AuraEnabled public String  id;
-        @AuraEnabled public String  employeeId;
-        @AuraEnabled public String  firstName;
-        @AuraEnabled public String  lastName;
-        @AuraEnabled public String  name;
-        @AuraEnabled public String  gender;
-        @AuraEnabled public String  dob;
-        @AuraEnabled public String  email;
-        @AuraEnabled public String  phone;
-        @AuraEnabled public String  address;
-        @AuraEnabled public String  designation;
-        @AuraEnabled public String  department;
-        @AuraEnabled public String  staffType;
-        @AuraEnabled public String  subject;
-        @AuraEnabled public String  qualification;
-        @AuraEnabled public String  joiningDate;
-        @AuraEnabled public String  status;
-        @AuraEnabled public Decimal basicSalary;
-        @AuraEnabled public Decimal hra;
-        @AuraEnabled public Decimal da;
-        @AuraEnabled public Decimal pf;
-        @AuraEnabled public String  accountNumber;
-        @AuraEnabled public String  ifsc;
-        @AuraEnabled public String  salaryStatus;
+        @AuraEnabled public String  EmployeeId;
+        @AuraEnabled public String  FirstName;
+        @AuraEnabled public String  LastName;
+        @AuraEnabled public String  Name;
+        @AuraEnabled public String  Gender;
+        @AuraEnabled public String  Dob;
+        @AuraEnabled public String  Email;
+        @AuraEnabled public String  Phone;
+        @AuraEnabled public String  Address;
+        @AuraEnabled public String  Designation;
+        @AuraEnabled public String  Department;
+        @AuraEnabled public String  StaffType;
+        @AuraEnabled public String  Subject;
+        @AuraEnabled public String  Qualification;
+        @AuraEnabled public String  JoiningDate;
+        @AuraEnabled public String  Status;
+        @AuraEnabled public Decimal BasicSalary;
+        @AuraEnabled public Decimal Hra;
+        @AuraEnabled public Decimal Da;
+        @AuraEnabled public Decimal Pf;
+        @AuraEnabled public String  AccountNumber;
+        @AuraEnabled public String  Ifsc;
+        @AuraEnabled public String  SalaryStatus;
     }
 
     public class PayrollWrapper {
@@ -163,25 +163,39 @@ public without sharing class SchoolStaffController {
     ───────────────────────────────────────── */
 
     @AuraEnabled
-    public static String upsertStaff(StaffWrapper data) {
+    public static String upsertStaff(String jsonData) {
+        
+        // ── LOG DATA FOR DEBUGGING ────────────────────────────
+        System.debug('upsertStaff received jsonData: ' + jsonData);
+
+        if (String.isBlank(jsonData)) {
+            throw new AuraHandledException('No staff data received on server.');
+        }
+
+        StaffWrapper data;
+        try {
+            data = (StaffWrapper) JSON.deserialize(jsonData, StaffWrapper.class);
+        } catch (Exception e) {
+            System.debug('JSON Parse Error: ' + e.getMessage());
+            throw new AuraHandledException('Failed to parse staff data: ' + e.getMessage());
+        }
+
+        if (data == null) {
+            throw new AuraHandledException('Parsed staff data is null.');
+        }
 
         // ── Step 1: Null-safe trim helpers applied first ──────────────
-        String firstName  = safeStr(data.firstName);
-        String lastName   = safeStr(data.lastName);
-        String email      = safeStr(data.email);
-        String phone      = safeStr(data.phone);
+        String firstName  = safeStr(data.FirstName);
+        String lastName   = safeStr(data.LastName);
+        String email      = safeStr(data.Email);
+        String phone      = safeStr(data.Phone);
 
-        System.debug('upsertStaff called — firstName=' + firstName
-            + ' | lastName=' + lastName
-            + ' | email=' + email
-            + ' | phone=' + phone
-            + ' | basicSalary=' + data.basicSalary
-            + ' | staffType=' + data.staffType
-            + ' | id=' + data.id);
+        System.debug('upsertStaff parsed fields — firstName=[' + firstName
+            + '] | lastName=[' + lastName + ']');
 
         // ── Step 2: Validate AFTER trimming ───────────────────────────
         if (String.isBlank(firstName)) {
-            throw new AuraHandledException('First Name is required.');
+            throw new AuraHandledException('First Name is required. (Received: ' + data + ')');
         }
         if (String.isBlank(lastName)) {
             throw new AuraHandledException('Last Name is required.');
@@ -192,7 +206,7 @@ public without sharing class SchoolStaffController {
         if (String.isBlank(phone)) {
             throw new AuraHandledException('Phone is required.');
         }
-        if (data.basicSalary == null || data.basicSalary <= 0) {
+        if (data.BasicSalary == null || data.BasicSalary <= 0) {
             throw new AuraHandledException('Please enter a valid Basic Salary.');
         }
 
@@ -219,61 +233,59 @@ public without sharing class SchoolStaffController {
             acc.FirstName           = firstName;
             acc.LastName            = lastName;
             acc.PersonEmail         = email;
-            acc.PersonMobilePhone   = String.isNotBlank(safeStr(data.phone))
-                                        ? safeStr(data.phone) : null;
-            acc.PersonMailingStreet = String.isNotBlank(safeStr(data.address))
-                                        ? safeStr(data.address) : null;
+            acc.PersonMobilePhone   = String.isNotBlank(phone) ? phone : null;
+            acc.PersonMailingStreet = String.isNotBlank(safeStr(data.Address)) ? safeStr(data.Address) : null;
 
             // Type: 'Teacher' or 'Non Teaching Staff'
-            acc.Type = (safeStr(data.staffType) == 'Teaching')
+            acc.Type = (safeStr(data.StaffType) == 'Teaching')
                         ? 'Teacher' : 'Non Teaching Staff';
 
             // ── PersonGenderIdentity — must be null (not '') if blank ─
             // Passing an empty string to a picklist field causes DML error
-            String gender = safeStr(data.gender);
+            String gender = safeStr(data.Gender);
             acc.PersonGenderIdentity = String.isNotBlank(gender) ? gender : null;
 
             // ── Department ────────────────────────────────────────────
-            String dept = safeStr(data.department);
+            String dept = safeStr(data.Department);
             acc.PersonDepartment = String.isNotBlank(dept) ? dept : null;
 
             // ── Custom fields ─────────────────────────────────────────
-            String desig = safeStr(data.designation);
+            String desig = safeStr(data.Designation);
             acc.Designation__c = String.isNotBlank(desig) ? desig : null;
 
-            String subj = safeStr(data.subject);
+            String subj = safeStr(data.Subject);
             acc.Subject_Taught__c = String.isNotBlank(subj) ? subj : null;
 
-            String qual = safeStr(data.qualification);
+            String qual = safeStr(data.Qualification);
             acc.Qualification__c = String.isNotBlank(qual) ? qual : null;
 
-            acc.Basic_Salary__c        = data.basicSalary != null ? data.basicSalary : 0;
-            acc.HRA__c                 = data.hra         != null ? data.hra         : 0;
-            acc.DA__c                  = data.da          != null ? data.da          : 0;
-            acc.PF_Deduction__c        = data.pf          != null ? data.pf          : 0;
+            acc.Basic_Salary__c        = data.BasicSalary != null ? data.BasicSalary : 0;
+            acc.HRA__c                 = data.Hra         != null ? data.Hra         : 0;
+            acc.DA__c                  = data.Da          != null ? data.Da          : 0;
+            acc.PF_Deduction__c        = data.Pf          != null ? data.Pf          : 0;
 
-            String accNum = safeStr(data.accountNumber);
+            String accNum = safeStr(data.AccountNumber);
             acc.Bank_Account_Number__c = String.isNotBlank(accNum) ? accNum : null;
 
-            String ifscVal = safeStr(data.ifsc);
+            String ifscVal = safeStr(data.Ifsc);
             acc.IFSC_Code__c = String.isNotBlank(ifscVal) ? ifscVal : null;
 
-            String statusVal = safeStr(data.status);
+            String statusVal = safeStr(data.Status);
             acc.Staff_Status__c = String.isNotBlank(statusVal) ? statusVal : 'Active';
 
             // ── Safe date parsing ─────────────────────────────────────
-            if (String.isNotBlank(safeStr(data.dob))) {
+            if (String.isNotBlank(safeStr(data.Dob))) {
                 try {
-                    acc.PersonBirthdate = Date.valueOf(data.dob);
+                    acc.PersonBirthdate = Date.valueOf(data.Dob);
                 } catch (Exception ex) {
-                    System.debug('upsertStaff — invalid DOB skipped: ' + data.dob);
+                    System.debug('upsertStaff — invalid Dob skipped: ' + data.Dob);
                 }
             }
-            if (String.isNotBlank(safeStr(data.joiningDate))) {
+            if (String.isNotBlank(safeStr(data.JoiningDate))) {
                 try {
-                    acc.Joining_Date__c = Date.valueOf(data.joiningDate);
+                    acc.Joining_Date__c = Date.valueOf(data.JoiningDate);
                 } catch (Exception ex) {
-                    System.debug('upsertStaff — invalid joiningDate skipped: ' + data.joiningDate);
+                    System.debug('upsertStaff — invalid JoiningDate skipped: ' + data.JoiningDate);
                 }
             }
 
@@ -289,7 +301,7 @@ public without sharing class SchoolStaffController {
                 System.debug('upsertStaff — INSERT success, id: ' + acc.Id);
 
                 // Auto-generate Employee ID after insert
-                String empId = generateEmployeeId(acc.Id, safeStr(data.staffType));
+                String empId = generateEmployeeId(acc.Id, safeStr(data.StaffType));
                 acc.Employee_ID__c = empId;
                 update acc;
                 System.debug('upsertStaff — Employee ID set: ' + empId);
@@ -504,29 +516,29 @@ public without sharing class SchoolStaffController {
     private static StaffWrapper toWrapper(Account acc, String salaryStatus) {
         StaffWrapper w = new StaffWrapper();
         w.id            = acc.Id;
-        w.employeeId    = acc.Employee_ID__c;
-        w.firstName     = acc.FirstName;
-        w.lastName      = acc.LastName;
-        w.name          = acc.Name;
-        w.gender        = acc.PersonGenderIdentity;
-        w.dob           = acc.PersonBirthdate  != null ? String.valueOf(acc.PersonBirthdate)  : '';
-        w.email         = acc.PersonEmail;
-        w.phone         = acc.PersonMobilePhone;
-        w.address       = acc.PersonMailingStreet;
-        w.staffType     = acc.Type == 'Teacher' ? 'Teaching' : 'Non-Teaching';
-        w.designation   = acc.Designation__c;
-        w.department    = acc.PersonDepartment;
-        w.subject       = acc.Subject_Taught__c;
-        w.qualification = acc.Qualification__c;
-        w.joiningDate   = acc.Joining_Date__c  != null ? String.valueOf(acc.Joining_Date__c)  : '';
-        w.status        = String.isNotBlank(acc.Staff_Status__c) ? acc.Staff_Status__c : 'Active';
-        w.basicSalary   = acc.Basic_Salary__c  != null ? acc.Basic_Salary__c  : 0;
-        w.hra           = acc.HRA__c           != null ? acc.HRA__c           : 0;
-        w.da            = acc.DA__c            != null ? acc.DA__c            : 0;
-        w.pf            = acc.PF_Deduction__c  != null ? acc.PF_Deduction__c  : 0;
-        w.accountNumber = acc.Bank_Account_Number__c;
-        w.ifsc          = acc.IFSC_Code__c;
-        w.salaryStatus  = salaryStatus != null ? salaryStatus : 'Pending';
+        w.EmployeeId    = acc.Employee_ID__c;
+        w.FirstName     = acc.FirstName;
+        w.LastName      = acc.LastName;
+        w.Name          = acc.Name;
+        w.Gender        = acc.PersonGenderIdentity;
+        w.Dob           = acc.PersonBirthdate  != null ? String.valueOf(acc.PersonBirthdate)  : '';
+        w.Email         = acc.PersonEmail;
+        w.Phone         = acc.PersonMobilePhone;
+        w.Address       = acc.PersonMailingStreet;
+        w.StaffType     = acc.Type == 'Teacher' ? 'Teaching' : 'Non-Teaching';
+        w.Designation   = acc.Designation__c;
+        w.Department    = acc.PersonDepartment;
+        w.Subject       = acc.Subject_Taught__c;
+        w.Qualification = acc.Qualification__c;
+        w.JoiningDate   = acc.Joining_Date__c  != null ? String.valueOf(acc.Joining_Date__c)  : '';
+        w.Status        = String.isNotBlank(acc.Staff_Status__c) ? acc.Staff_Status__c : 'Active';
+        w.BasicSalary   = acc.Basic_Salary__c  != null ? acc.Basic_Salary__c  : 0;
+        w.Hra           = acc.HRA__c           != null ? acc.HRA__c           : 0;
+        w.Da            = acc.DA__c            != null ? acc.DA__c            : 0;
+        w.Pf            = acc.PF_Deduction__c  != null ? acc.PF_Deduction__c  : 0;
+        w.AccountNumber = acc.Bank_Account_Number__c;
+        w.Ifsc          = acc.IFSC_Code__c;
+        w.SalaryStatus  = salaryStatus != null ? salaryStatus : 'Pending';
         return w;
     }
 

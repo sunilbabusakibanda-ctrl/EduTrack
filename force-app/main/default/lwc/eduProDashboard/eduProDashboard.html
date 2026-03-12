@@ -25,6 +25,10 @@
                                 <span class="icon">👥</span>
                                 Students
                             </a>
+                            <a href="#" class={staffNavClass} onclick={handleStaffClick}>
+                                <span class="icon">🧑‍🏫</span>
+                                School Staff
+                            </a>
                             <a href="#" class={schoolManagementNavClass} onclick={handleSchoolManagementClick}>
                                 <span class="icon">🏫</span>
                                 Teacher &amp; Class Management
@@ -377,6 +381,10 @@
                                     </div>
                                 </div>
                             </div>
+                        </template>
+
+                        <template lwc:if={isStaffPage}>
+                            <c-schoolstaff></c-schoolstaff>
                         </template>
 
                         <template lwc:if={isAdmissionPage}>

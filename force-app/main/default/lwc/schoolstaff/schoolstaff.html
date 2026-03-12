@@ -1,6 +1,14 @@
 <template>
     <div class="ss-wrap">
 
+        <!-- ══ TOAST ══ -->
+        <template lwc:if={showToast}>
+            <div class={toastClass}>
+                <span class="toast-icon">{toastIcon}</span>
+                <span>{toastMessage}</span>
+            </div>
+        </template>
+
         <!-- ══ LOADING SPINNER ══ -->
         <template lwc:if={isLoading}>
             <div class="ss-loading-overlay">

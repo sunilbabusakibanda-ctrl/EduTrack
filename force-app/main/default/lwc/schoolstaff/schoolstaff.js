@@ -77,30 +77,32 @@ export default class SchoolStaff extends LightningElement {
        GETTERS – COUNTS & TOTALS
     ══════════════════════════════════════════ */
     get totalStaffCount()  { return this._rawStaffList.length; }
-    get teachingCount()    { return this._rawStaffList.filter(s => s.staffType === 'Teaching').length; }
-    get nonTeachingCount() { return this._rawStaffList.filter(s => s.staffType === 'Non-Teaching').length; }
+    get teachingCount()    { return this._rawStaffList.filter(s => s.StaffType === 'Teaching').length; }
+    get nonTeachingCount() { return this._rawStaffList.filter(s => s.StaffType === 'Non-Teaching').length; }
     get paidCount()        { return this._rawPayrollList.filter(r => r.salaryStatus === 'Paid').length; }
     get pendingCount()     { return this._rawPayrollList.filter(r => r.salaryStatus !== 'Paid').length; }
 
     get totalMonthlySalary() {
         const t = this._rawStaffList.reduce((s, m) =>
-            s + Number(m.basicSalary) + Number(m.hra) + Number(m.da) - Number(m.pf), 0);
+            s + Number(m.BasicSalary) + Number(m.Hra) + Number(m.Da) - Number(m.Pf), 0);
         return t >= 100000 ? `₹${(t / 100000).toFixed(1)}L` : `₹${t.toLocaleString('en-IN')}`;
     }
     get totalAnnualSalary() {
         const t = this._rawStaffList.reduce((s, m) =>
-            s + Number(m.basicSalary) + Number(m.hra) + Number(m.da) - Number(m.pf), 0) * 12;
+            s + Number(m.BasicSalary) + Number(m.Hra) + Number(m.Da) - Number(m.Pf), 0) * 12;
         return t >= 100000 ? `₹${(t / 100000).toFixed(1)}L` : `₹${t.toLocaleString('en-IN')}`;
     }
 
     get totalAllowances() {
-        return (Number(this.formData.hra || 0) + Number(this.formData.da || 0)).toLocaleString('en-IN');
+        const val = (n) => { const num = Number(n); return isNaN(num) ? 0 : num; };
+        return (val(this.formData.hra) + val(this.formData.da)).toLocaleString('en-IN');
     }
     get computedNetSalary() {
-        const n = Number(this.formData.basicSalary || 0)
-                + Number(this.formData.hra          || 0)
-                + Number(this.formData.da           || 0)
-                - Number(this.formData.pf           || 0);
+        const val = (n) => { const num = Number(n); return isNaN(num) ? 0 : num; };
+        const n = val(this.formData.basicSalary)
+                + val(this.formData.hra)
+                + val(this.formData.da)
+                - val(this.formData.pf);
         return n.toLocaleString('en-IN');
     }
 
@@ -110,21 +112,21 @@ export default class SchoolStaff extends LightningElement {
     get filteredStaff() {
         let list = this._rawStaffList.map(s => ({
             ...s,
-            netSalaryFmt: `₹${(Number(s.basicSalary) + Number(s.hra) + Number(s.da) - Number(s.pf)).toLocaleString('en-IN')}`
+            netSalaryFmt: `₹${(Number(s.BasicSalary) + Number(s.Hra) + Number(s.Da) - Number(s.Pf)).toLocaleString('en-IN')}`
         }));
-        if (this.activeTab === 'teaching')     list = list.filter(s => s.staffType === 'Teaching');
-        if (this.activeTab === 'non-teaching') list = list.filter(s => s.staffType === 'Non-Teaching');
+        if (this.activeTab === 'teaching')     list = list.filter(s => s.StaffType === 'Teaching');
+        if (this.activeTab === 'non-teaching') list = list.filter(s => s.StaffType === 'Non-Teaching');
         if (this.searchTerm) {
             const t = this.searchTerm.toLowerCase();
             list = list.filter(s =>
-                s.name.toLowerCase().includes(t) ||
-                (s.employeeId && s.employeeId.toLowerCase().includes(t)) ||
-                (s.subject && s.subject.toLowerCase().includes(t)) ||
-                s.designation.toLowerCase().includes(t)
+                s.Name.toLowerCase().includes(t) ||
+                (s.EmployeeId && s.EmployeeId.toLowerCase().includes(t)) ||
+                (s.Subject && s.Subject.toLowerCase().includes(t)) ||
+                (s.Designation && s.Designation.toLowerCase().includes(t))
             );
         }
-        if (this.deptFilter)   list = list.filter(s => s.department === this.deptFilter);
-        if (this.statusFilter) list = list.filter(s => s.status === this.statusFilter);
+        if (this.deptFilter)   list = list.filter(s => s.Department === this.deptFilter);
+        if (this.statusFilter) list = list.filter(s => s.Status === this.statusFilter);
         return list;
     }
     get hasFilteredStaff() { return this.filteredStaff.length > 0; }
@@ -151,16 +153,39 @@ export default class SchoolStaff extends LightningElement {
 
     handleStaffCardClick(e) {
         const id = e.currentTarget.dataset.id;
-        const s  = this._rawStaffList.find(x => x.id === id);
-        if (!s) return;
-        this.selectedStaff = {
-            ...s,
-            basicSalaryFmt : `₹${Number(s.basicSalary).toLocaleString('en-IN')}`,
-            allowancesFmt  : `₹${(Number(s.hra) + Number(s.da)).toLocaleString('en-IN')}`,
-            deductionsFmt  : `₹${Number(s.pf).toLocaleString('en-IN')}`,
-            netSalaryFmt   : `₹${(Number(s.basicSalary)+Number(s.hra)+Number(s.da)-Number(s.pf)).toLocaleString('en-IN')}`
-        };
-        this.showDetailModal = true;
+        const r = this._rawStaffList.find(x => x.id === e.currentTarget.dataset.id);
+        if (r) {
+            this.selectedStaff = { ...r };
+            
+            // Map the parsed properties back into the camelCase formData payload object
+            this.formData = {
+                id            : r.id,
+                employeeId    : r.EmployeeId,
+                firstName     : r.FirstName,
+                lastName      : r.LastName,
+                gender        : r.Gender,
+                dob           : r.Dob,
+                email         : r.Email,
+                phone         : r.Phone,
+                address       : r.Address,
+                designation   : r.Designation,
+                department    : r.Department,
+                staffType     : r.StaffType,
+                subject       : r.Subject,
+                qualification : r.Qualification,
+                joiningDate   : r.JoiningDate,
+                status        : r.Status,
+                basicSalary   : r.BasicSalary,
+                hra           : r.Hra,
+                da            : r.Da,
+                pf            : r.Pf,
+                accountNumber : r.AccountNumber,
+                ifsc          : r.Ifsc
+            };
+
+            this.isEditMode      = true;
+            this.showStaffModal  = true;
+        }
     }
 
     handleEditFromDetail() {
@@ -235,33 +260,34 @@ export default class SchoolStaff extends LightningElement {
 
         // Build a clean plain object — avoids Apex receiving Proxy wrapper
         const payload = {
-            id            : this.formData.id           || null,
-            employeeId    : this.formData.employeeId   || '',
-            firstName     : this.formData.firstName.trim(),
-            lastName      : this.formData.lastName.trim(),
-            gender        : this.formData.gender       || '',
-            dob           : this.formData.dob          || '',
-            email         : this.formData.email.trim(),
-            phone         : this.formData.phone.trim(),
-            address       : this.formData.address      || '',
-            staffType     : this.formData.staffType    || 'Teaching',
-            designation   : this.formData.designation  || '',
-            department    : this.formData.department   || '',
-            subject       : this.formData.subject      || '',
-            qualification : this.formData.qualification|| '',
-            joiningDate   : this.formData.joiningDate  || '',
-            status        : this.formData.status       || 'Active',
-            basicSalary   : Number(this.formData.basicSalary) || 0,
-            hra           : Number(this.formData.hra)          || 0,
-            da            : Number(this.formData.da)           || 0,
-            pf            : Number(this.formData.pf)           || 0,
-            accountNumber : this.formData.accountNumber|| '',
-            ifsc          : this.formData.ifsc         || ''
+            id            : this.formData.id            || null,
+            EmployeeId    : this.formData.employeeId    || '',
+            FirstName     : (this.formData.firstName    || '').trim(),
+            LastName      : (this.formData.lastName     || '').trim(),
+            Gender        : this.formData.gender        || '',
+            Dob           : this.formData.dob           || '',
+            Email         : (this.formData.email        || '').trim(),
+            Phone         : (this.formData.phone        || '').trim(),
+            Address       : this.formData.address       || '',
+            StaffType     : this.formData.staffType     || 'Teaching',
+            Designation   : this.formData.designation   || '',
+            Department    : this.formData.department    || '',
+            Subject       : this.formData.subject       || '',
+            Qualification : this.formData.qualification || '',
+            JoiningDate   : this.formData.joiningDate   || '',
+            Status        : this.formData.status        || 'Active',
+            BasicSalary   : Number(this.formData.basicSalary) || 0,
+            Hra           : Number(this.formData.hra)          || 0,
+            Da            : Number(this.formData.da)           || 0,
+            Pf            : Number(this.formData.pf)           || 0,
+            AccountNumber : this.formData.accountNumber || '',
+            Ifsc          : this.formData.ifsc          || ''
         };
 
         try {
             this.isLoading = true;
-            await upsertStaff({ data: payload });
+            console.log('Upserting staff with payload:', JSON.stringify(payload));
+            await upsertStaff({ jsonData: JSON.stringify(payload) });
             await refreshApex(this._wiredStaffResult);
             this.showStaffModal = false;
             const msg = this.isEditMode
@@ -269,6 +295,7 @@ export default class SchoolStaff extends LightningElement {
                 : `${payload.firstName} ${payload.lastName} added to staff directory!`;
             this._showToastMsg('✅', msg, 'success');
         } catch (err) {
+            console.error('Error in upsertStaff:', err);
             const errMsg = err.body?.message || err.message || 'Save failed. Please try again.';
             this._showToastMsg('❌', errMsg, 'error');
         } finally {
@@ -347,24 +374,37 @@ export default class SchoolStaff extends LightningElement {
 
     _decorate(s, idx) {
         const v = this._colorVariants[(idx || 0) % this._colorVariants.length];
-        const isTeaching = s.staffType === 'Teaching';
+        const isTeaching = s.StaffType === 'Teaching';
         const statusMap  = {
             'Active'   : { badge: 'badge-status badge-active',  dot: 'ss-status-dot dot-active' },
             'On Leave' : { badge: 'badge-status badge-pending', dot: 'ss-status-dot dot-leave' },
             'Inactive' : { badge: 'badge-status badge-inactive',dot: 'ss-status-dot dot-inactive' }
         };
-        const sm = statusMap[s.status] || statusMap['Active'];
-        const fi = (s.firstName || '').charAt(0).toUpperCase();
-        const li = (s.lastName  || '').charAt(0).toUpperCase();
+        const sm = statusMap[s.Status] || statusMap['Active'];
+        const fi = (s.FirstName || '').charAt(0).toUpperCase();
+        const li = (s.LastName  || '').charAt(0).toUpperCase();
         return {
             ...s,
+            
+            // Re-mapping important lowercase wrapper fields for the HTML template view
+            employeeId     : s.EmployeeId,
+            name           : s.Name || `${s.FirstName} ${s.LastName}`,
+            designation    : s.Designation,
+            department     : s.Department,
+            email          : s.Email,
+            phone          : s.Phone,
+            subject        : s.Subject,
+            joiningDate    : s.JoiningDate,
+            staffType      : s.StaffType,
+            status         : s.Status,
+
             initials       : fi + li,
             avatarClass    : v.av,
             cardBandClass  : v.band,
             typeBadgeClass : isTeaching ? 'badge-status badge-active' : 'badge-status badge-inactive',
             statusBadgeClass: sm.badge,
             statusDotClass : sm.dot,
-            netSalaryFmt   : `₹${(Number(s.basicSalary)+Number(s.hra)+Number(s.da)-Number(s.pf)).toLocaleString('en-IN')}`
+            netSalaryFmt   : `₹${(Number(s.BasicSalary)+Number(s.Hra)+Number(s.Da)-Number(s.Pf)).toLocaleString('en-IN')}`
         };
     }
 
