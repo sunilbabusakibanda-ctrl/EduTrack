@@ -77,6 +77,24 @@ git remote set-url origin https://sunilbabusakibanda-ctrl:YOUR_TOKEN@github.com/
 
 ---
 
+## Phase 0: Getting Changes from SunilDevOrg1 (The Packaging Org)
+
+If you made changes directly in your packaging org (like creating a new field or updating a layout) and you want to bring those changes to your computer and GitHub, follow these steps:
+
+### 1. Retrieve the changes
+Run this command to pull the latest metadata from `DevOrg1` to your computer:
+```bash
+sf project retrieve start -o DevOrg1
+```
+
+### 2. Save to GitHub (Sync)
+Now that the files are on your computer, save them to Git:
+```bash
+git add .
+git commit -m "Retrieve latest changes from DevOrg1"
+git push origin main
+```
+
 ---
 
 ## Phase 2: Deploying to the Target Org (SunilDev)
