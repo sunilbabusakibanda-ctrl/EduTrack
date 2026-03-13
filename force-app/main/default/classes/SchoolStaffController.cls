@@ -18,7 +18,7 @@ public without sharing class SchoolStaffController {
         @AuraEnabled public String  Designation;
         @AuraEnabled public String  Department;
         @AuraEnabled public String  StaffType;
-        @AuraEnabled public String  Subject;
+        @AuraEnabled public String  Subject;           // kept for backward compat
         @AuraEnabled public String  Qualification;
         @AuraEnabled public String  JoiningDate;
         @AuraEnabled public String  Status;
@@ -29,6 +29,9 @@ public without sharing class SchoolStaffController {
         @AuraEnabled public String  AccountNumber;
         @AuraEnabled public String  Ifsc;
         @AuraEnabled public String  SalaryStatus;
+        @AuraEnabled public String  PhotoUrl;
+        // Subject skills (replaces single Subject field in form)
+        @AuraEnabled public List<Map<String,Object>> SubjectSkills;
     }
 
     public class PayrollWrapper {
@@ -39,37 +42,229 @@ public without sharing class SchoolStaffController {
         @AuraEnabled public String  staffType;
         @AuraEnabled public String  employeeId;
         @AuraEnabled public Decimal basicSalary;
+        @AuraEnabled public Decimal hra;
+        @AuraEnabled public Decimal da;
+        @AuraEnabled public Decimal pf;
         @AuraEnabled public Decimal allowances;
         @AuraEnabled public Decimal deductions;
         @AuraEnabled public Decimal netSalary;
         @AuraEnabled public String  salaryStatus;
         @AuraEnabled public String  invoiceMonth;
+        @AuraEnabled public String  paidDate;
+    }
+
+    public class PayslipWrapper {
+        @AuraEnabled public String  invoiceId;
+        @AuraEnabled public String  staffId;
+        @AuraEnabled public String  staffName;
+        @AuraEnabled public String  employeeId;
+        @AuraEnabled public String  designation;
+        @AuraEnabled public String  staffType;
+        @AuraEnabled public String  invoiceMonth;
+        @AuraEnabled public String  paidDate;
+        @AuraEnabled public Decimal basicSalary;
+        @AuraEnabled public Decimal hra;
+        @AuraEnabled public Decimal da;
+        @AuraEnabled public Decimal pf;
+        @AuraEnabled public Decimal allowances;
+        @AuraEnabled public Decimal deductions;
+        @AuraEnabled public Decimal netSalary;
+        @AuraEnabled public String  bankAccount;
+        @AuraEnabled public String  ifscCode;
     }
 
     /* ─────────────────────────────────────────
-       READ – GET ALL STAFF
+       NEW — GET STAFF DETAIL (for card click)
+       Returns: skills, invoices, timetable periods
     ───────────────────────────────────────── */
+    @AuraEnabled(cacheable=false)
+    public static Map<String, Object> getStaffDetail(String staffId) {
+        if (String.isBlank(staffId)) throw new AuraHandledException('Staff ID is required.');
 
+        Map<String, Object> result = new Map<String, Object>();
+
+        // 1️⃣ Subject Skills
+        List<Map<String, Object>> skills = new List<Map<String, Object>>();
+        try {
+            for (Teacher_Skill__c sk : [
+                SELECT Id, Subject__c, Subject__r.Name, Skill_Level__c, Years_of_Experience__c
+                FROM Teacher_Skill__c
+                WHERE Teacher__c = :staffId
+                ORDER BY Subject__r.Name ASC
+            ]) {
+                skills.add(new Map<String, Object>{
+                    'id'                => sk.Id,
+                    'subjectId'         => sk.Subject__c,
+                    'subjectName'       => sk.Subject__r != null ? sk.Subject__r.Name : '',
+                    'skillLevel'        => sk.Skill_Level__c,
+                    'yearsOfExperience' => sk.Years_of_Experience__c
+                });
+            }
+        } catch (Exception e) { /* No skills */ }
+        result.put('skills', skills);
+
+        // 2️⃣ Invoices (last 6 months)
+        List<Map<String, Object>> invoices = new List<Map<String, Object>>();
+        try {
+            for (Invoice__c inv : [
+                SELECT Id, Invoice_Month__c, Status__c, Total_Amount__c,
+                       Invoice_Date__c, Due_Date__c
+                FROM Invoice__c
+                WHERE Account__c = :staffId
+                  AND Invoice_Type__c = 'Salary'
+                ORDER BY Invoice_Date__c DESC
+                LIMIT 12
+            ]) {
+                invoices.add(new Map<String, Object>{
+                    'id'           => inv.Id,
+                    'month'        => inv.Invoice_Month__c,
+                    'status'       => inv.Status__c == 'Paid' ? 'Paid' : 'Pending',
+                    'amount'       => inv.Total_Amount__c != null ? inv.Total_Amount__c : 0,
+                    'paidDate'     => inv.Invoice_Date__c != null ? inv.Invoice_Date__c.format() : '',
+                    'dueDate'      => inv.Due_Date__c     != null ? inv.Due_Date__c.format()     : ''
+                });
+            }
+        } catch (Exception e) { /* No invoices */ }
+        result.put('invoices', invoices);
+
+        // 3️⃣ Timetable periods (today's + weekly count)
+        List<Map<String, Object>> periods = new List<Map<String, Object>>();
+        try {
+            for (Period__c p : [
+                SELECT Id, Day__c, Period_Number__c,
+                       Subjects__c, Subjects__r.Name,
+                       Class_Section__c, Class_Section__r.Name,
+                       Start_Time__c, End_Time__c
+                FROM Period__c
+                WHERE Assigned_Teacher__c = :staffId
+                ORDER BY Day__c, Period_Number__c
+            ]) {
+                String startTime = p.Start_Time__c != null
+                    ? DateTime.newInstance(Date.today(), p.Start_Time__c).format('h:mm a') : '';
+                String endTime = p.End_Time__c != null
+                    ? DateTime.newInstance(Date.today(), p.End_Time__c).format('h:mm a') : '';
+                periods.add(new Map<String, Object>{
+                    'periodId'       => p.Id,
+                    'day'            => p.Day__c,
+                    'periodNumber'   => p.Period_Number__c,
+                    'subjectName'    => p.Subjects__r != null ? p.Subjects__r.Name : '—',
+                    'className'      => p.Class_Section__r != null ? p.Class_Section__r.Name : '—',
+                    'startTime'      => startTime,
+                    'endTime'        => endTime,
+                    'timeLabel'      => (String.isNotBlank(startTime) && String.isNotBlank(endTime))
+                                        ? startTime + ' – ' + endTime : ''
+                });
+            }
+        } catch (Exception e) { /* No periods */ }
+        result.put('periods', periods);
+
+        return result;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       UPLOAD STAFF PHOTO
+    ═══════════════════════════════════════════════════════════ */
+    @AuraEnabled
+    public static String uploadStaffPhoto(String staffId, String base64Data, String fileName) {
+        try {
+            if (String.isBlank(staffId))    throw new AuraHandledException('Staff ID is required.');
+            if (String.isBlank(base64Data)) throw new AuraHandledException('Image data is required.');
+            if (String.isBlank(fileName))   fileName = 'staff_photo.jpg';
+
+            String cleanBase64 = base64Data.contains(',')
+                                 ? base64Data.substringAfter(',')
+                                 : base64Data;
+
+            List<ContentDocumentLink> oldLinks = [
+                SELECT ContentDocumentId FROM ContentDocumentLink
+                WHERE LinkedEntityId = :staffId
+            ];
+            if (!oldLinks.isEmpty()) {
+                Set<Id> docIds = new Set<Id>();
+                for (ContentDocumentLink cdl : oldLinks) docIds.add(cdl.ContentDocumentId);
+                List<ContentVersion> oldPhotos = [
+                    SELECT ContentDocumentId FROM ContentVersion
+                    WHERE ContentDocumentId IN :docIds AND Title LIKE 'staff_photo_%' AND IsLatest = true
+                ];
+                if (!oldPhotos.isEmpty()) {
+                    Set<Id> delDocIds = new Set<Id>();
+                    for (ContentVersion cv : oldPhotos) delDocIds.add(cv.ContentDocumentId);
+                    delete [SELECT Id FROM ContentDocument WHERE Id IN :delDocIds];
+                }
+            }
+
+            ContentVersion cv = new ContentVersion();
+            cv.Title          = 'staff_photo_' + staffId;
+            cv.PathOnClient   = fileName;
+            cv.VersionData    = EncodingUtil.base64Decode(cleanBase64);
+            cv.IsMajorVersion = true;
+            insert cv;
+
+            Id contentDocId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+
+            ContentDocumentLink cdl = new ContentDocumentLink();
+            cdl.ContentDocumentId = contentDocId;
+            cdl.LinkedEntityId    = staffId;
+            cdl.ShareType         = 'V';
+            cdl.Visibility        = 'AllUsers';
+            insert cdl;
+
+            return cv.Id;
+        } catch (AuraHandledException ahe) { throw ahe; }
+        catch (Exception e) { throw new AuraHandledException('Photo upload failed: ' + e.getMessage()); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       BULK PHOTO URL MAP
+    ═══════════════════════════════════════════════════════════ */
+    private static Map<Id, String> getPhotoUrlMap(Set<Id> accountIds) {
+        Map<Id, String> result = new Map<Id, String>();
+        if (accountIds == null || accountIds.isEmpty()) return result;
+
+        Map<Id, Set<Id>> accToDocIds = new Map<Id, Set<Id>>();
+        for (ContentDocumentLink cdl : [
+            SELECT LinkedEntityId, ContentDocumentId FROM ContentDocumentLink
+            WHERE LinkedEntityId IN :accountIds
+        ]) {
+            if (!accToDocIds.containsKey(cdl.LinkedEntityId))
+                accToDocIds.put(cdl.LinkedEntityId, new Set<Id>());
+            accToDocIds.get(cdl.LinkedEntityId).add(cdl.ContentDocumentId);
+        }
+        if (accToDocIds.isEmpty()) return result;
+
+        Set<Id> allDocIds = new Set<Id>();
+        for (Set<Id> ds : accToDocIds.values()) allDocIds.addAll(ds);
+
+        Map<Id, String> docToUrl = new Map<Id, String>();
+        for (ContentVersion cv : [
+            SELECT Id, ContentDocumentId FROM ContentVersion
+            WHERE ContentDocumentId IN :allDocIds AND Title LIKE 'staff_photo_%' AND IsLatest = true
+        ]) {
+            if (!docToUrl.containsKey(cv.ContentDocumentId))
+                docToUrl.put(cv.ContentDocumentId, '/sfc/servlet.shepherd/version/download/' + cv.Id);
+        }
+
+        for (Id accId : accToDocIds.keySet()) {
+            for (Id docId : accToDocIds.get(accId)) {
+                if (docToUrl.containsKey(docId)) { result.put(accId, docToUrl.get(docId)); break; }
+            }
+        }
+        return result;
+    }
+
+    /* ─────────────────────────────────────────
+       READ – GET ALL STAFF (with SubjectSkills)
+    ───────────────────────────────────────── */
     @AuraEnabled(cacheable=true)
     public static List<StaffWrapper> getAllStaff() {
         List<Account> accounts = [
             SELECT Id, FirstName, LastName, Name,
                    PersonEmail, PersonMobilePhone,
-                   PersonBirthdate, PersonMailingStreet,
-                   Type,
-                   Employee_ID__c,
-                   PersonGenderIdentity,
-                   Designation__c,
-                   PersonDepartment,
-                   Joining_Date__c,
-                   Subject_Taught__c,
-                   Qualification__c,
-                   Basic_Salary__c,
-                   HRA__c,
-                   DA__c,
-                   PF_Deduction__c,
-                   Bank_Account_Number__c,
-                   IFSC_Code__c,
+                   PersonBirthdate, PersonMailingStreet, Type,
+                   Employee_ID__c, PersonGenderIdentity, Designation__c,
+                   PersonDepartment, Joining_Date__c, Subject_Taught__c,
+                   Qualification__c, Basic_Salary__c, HRA__c, DA__c,
+                   PF_Deduction__c, Bank_Account_Number__c, IFSC_Code__c,
                    Staff_Status__c
             FROM Account
             WHERE IsPersonAccount = true
@@ -79,10 +274,37 @@ public without sharing class SchoolStaffController {
 
         Set<Id> accountIds = new Map<Id, Account>(accounts).keySet();
         Map<Id, String> salaryStatusMap = getSalaryStatusMap(accountIds);
+        Map<Id, String> photoUrlMap     = getPhotoUrlMap(accountIds);
+
+        // Load subject skills for all teacher accounts
+        Map<Id, List<Map<String,Object>>> skillsMap = new Map<Id, List<Map<String,Object>>>();
+        try {
+            for (Teacher_Skill__c sk : [
+                SELECT Teacher__c, Subject__c, Subject__r.Name, Skill_Level__c, Years_of_Experience__c
+                FROM Teacher_Skill__c
+                WHERE Teacher__c IN :accountIds
+                ORDER BY Subject__r.Name ASC
+            ]) {
+                if (!skillsMap.containsKey(sk.Teacher__c))
+                    skillsMap.put(sk.Teacher__c, new List<Map<String,Object>>());
+                skillsMap.get(sk.Teacher__c).add(new Map<String,Object>{
+                    'id'                => sk.Id,
+                    'subjectId'         => sk.Subject__c,
+                    'subjectName'       => sk.Subject__r != null ? sk.Subject__r.Name : '',
+                    'skillLevel'        => sk.Skill_Level__c,
+                    'yearsOfExperience' => sk.Years_of_Experience__c
+                });
+            }
+        } catch (Exception e) { /* ignore */ }
 
         List<StaffWrapper> result = new List<StaffWrapper>();
         for (Account acc : accounts) {
-            result.add(toWrapper(acc, salaryStatusMap.get(acc.Id)));
+            StaffWrapper w = toWrapper(acc, salaryStatusMap.get(acc.Id));
+            w.PhotoUrl     = photoUrlMap.get(acc.Id);
+            w.SubjectSkills = skillsMap.containsKey(acc.Id)
+                              ? skillsMap.get(acc.Id)
+                              : new List<Map<String,Object>>();
+            result.add(w);
         }
         return result;
     }
@@ -90,7 +312,6 @@ public without sharing class SchoolStaffController {
     /* ─────────────────────────────────────────
        READ – GET PAYROLL RECORDS
     ───────────────────────────────────────── */
-
     @AuraEnabled(cacheable=true)
     public static List<PayrollWrapper> getPayrollRecords(String invoiceMonth) {
         List<Account> accounts = [
@@ -105,7 +326,8 @@ public without sharing class SchoolStaffController {
 
         Map<Id, Invoice__c> invoiceByAccount = new Map<Id, Invoice__c>();
         for (Invoice__c inv : [
-            SELECT Id, Account__c, Status__c, Invoice_Month__c
+            SELECT Id, Account__c, Status__c, Invoice_Month__c,
+                   Invoice_Date__c, CreatedDate
             FROM Invoice__c
             WHERE Invoice_Type__c  = 'Salary'
               AND Invoice_Month__c = :invoiceMonth
@@ -117,10 +339,10 @@ public without sharing class SchoolStaffController {
         List<PayrollWrapper> result = new List<PayrollWrapper>();
         for (Account acc : accounts) {
             Invoice__c inv = invoiceByAccount.get(acc.Id);
-            Decimal basic = acc.Basic_Salary__c != null ? acc.Basic_Salary__c : 0;
-            Decimal hra   = acc.HRA__c          != null ? acc.HRA__c          : 0;
-            Decimal da    = acc.DA__c           != null ? acc.DA__c           : 0;
-            Decimal pf    = acc.PF_Deduction__c != null ? acc.PF_Deduction__c : 0;
+            Decimal basic  = acc.Basic_Salary__c != null ? acc.Basic_Salary__c : 0;
+            Decimal hra    = acc.HRA__c          != null ? acc.HRA__c          : 0;
+            Decimal da     = acc.DA__c           != null ? acc.DA__c           : 0;
+            Decimal pf     = acc.PF_Deduction__c != null ? acc.PF_Deduction__c : 0;
 
             PayrollWrapper pw = new PayrollWrapper();
             pw.staffId      = acc.Id;
@@ -129,6 +351,9 @@ public without sharing class SchoolStaffController {
             pw.staffType    = acc.Type == 'Teacher' ? 'Teaching' : 'Non-Teaching';
             pw.employeeId   = acc.Employee_ID__c;
             pw.basicSalary  = basic;
+            pw.hra          = hra;
+            pw.da           = da;
+            pw.pf           = pf;
             pw.allowances   = hra + da;
             pw.deductions   = pf;
             pw.netSalary    = basic + hra + da - pf;
@@ -137,9 +362,13 @@ public without sharing class SchoolStaffController {
             if (inv != null) {
                 pw.id           = inv.Id;
                 pw.salaryStatus = inv.Status__c == 'Paid' ? 'Paid' : 'Pending';
+                pw.paidDate     = inv.Invoice_Date__c != null
+                                  ? inv.Invoice_Date__c.format()
+                                  : String.valueOf(Date.today());
             } else {
                 pw.id           = null;
                 pw.salaryStatus = 'Pending';
+                pw.paidDate     = '';
             }
             result.add(pw);
         }
@@ -147,374 +376,305 @@ public without sharing class SchoolStaffController {
     }
 
     /* ─────────────────────────────────────────
-       WRITE – UPSERT STAFF MEMBER
-
-       ROOT CAUSE FIXES:
-       1. Validation now done AFTER null-safe trimming, not before.
-       2. RecordTypeId lookup made safe — if no PersonAccount RT exists
-          we skip setting it (some orgs use a default RT).
-       3. PersonGenderIdentity is a standard picklist — blank string
-          causes a DML error on some orgs; set to null instead of ''.
-       4. All String fields use safeStr() to avoid passing empty strings
-          where Salesforce expects null.
-       5. Detailed exception logging so the REAL error surfaces instead
-          of being swallowed by the outer catch re-throwing
-          'First Name is required.'
+       READ – GET PAYSLIP DATA
     ───────────────────────────────────────── */
+    @AuraEnabled(cacheable=true)
+    public static PayslipWrapper getPayslipData(String staffId, String invoiceMonth) {
+        if (String.isBlank(staffId) || String.isBlank(invoiceMonth))
+            throw new AuraHandledException('Staff ID and Invoice Month are required.');
 
+        Account acc = [
+            SELECT Id, Name, Employee_ID__c, Designation__c, Type,
+                   Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c,
+                   Bank_Account_Number__c, IFSC_Code__c
+            FROM Account WHERE Id = :staffId LIMIT 1
+        ];
+        List<Invoice__c> invList = [
+            SELECT Id, Status__c, Invoice_Date__c, Total_Amount__c
+            FROM Invoice__c
+            WHERE Account__c = :staffId AND Invoice_Type__c = 'Salary'
+              AND Invoice_Month__c = :invoiceMonth AND Status__c = 'Paid'
+            ORDER BY Invoice_Date__c DESC LIMIT 1
+        ];
+        Decimal basic = acc.Basic_Salary__c != null ? acc.Basic_Salary__c : 0;
+        Decimal hra   = acc.HRA__c          != null ? acc.HRA__c          : 0;
+        Decimal da    = acc.DA__c           != null ? acc.DA__c           : 0;
+        Decimal pf    = acc.PF_Deduction__c != null ? acc.PF_Deduction__c : 0;
+
+        PayslipWrapper ps = new PayslipWrapper();
+        ps.staffId      = acc.Id;
+        ps.staffName    = acc.Name;
+        ps.employeeId   = acc.Employee_ID__c;
+        ps.designation  = acc.Designation__c;
+        ps.staffType    = acc.Type == 'Teacher' ? 'Teaching' : 'Non-Teaching';
+        ps.invoiceMonth = invoiceMonth;
+        ps.basicSalary  = basic;
+        ps.hra          = hra;
+        ps.da           = da;
+        ps.pf           = pf;
+        ps.allowances   = basic + hra + da;
+        ps.deductions   = pf;
+        ps.netSalary    = basic + hra + da - pf;
+        ps.bankAccount  = acc.Bank_Account_Number__c;
+        ps.ifscCode     = acc.IFSC_Code__c;
+        if (!invList.isEmpty()) {
+            ps.invoiceId = invList[0].Id;
+            ps.paidDate  = invList[0].Invoice_Date__c != null
+                           ? invList[0].Invoice_Date__c.format()
+                           : String.valueOf(Date.today());
+        } else {
+            ps.invoiceId = '—';
+            ps.paidDate  = String.valueOf(Date.today());
+        }
+        return ps;
+    }
+
+    /* ─────────────────────────────────────────
+       WRITE – UPSERT STAFF MEMBER
+       Now also saves/updates Teacher_Skill__c records
+    ───────────────────────────────────────── */
     @AuraEnabled
     public static String upsertStaff(String jsonData) {
-        
-        // ── LOG DATA FOR DEBUGGING ────────────────────────────
-        System.debug('upsertStaff received jsonData: ' + jsonData);
-
-        if (String.isBlank(jsonData)) {
-            throw new AuraHandledException('No staff data received on server.');
-        }
-
+        if (String.isBlank(jsonData)) throw new AuraHandledException('No staff data received.');
         StaffWrapper data;
-        try {
-            data = (StaffWrapper) JSON.deserialize(jsonData, StaffWrapper.class);
-        } catch (Exception e) {
-            System.debug('JSON Parse Error: ' + e.getMessage());
-            throw new AuraHandledException('Failed to parse staff data: ' + e.getMessage());
-        }
+        try { data = (StaffWrapper) JSON.deserialize(jsonData, StaffWrapper.class); }
+        catch (Exception e) { throw new AuraHandledException('Failed to parse staff data: ' + e.getMessage()); }
+        if (data == null) throw new AuraHandledException('Parsed staff data is null.');
 
-        if (data == null) {
-            throw new AuraHandledException('Parsed staff data is null.');
-        }
+        String firstName = safeStr(data.FirstName);
+        String lastName  = safeStr(data.LastName);
+        String email     = safeStr(data.Email);
+        String phone     = safeStr(data.Phone);
 
-        // ── Step 1: Null-safe trim helpers applied first ──────────────
-        String firstName  = safeStr(data.FirstName);
-        String lastName   = safeStr(data.LastName);
-        String email      = safeStr(data.Email);
-        String phone      = safeStr(data.Phone);
-
-        System.debug('upsertStaff parsed fields — firstName=[' + firstName
-            + '] | lastName=[' + lastName + ']');
-
-        // ── Step 2: Validate AFTER trimming ───────────────────────────
-        if (String.isBlank(firstName)) {
-            throw new AuraHandledException('First Name is required. (Received: ' + data + ')');
-        }
-        if (String.isBlank(lastName)) {
-            throw new AuraHandledException('Last Name is required.');
-        }
-        if (String.isBlank(email)) {
-            throw new AuraHandledException('Email is required.');
-        }
-        if (String.isBlank(phone)) {
-            throw new AuraHandledException('Phone is required.');
-        }
-        if (data.BasicSalary == null || data.BasicSalary <= 0) {
+        if (String.isBlank(firstName)) throw new AuraHandledException('First Name is required.');
+        if (String.isBlank(lastName))  throw new AuraHandledException('Last Name is required.');
+        if (String.isBlank(email))     throw new AuraHandledException('Email is required.');
+        if (String.isBlank(phone))     throw new AuraHandledException('Phone is required.');
+        if (data.BasicSalary == null || data.BasicSalary <= 0)
             throw new AuraHandledException('Please enter a valid Basic Salary.');
-        }
 
+        Savepoint sp = Database.setSavepoint();
         try {
             Account acc;
-
             if (String.isNotBlank(data.id)) {
-                // UPDATE — load existing record
                 acc = new Account(Id = data.id);
-                System.debug('upsertStaff — UPDATE mode for id: ' + data.id);
             } else {
-                // INSERT — new record, must set RecordTypeId for Person Account
                 acc = new Account();
                 Id rtId = getPersonAccountRecordTypeId();
-                System.debug('upsertStaff — INSERT mode, PersonAccount RecordTypeId: ' + rtId);
-                if (rtId != null) {
-                    acc.RecordTypeId = rtId;
-                }
-                // If rtId is null the org uses a default RT — Salesforce
-                // will assign it automatically; do NOT throw here.
+                if (rtId != null) acc.RecordTypeId = rtId;
             }
-
-            // ── Standard Person Account fields ────────────────────────
-            acc.FirstName           = firstName;
-            acc.LastName            = lastName;
-            acc.PersonEmail         = email;
-            acc.PersonMobilePhone   = String.isNotBlank(phone) ? phone : null;
-            acc.PersonMailingStreet = String.isNotBlank(safeStr(data.Address)) ? safeStr(data.Address) : null;
-
-            // Type: 'Teacher' or 'Non Teaching Staff'
-            acc.Type = (safeStr(data.StaffType) == 'Teaching')
-                        ? 'Teacher' : 'Non Teaching Staff';
-
-            // ── PersonGenderIdentity — must be null (not '') if blank ─
-            // Passing an empty string to a picklist field causes DML error
-            String gender = safeStr(data.Gender);
-            acc.PersonGenderIdentity = String.isNotBlank(gender) ? gender : null;
-
-            // ── Department ────────────────────────────────────────────
-            String dept = safeStr(data.Department);
-            acc.PersonDepartment = String.isNotBlank(dept) ? dept : null;
-
-            // ── Custom fields ─────────────────────────────────────────
-            String desig = safeStr(data.Designation);
-            acc.Designation__c = String.isNotBlank(desig) ? desig : null;
-
-            String subj = safeStr(data.Subject);
-            acc.Subject_Taught__c = String.isNotBlank(subj) ? subj : null;
-
-            String qual = safeStr(data.Qualification);
-            acc.Qualification__c = String.isNotBlank(qual) ? qual : null;
-
+            acc.FirstName              = firstName;
+            acc.LastName               = lastName;
+            acc.PersonEmail            = email;
+            acc.PersonMobilePhone      = String.isNotBlank(phone) ? phone : null;
+            acc.PersonMailingStreet    = String.isNotBlank(safeStr(data.Address)) ? safeStr(data.Address) : null;
+            acc.Type                   = (safeStr(data.StaffType) == 'Teaching') ? 'Teacher' : 'Non Teaching Staff';
+            acc.PersonGenderIdentity   = String.isNotBlank(safeStr(data.Gender)) ? safeStr(data.Gender) : null;
+            acc.PersonDepartment       = String.isNotBlank(safeStr(data.Department)) ? safeStr(data.Department) : null;
+            acc.Designation__c         = String.isNotBlank(safeStr(data.Designation)) ? safeStr(data.Designation) : null;
+            acc.Qualification__c       = String.isNotBlank(safeStr(data.Qualification)) ? safeStr(data.Qualification) : null;
             acc.Basic_Salary__c        = data.BasicSalary != null ? data.BasicSalary : 0;
             acc.HRA__c                 = data.Hra         != null ? data.Hra         : 0;
             acc.DA__c                  = data.Da          != null ? data.Da          : 0;
             acc.PF_Deduction__c        = data.Pf          != null ? data.Pf          : 0;
+            acc.Bank_Account_Number__c = String.isNotBlank(safeStr(data.AccountNumber)) ? safeStr(data.AccountNumber) : null;
+            acc.IFSC_Code__c           = String.isNotBlank(safeStr(data.Ifsc)) ? safeStr(data.Ifsc) : null;
+            acc.Staff_Status__c        = String.isNotBlank(safeStr(data.Status)) ? safeStr(data.Status) : 'Active';
 
-            String accNum = safeStr(data.AccountNumber);
-            acc.Bank_Account_Number__c = String.isNotBlank(accNum) ? accNum : null;
-
-            String ifscVal = safeStr(data.Ifsc);
-            acc.IFSC_Code__c = String.isNotBlank(ifscVal) ? ifscVal : null;
-
-            String statusVal = safeStr(data.Status);
-            acc.Staff_Status__c = String.isNotBlank(statusVal) ? statusVal : 'Active';
-
-            // ── Safe date parsing ─────────────────────────────────────
             if (String.isNotBlank(safeStr(data.Dob))) {
-                try {
-                    acc.PersonBirthdate = Date.valueOf(data.Dob);
-                } catch (Exception ex) {
-                    System.debug('upsertStaff — invalid Dob skipped: ' + data.Dob);
-                }
+                try { acc.PersonBirthdate = Date.valueOf(data.Dob); } catch (Exception ex) {}
             }
             if (String.isNotBlank(safeStr(data.JoiningDate))) {
-                try {
-                    acc.Joining_Date__c = Date.valueOf(data.JoiningDate);
-                } catch (Exception ex) {
-                    System.debug('upsertStaff — invalid JoiningDate skipped: ' + data.JoiningDate);
-                }
+                try { acc.Joining_Date__c = Date.valueOf(data.JoiningDate); } catch (Exception ex) {}
             }
 
-            // ── DML ───────────────────────────────────────────────────
             if (String.isNotBlank(data.id)) {
-                System.debug('upsertStaff — running UPDATE');
                 update acc;
-                System.debug('upsertStaff — UPDATE success, id: ' + acc.Id);
-                return acc.Id;
             } else {
-                System.debug('upsertStaff — running INSERT, acc: ' + JSON.serialize(acc));
                 insert acc;
-                System.debug('upsertStaff — INSERT success, id: ' + acc.Id);
-
-                // Auto-generate Employee ID after insert
-                String empId = generateEmployeeId(acc.Id, safeStr(data.StaffType));
-                acc.Employee_ID__c = empId;
+                acc.Employee_ID__c = generateEmployeeId(acc.Id, safeStr(data.StaffType));
                 update acc;
-                System.debug('upsertStaff — Employee ID set: ' + empId);
-                return acc.Id;
             }
+
+            // ── Save Subject Skills ──
+            if (data.SubjectSkills != null) {
+                // Delete existing skills for this teacher
+                List<Teacher_Skill__c> oldSkills = [
+                    SELECT Id FROM Teacher_Skill__c WHERE Teacher__c = :acc.Id
+                ];
+                if (!oldSkills.isEmpty()) delete oldSkills;
+
+                // Insert new skills
+                List<Teacher_Skill__c> newSkills = new List<Teacher_Skill__c>();
+                String fullName = firstName + ' ' + lastName;
+                for (Map<String, Object> sk : data.SubjectSkills) {
+                    String subjectId  = sk.get('subjectId')  != null ? String.valueOf(sk.get('subjectId'))  : '';
+                    String skillLevel = sk.get('skillLevel') != null ? String.valueOf(sk.get('skillLevel')) : '';
+                    if (String.isBlank(subjectId) || String.isBlank(skillLevel)) continue;
+
+                    // Get subject name for the skill record Name field
+                    String subjectName = sk.get('subjectName') != null ? String.valueOf(sk.get('subjectName')) : subjectId;
+
+                    Teacher_Skill__c ts = new Teacher_Skill__c(
+                        Name               = fullName + ' - ' + subjectName,
+                        Teacher__c         = acc.Id,
+                        Subject__c         = subjectId,
+                        Skill_Level__c     = skillLevel
+                    );
+                    if (sk.get('yearsOfExperience') != null) {
+                        try {
+                            ts.Years_of_Experience__c = Decimal.valueOf(String.valueOf(sk.get('yearsOfExperience')));
+                        } catch (Exception ex) {}
+                    }
+                    newSkills.add(ts);
+                }
+                if (!newSkills.isEmpty()) insert newSkills;
+            }
+
+            return acc.Id;
 
         } catch (AuraHandledException ahe) {
-            // Re-throw our own validation messages as-is
-            System.debug('upsertStaff — AuraHandledException: ' + ahe.getMessage());
-            throw ahe;
+            Database.rollback(sp); throw ahe;
         } catch (DmlException dml) {
-            // Surface the actual Salesforce DML error (field name + message)
-            String dmlMsg = '';
-            for (Integer i = 0; i < dml.getNumDml(); i++) {
-                dmlMsg += dml.getDmlFieldNames(i) + ': ' + dml.getDmlMessage(i) + '; ';
-            }
-            System.debug('upsertStaff — DmlException: ' + dmlMsg);
-            throw new AuraHandledException('Save failed: ' + dmlMsg);
+            Database.rollback(sp);
+            String msg = '';
+            for (Integer i = 0; i < dml.getNumDml(); i++)
+                msg += dml.getDmlFieldNames(i) + ': ' + dml.getDmlMessage(i) + '; ';
+            throw new AuraHandledException('Save failed: ' + msg);
         } catch (Exception e) {
-            System.debug('upsertStaff — Exception: ' + e.getMessage() + ' | ' + e.getStackTraceString());
+            Database.rollback(sp);
             throw new AuraHandledException('Save failed: ' + e.getMessage());
         }
     }
 
     /* ─────────────────────────────────────────
-       WRITE – DELETE STAFF MEMBER
+       WRITE – DELETE STAFF
     ───────────────────────────────────────── */
-
     @AuraEnabled
     public static void deleteStaff(String staffId) {
         try {
-            if (String.isBlank(staffId)) {
-                throw new AuraHandledException('Staff ID is required for deletion.');
-            }
+            if (String.isBlank(staffId)) throw new AuraHandledException('Staff ID is required.');
             delete [SELECT Id FROM Account WHERE Id = :staffId LIMIT 1];
-        } catch (AuraHandledException ahe) {
-            throw ahe;
-        } catch (Exception e) {
-            throw new AuraHandledException('Error deleting staff: ' + e.getMessage());
-        }
+        } catch (AuraHandledException ahe) { throw ahe; }
+        catch (Exception e) { throw new AuraHandledException('Error deleting staff: ' + e.getMessage()); }
     }
 
     /* ─────────────────────────────────────────
-       WRITE – PAY SINGLE SALARY (Invoice)
+       WRITE – PAY SINGLE SALARY
     ───────────────────────────────────────── */
-
     @AuraEnabled
     public static String paySalary(String staffId, String invoiceMonth) {
         try {
             if (String.isBlank(staffId))      throw new AuraHandledException('Staff ID is required.');
             if (String.isBlank(invoiceMonth)) throw new AuraHandledException('Invoice month is required.');
-
             Account acc = [
-                SELECT Id, Name, Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c
+                SELECT Id, Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c
                 FROM Account WHERE Id = :staffId LIMIT 1
             ];
-
             Decimal basic = acc.Basic_Salary__c != null ? acc.Basic_Salary__c : 0;
             Decimal hra   = acc.HRA__c          != null ? acc.HRA__c          : 0;
             Decimal da    = acc.DA__c           != null ? acc.DA__c           : 0;
             Decimal pf    = acc.PF_Deduction__c != null ? acc.PF_Deduction__c : 0;
             Decimal net   = basic + hra + da - pf;
-
             List<Invoice__c> existing = [
-                SELECT Id, Status__c FROM Invoice__c
-                WHERE Account__c       = :staffId
-                  AND Invoice_Type__c  = 'Salary'
-                  AND Invoice_Month__c = :invoiceMonth
-                LIMIT 1
+                SELECT Id FROM Invoice__c
+                WHERE Account__c = :staffId AND Invoice_Type__c = 'Salary'
+                  AND Invoice_Month__c = :invoiceMonth LIMIT 1
             ];
-
             if (!existing.isEmpty()) {
-                existing[0].Status__c = 'Paid';
+                existing[0].Status__c       = 'Paid';
+                existing[0].Invoice_Date__c = Date.today();
+                existing[0].Total_Amount__c = net;
+                existing[0].Paid_Amount__c  = net;
                 update existing[0];
                 return existing[0].Id;
             } else {
-                Invoice__c inv = new Invoice__c();
-                inv.Account__c       = staffId;
-                inv.Invoice_Date__c  = Date.today();
-                inv.Due_Date__c      = Date.today();
-                inv.Status__c        = 'Paid';
-                inv.Total_Amount__c  = net;
-                inv.Invoice_Type__c  = 'Salary';
-                inv.Invoice_Month__c = invoiceMonth;
-                inv.Description__c   = 'Monthly salary for ' + invoiceMonth
-                                     + ' | Basic: ' + basic
-                                     + ' | HRA: '   + hra
-                                     + ' | DA: '    + da
-                                     + ' | PF: -'   + pf;
+                Invoice__c inv = new Invoice__c(
+                    Account__c = staffId, Invoice_Date__c = Date.today(),
+                    Due_Date__c = Date.today(), Status__c = 'Paid',
+                    Total_Amount__c = net, Paid_Amount__c = net,
+                    Invoice_Type__c = 'Salary', Invoice_Month__c = invoiceMonth,
+                    Description__c  = 'Salary ' + invoiceMonth + ' | Net: ' + net
+                );
                 insert inv;
                 return inv.Id;
             }
-        } catch (AuraHandledException ahe) {
-            throw ahe;
-        } catch (Exception e) {
-            throw new AuraHandledException('Error processing payment: ' + e.getMessage());
-        }
+        } catch (AuraHandledException ahe) { throw ahe; }
+        catch (Exception e) { throw new AuraHandledException('Payment failed: ' + e.getMessage()); }
     }
 
     /* ─────────────────────────────────────────
        WRITE – PROCESS ALL PAYROLL
     ───────────────────────────────────────── */
-
     @AuraEnabled
     public static void processAllPayroll(String invoiceMonth) {
         try {
-            if (String.isBlank(invoiceMonth)) {
-                throw new AuraHandledException('Invoice month is required.');
-            }
-
+            if (String.isBlank(invoiceMonth)) throw new AuraHandledException('Invoice month is required.');
             List<Account> accounts = [
-                SELECT Id, Name, Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c
+                SELECT Id, Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c
                 FROM Account
-                WHERE IsPersonAccount = true
-                  AND Type IN ('Teacher', 'Non Teaching Staff')
+                WHERE IsPersonAccount = true AND Type IN ('Teacher', 'Non Teaching Staff')
             ];
-
             if (accounts.isEmpty()) return;
-
-            Set<Id> accountIds = new Map<Id, Account>(accounts).keySet();
-
-            Map<Id, Invoice__c> existingMap = new Map<Id, Invoice__c>();
+            Set<Id> ids = new Map<Id, Account>(accounts).keySet();
+            Map<Id, Invoice__c> existing = new Map<Id, Invoice__c>();
             for (Invoice__c inv : [
-                SELECT Id, Account__c, Status__c FROM Invoice__c
-                WHERE Invoice_Type__c  = 'Salary'
-                  AND Invoice_Month__c = :invoiceMonth
-                  AND Account__c IN    :accountIds
-            ]) {
-                existingMap.put(inv.Account__c, inv);
-            }
+                SELECT Id, Account__c FROM Invoice__c
+                WHERE Invoice_Type__c = 'Salary' AND Invoice_Month__c = :invoiceMonth
+                  AND Account__c IN :ids
+            ]) { existing.put(inv.Account__c, inv); }
 
             List<Invoice__c> toInsert = new List<Invoice__c>();
             List<Invoice__c> toUpdate = new List<Invoice__c>();
-
             for (Account acc : accounts) {
                 Decimal basic = acc.Basic_Salary__c != null ? acc.Basic_Salary__c : 0;
                 Decimal hra   = acc.HRA__c          != null ? acc.HRA__c          : 0;
                 Decimal da    = acc.DA__c           != null ? acc.DA__c           : 0;
                 Decimal pf    = acc.PF_Deduction__c != null ? acc.PF_Deduction__c : 0;
                 Decimal net   = basic + hra + da - pf;
-
-                if (existingMap.containsKey(acc.Id)) {
-                    Invoice__c inv = existingMap.get(acc.Id);
-                    inv.Status__c = 'Paid';
+                if (existing.containsKey(acc.Id)) {
+                    Invoice__c inv = existing.get(acc.Id);
+                    inv.Status__c = 'Paid'; inv.Invoice_Date__c = Date.today();
+                    inv.Total_Amount__c = net; inv.Paid_Amount__c = net;
                     toUpdate.add(inv);
                 } else {
-                    Invoice__c inv = new Invoice__c();
-                    inv.Account__c       = acc.Id;
-                    inv.Invoice_Date__c  = Date.today();
-                    inv.Due_Date__c      = Date.today();
-                    inv.Status__c        = 'Paid';
-                    inv.Total_Amount__c  = net;
-                    inv.Invoice_Type__c  = 'Salary';
-                    inv.Invoice_Month__c = invoiceMonth;
-                    inv.Description__c   = 'Monthly salary for ' + invoiceMonth;
-                    toInsert.add(inv);
+                    toInsert.add(new Invoice__c(
+                        Account__c = acc.Id, Invoice_Date__c = Date.today(),
+                        Due_Date__c = Date.today(), Status__c = 'Paid',
+                        Total_Amount__c = net, Paid_Amount__c = net,
+                        Invoice_Type__c = 'Salary', Invoice_Month__c = invoiceMonth,
+                        Description__c  = 'Salary ' + invoiceMonth
+                    ));
                 }
             }
-
             if (!toUpdate.isEmpty()) update toUpdate;
             if (!toInsert.isEmpty()) insert toInsert;
-
-        } catch (AuraHandledException ahe) {
-            throw ahe;
-        } catch (Exception e) {
-            throw new AuraHandledException('Error processing payroll: ' + e.getMessage());
-        }
+        } catch (AuraHandledException ahe) { throw ahe; }
+        catch (Exception e) { throw new AuraHandledException('Payroll processing failed: ' + e.getMessage()); }
     }
 
     /* ─────────────────────────────────────────
-       HELPER – NULL-SAFE STRING TRIM
-       Converts null → '' so isBlank() works
-       predictably; trims whitespace.
+       HELPERS
     ───────────────────────────────────────── */
-
-    private static String safeStr(String val) {
-        return val == null ? '' : val.trim();
-    }
-
-    /* ─────────────────────────────────────────
-       HELPER – SALARY STATUS MAP
-    ───────────────────────────────────────── */
+    private static String safeStr(String val) { return val == null ? '' : val.trim(); }
 
     private static Map<Id, String> getSalaryStatusMap(Set<Id> accountIds) {
         Map<Id, String> result = new Map<Id, String>();
         if (accountIds == null || accountIds.isEmpty()) return result;
-
         for (Invoice__c inv : [
-            SELECT Account__c, Status__c
-            FROM Invoice__c
-            WHERE Invoice_Type__c = 'Salary'
-              AND Account__c IN   :accountIds
+            SELECT Account__c, Status__c FROM Invoice__c
+            WHERE Invoice_Type__c = 'Salary' AND Account__c IN :accountIds
             ORDER BY Invoice_Date__c DESC
         ]) {
-            if (!result.containsKey(inv.Account__c)) {
+            if (!result.containsKey(inv.Account__c))
                 result.put(inv.Account__c, inv.Status__c == 'Paid' ? 'Paid' : 'Pending');
-            }
         }
-
-        for (Id accId : accountIds) {
-            if (!result.containsKey(accId)) {
-                result.put(accId, 'Pending');
-            }
-        }
+        for (Id id : accountIds) if (!result.containsKey(id)) result.put(id, 'Pending');
         return result;
     }
 
-    /* ─────────────────────────────────────────
-       HELPER – CONVERT ACCOUNT → WRAPPER
-    ───────────────────────────────────────── */
-
     private static StaffWrapper toWrapper(Account acc, String salaryStatus) {
-        StaffWrapper w = new StaffWrapper();
+        StaffWrapper w  = new StaffWrapper();
         w.id            = acc.Id;
         w.EmployeeId    = acc.Employee_ID__c;
         w.FirstName     = acc.FirstName;
@@ -542,37 +702,19 @@ public without sharing class SchoolStaffController {
         return w;
     }
 
-    /* ─────────────────────────────────────────
-       HELPER – PERSON ACCOUNT RECORD TYPE ID
-       Returns null safely if no PersonAccount
-       RT exists (some orgs use a default RT).
-    ───────────────────────────────────────── */
-
     private static Id getPersonAccountRecordTypeId() {
         try {
             List<RecordType> rt = [
                 SELECT Id FROM RecordType
-                WHERE SObjectType = 'Account'
-                  AND IsPersonType = true
-                  AND IsActive     = true
+                WHERE SObjectType = 'Account' AND IsPersonType = true AND IsActive = true
                 LIMIT 1
             ];
-            Id rtId = rt.isEmpty() ? null : rt[0].Id;
-            System.debug('getPersonAccountRecordTypeId — rtId: ' + rtId);
-            return rtId;
-        } catch (Exception e) {
-            System.debug('getPersonAccountRecordTypeId — error: ' + e.getMessage());
-            return null;
-        }
+            return rt.isEmpty() ? null : rt[0].Id;
+        } catch (Exception e) { return null; }
     }
 
-    /* ─────────────────────────────────────────
-       HELPER – GENERATE EMPLOYEE ID
-    ───────────────────────────────────────── */
-
     private static String generateEmployeeId(Id accountId, String staffType) {
-        String prefix  = (staffType == 'Teaching') ? 'TCH' : 'NTS';
-        String shortId = String.valueOf(accountId).right(5).toUpperCase();
-        return prefix + '-' + shortId;
+        return ((staffType == 'Teaching') ? 'TCH' : 'NTS')
+               + '-' + String.valueOf(accountId).right(5).toUpperCase();
     }
 }

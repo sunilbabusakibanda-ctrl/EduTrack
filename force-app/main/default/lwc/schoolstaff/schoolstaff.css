@@ -1,7 +1,5 @@
 /* ════════════════════════════════════════════════
    SCHOOL STAFF — schoolStaff.css
-   All existing styles are unchanged.
-   One new block added at the top: loading overlay.
    ════════════════════════════════════════════════ */
 
 /* ── LOADING OVERLAY ── */
@@ -15,8 +13,6 @@
     align-items: center;
     justify-content: center;
 }
-
-/* ════ All styles below are identical to the original CSS ════ */
 
 :host {
     --primary:       #2E5BFF;
@@ -595,6 +591,152 @@ tr:hover { background: var(--bg-secondary); }
 .toast-error   { background: #FFE8EC; color: var(--danger); }
 .toast-icon    { font-size: 16px; }
 
+/* ════════════════════════════════════════════
+   PAYSLIP MODAL — New styles
+   ════════════════════════════════════════════ */
+
+.ss-payslip-modal {
+    max-width: 680px;
+}
+
+.ss-payslip-header {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3FCC 100%);
+    border-bottom: none;
+}
+.ss-payslip-header .card-title {
+    color: white;
+    font-size: 18px;
+}
+
+.ss-payslip-body {
+    padding: 0;
+    background: var(--bg-secondary);
+}
+
+/* School Band */
+.payslip-school-band {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 28px;
+    background: linear-gradient(135deg, #0F172A 0%, #1E3FCC 100%);
+    color: white;
+    flex-wrap: wrap;
+}
+.psb-logo {
+    font-size: 32px;
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.psb-info { flex: 1; }
+.psb-school-name { font-size: 18px; font-weight: 800; letter-spacing: 0.3px; }
+.psb-subtitle    { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+.psb-inv-id { text-align: right; }
+.psb-inv-label { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.8px; }
+.psb-inv-val   { font-size: 13px; font-weight: 700; font-family: monospace; }
+
+/* Employee Row */
+.payslip-emp-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 28px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-light);
+    flex-wrap: wrap;
+}
+.per-details { flex: 1; }
+.per-name  { font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px; }
+.per-desig { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+.per-meta  { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.per-month-box {
+    text-align: right;
+    background: var(--primary-light);
+    padding: 12px 18px; border-radius: 12px;
+    min-width: 140px;
+}
+.per-month-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); }
+.per-month-val   { font-size: 17px; font-weight: 800; color: var(--primary); margin: 2px 0; }
+.per-paid-label  { font-size: 11px; color: var(--text-tertiary); }
+
+/* Breakdown */
+.payslip-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--border-light);
+}
+.pbs-section {
+    padding: 20px 28px;
+    background: var(--bg-primary);
+}
+.pbs-section:first-child {
+    border-right: 1px solid var(--border-light);
+}
+
+.pbs-heading {
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 7px 12px; border-radius: 8px;
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 14px;
+}
+.pbs-earn-heading { background: #E6FAF5; color: #059669; }
+.pbs-ded-heading  { background: #FFE8EC; color: var(--danger); }
+
+.pbs-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-light);
+    font-size: 13px;
+}
+.pbs-row:last-of-type { border-bottom: none; }
+.pbs-row span    { color: var(--text-secondary); }
+.pbs-row strong  { font-weight: 700; color: var(--text-primary); }
+
+.pbs-sub-total {
+    display: flex; justify-content: space-between;
+    padding: 10px 12px; border-radius: 8px; margin-top: 12px;
+    font-size: 13px; font-weight: 700;
+}
+.earn-total { background: #E6FAF5; color: #059669; }
+.ded-total  { background: #FFE8EC; color: var(--danger); }
+
+/* Net Banner */
+.payslip-net-banner {
+    padding: 24px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+    text-align: center;
+    color: white;
+}
+.pnb-label  { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; }
+.pnb-amount { font-size: 40px; font-weight: 900; letter-spacing: -1px; margin: 6px 0 4px; }
+.pnb-note   { font-size: 12px; opacity: 0.75; }
+
+/* Footer Note */
+.payslip-footer-note {
+    padding: 14px 28px;
+    font-size: 11px; color: var(--text-tertiary);
+    text-align: center; font-style: italic;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-light);
+}
+
+@media (max-width: 576px) {
+    .payslip-breakdown { grid-template-columns: 1fr; }
+    .pbs-section:first-child { border-right: none; border-bottom: 1px solid var(--border-light); }
+    .payslip-emp-row { gap: 12px; }
+    .per-month-box { min-width: unset; width: 100%; text-align: left; }
+    .pnb-amount { font-size: 30px; }
+    .payslip-school-band { gap: 10px; }
+    .psb-inv-id { width: 100%; text-align: left; }
+}
+
+/* ════ Responsive (existing) ════ */
 @media (max-width: 992px) {
     .page-header { flex-direction: column; align-items: flex-start; }
     .staff-cards-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
@@ -610,4 +752,458 @@ tr:hover { background: var(--bg-secondary); }
     .form-grid { grid-template-columns: 1fr; }
     .ss-toast { bottom: 12px; right: 12px; left: 12px; max-width: none; }
     .page-title h2 { font-size: 22px; }
+}
+/* ════════════════════════════════════════════════════
+   ADD THESE NEW RULES to the bottom of schoolStaff.css
+   ════════════════════════════════════════════════════ */
+
+/* ── STAFF CARD PHOTO (replaces initials avatar) ── */
+.scard-photo {
+    width: 52px;
+    height: 52px;
+    border-radius: 13px;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ── DETAIL MODAL PHOTO ── */
+.ss-detail-photo {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    flex-shrink: 0;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-md);
+}
+
+/* ── PHOTO UPLOAD ROW IN FORM MODAL ── */
+.ss-photo-upload-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1.5px dashed var(--border);
+}
+
+/* Preview box */
+.ss-photo-preview-wrap {
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border-light);
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ss-photo-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+.ss-photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+}
+
+.ss-photo-icon {
+    font-size: 26px;
+    line-height: 1;
+    opacity: 0.4;
+}
+
+.ss-photo-hint {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Controls beside preview */
+.ss-photo-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 180px;
+}
+
+.ss-photo-desc {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+}
+
+/* Hide the real file input; use the label as button */
+.ss-photo-input {
+    display: none;
+}
+
+.ss-photo-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+
+.ss-photo-remove-btn {
+    width: fit-content;
+    padding: 7px 14px;
+    font-size: 12px;
+}
+/* ════════════════════════════════════════════════════
+   NEW ADDITIONS — append to schoolStaff.css
+   ════════════════════════════════════════════════════ */
+
+/* ── SUBJECT SKILLS FORM SECTION ── */
+.ss-section-heading-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-light);
+    margin-bottom: 16px;
+}
+
+.ss-add-skill-btn {
+    padding: 7px 14px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.ss-add-skill-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.ss-skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ss-skill-card {
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+}
+.ss-skill-card:hover { border-color: var(--primary-light); }
+
+.ss-skill-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.ss-skill-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 3px 9px;
+    border-radius: 6px;
+    letter-spacing: 0.4px;
+}
+
+.ss-skill-remove-btn {
+    background: #FFE8EC;
+    border: none;
+    border-radius: 7px;
+    color: var(--danger);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 9px;
+    transition: all 0.2s;
+}
+.ss-skill-remove-btn:hover { background: var(--danger); color: white; }
+
+.ss-skill-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 576px) {
+    .ss-skill-fields { grid-template-columns: 1fr; }
+}
+
+.ss-skills-empty {
+    text-align: center;
+    padding: 28px 16px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1.5px dashed var(--border);
+    color: var(--text-tertiary);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.ss-skills-empty span { font-size: 28px; opacity: 0.5; }
+.ss-skills-empty strong { color: var(--primary); }
+
+/* ── DETAIL MODAL SECTIONS (skills / invoices / periods) ── */
+.dd-loading-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0 4px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+}
+.dd-loading-text { font-weight: 500; }
+
+.dd-section {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.dd-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dd-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.dd-weekly-badge {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 3px 9px;
+    border-radius: 6px;
+}
+
+.dd-toggle-btn {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.dd-toggle-btn:hover { background: var(--primary); color: white; }
+
+.dd-empty-msg {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* ── Skills chips ── */
+.dd-skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.dd-skill-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+.dd-skill-chip:hover { border-color: var(--primary-light); background: var(--primary-light); }
+
+.dd-skill-subject {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dd-skill-level-chip {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 2px 8px;
+    border-radius: 5px;
+}
+.skill-level-expert       { background: #FDF2FF; color: #7C3AED; }
+.skill-level-advanced     { background: #E8EEFF; color: var(--primary); }
+.skill-level-intermediate { background: #E6FAF5; color: var(--success); }
+.skill-level-beginner     { background: var(--bg-tertiary); color: var(--text-secondary); }
+
+.dd-skill-exp {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+}
+
+/* ── Invoice list ── */
+.dd-invoices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.dd-invoice-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    transition: all 0.2s;
+    flex-wrap: wrap;
+}
+.dd-invoice-row:hover { background: var(--bg-tertiary); }
+
+.dd-inv-month {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 100px;
+}
+.dd-inv-icon  { font-size: 14px; }
+.dd-inv-label { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+.di-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 7px;
+    white-space: nowrap;
+}
+.di-paid    { background: #E6FAF5; color: var(--success); }
+.di-pending { background: #FFF8E1; color: var(--warning); }
+
+.dd-inv-amount {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--primary);
+}
+.dd-inv-date {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+}
+
+/* ── Period / timetable rows ── */
+.dd-day-group { margin-bottom: 16px; }
+
+.dd-day-label {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dd-period-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.dd-period-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border: 1px solid var(--border-light);
+    transition: all 0.2s;
+}
+.dd-period-card:hover { background: var(--primary-light); border-color: transparent; }
+
+.dd-period-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dd-period-info { flex: 1; }
+.dd-period-subject {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+.dd-period-class {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+}
+
+.dd-period-time {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
 }

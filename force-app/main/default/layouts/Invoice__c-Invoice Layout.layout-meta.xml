@@ -29,6 +29,10 @@
                 <behavior>Readonly</behavior>
                 <field>Student_Total_Balance__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Paid_Amount__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

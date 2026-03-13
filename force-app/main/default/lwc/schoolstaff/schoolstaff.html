@@ -124,7 +124,12 @@
                             <div class="scard-body">
                                 <div class="scard-top">
                                     <div class="scard-avatar-wrap">
-                                        <div class={member.avatarClass}>{member.initials}</div>
+                                        <template lwc:if={member.hasPhoto}>
+                                            <img class="scard-photo" src={member.photoUrl} alt={member.name} />
+                                        </template>
+                                        <template lwc:else>
+                                            <div class={member.avatarClass}>{member.initials}</div>
+                                        </template>
                                         <span class={member.statusDotClass}></span>
                                     </div>
                                     <div class="scard-emp-id">{member.employeeId}</div>
@@ -141,12 +146,6 @@
                                         <span>📱</span>
                                         <span class="scard-info-val">{member.phone}</span>
                                     </div>
-                                    <template lwc:if={member.subject}>
-                                        <div class="scard-info-row">
-                                            <span>📚</span>
-                                            <span class="scard-info-val">{member.subject}</span>
-                                        </div>
-                                    </template>
                                     <div class="scard-info-row">
                                         <span>📅</span>
                                         <span class="scard-info-val">Joined {member.joiningDate}</span>
@@ -247,7 +246,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="table-container">
                     <table>
                         <thead>
@@ -281,8 +279,9 @@
                                     <td style="font-weight:800;color:var(--primary);font-size:15px;">{rec.netSalary}</td>
                                     <td><span class={rec.salaryStatusClass}>{rec.salaryStatus}</span></td>
                                     <td>
-                                        <button class={rec.actionBtnClass} data-id={rec.staffId}
-                                            onclick={handlePaySalary}>{rec.actionLabel}</button>
+                                        <button class={rec.actionBtnClass}
+                                                data-id={rec.staffId}
+                                                onclick={handlePaySalary}>{rec.actionLabel}</button>
                                     </td>
                                 </tr>
                             </template>
@@ -308,6 +307,36 @@
                                 onclick={handleStaffTypeChange}>👩‍🏫 Teaching Staff</button>
                             <button class={nonTeachingToggleClass} data-type="Non-Teaching"
                                 onclick={handleStaffTypeChange}>🧹 Non-Teaching</button>
+                        </div>
+
+                        <!-- ══ PHOTO UPLOAD ══ -->
+                        <div class="ss-form-section">
+                            <div class="ss-section-heading">📷 Profile Photo</div>
+                            <div class="ss-photo-upload-row">
+                                <div class="ss-photo-preview-wrap">
+                                    <template lwc:if={hasPhotoPreview}>
+                                        <img class="ss-photo-preview-img" src={photoPreview} alt="Preview" />
+                                    </template>
+                                    <template lwc:else>
+                                        <div class="ss-photo-placeholder">
+                                            <span class="ss-photo-icon">📷</span>
+                                            <span class="ss-photo-hint">No photo</span>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="ss-photo-controls">
+                                    <p class="ss-photo-desc">Upload a profile photo. Accepted: JPG, PNG, GIF (max 2MB).</p>
+                                    <label class="btn btn-secondary ss-photo-label" for="staffPhotoInput">
+                                        📁 Choose Photo
+                                    </label>
+                                    <input id="staffPhotoInput" type="file" accept="image/*"
+                                           class="ss-photo-input" onchange={handlePhotoChange} />
+                                    <template lwc:if={hasPhotoPreview}>
+                                        <button class="btn ss-danger-btn ss-photo-remove-btn"
+                                                onclick={handleRemovePhoto}>🗑️ Remove</button>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Personal -->
@@ -437,11 +466,6 @@
                                 </div>
                                 <template lwc:if={isTeachingType}>
                                     <div class="form-group">
-                                        <label class="form-label">Subject Taught</label>
-                                        <input type="text" class="form-input" placeholder="e.g. Physics"
-                                            data-field="subject" value={formData.subject} oninput={handleFormInput} />
-                                    </div>
-                                    <div class="form-group">
                                         <label class="form-label">Qualification</label>
                                         <input type="text" class="form-input" placeholder="e.g. M.Sc, B.Ed"
                                             data-field="qualification" value={formData.qualification}
@@ -450,6 +474,71 @@
                                 </template>
                             </div>
                         </div>
+
+                        <!-- ══ SUBJECT SKILLS (Teaching only) ══ -->
+                        <template lwc:if={isTeachingType}>
+                            <div class="ss-form-section">
+                                <div class="ss-section-heading-row">
+                                    <div class="ss-section-heading" style="margin-bottom:0;border-bottom:none;">📚 Subject Skills</div>
+                                    <button class="ss-add-skill-btn" onclick={handleAddSkill}>
+                                        ➕ Add Subject Skill
+                                    </button>
+                                </div>
+
+                                <template lwc:if={hasFormSkills}>
+                                    <div class="ss-skills-list">
+                                        <template for:each={formSkillsList} for:item="sk">
+                                            <div key={sk.id} class="ss-skill-card">
+                                                <div class="ss-skill-card-header">
+                                                    <span class="ss-skill-badge">Skill #{sk.id}</span>
+                                                    <button class="ss-skill-remove-btn"
+                                                            data-skill-id={sk.id}
+                                                            onclick={handleRemoveSkill}>🗑</button>
+                                                </div>
+                                                <div class="ss-skill-fields">
+                                                    <div class="form-group">
+                                                        <label class="form-label">* Subject</label>
+                                                        <select class="form-input"
+                                                                data-skill-id={sk.id}
+                                                                onchange={handleSkillSubjectChange}>
+                                                            <option value="">Select Subject</option>
+                                                            <template for:each={sk.subjectOptions} for:item="opt">
+                                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">* Skill Level</label>
+                                                        <select class="form-input"
+                                                                data-skill-id={sk.id}
+                                                                onchange={handleSkillLevelChange}>
+                                                            <option value="">Select Level</option>
+                                                            <template for:each={sk.skillLevelOptions} for:item="opt">
+                                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="form-label">Years of Experience</label>
+                                                        <input type="number" class="form-input"
+                                                               min="0" step="0.5" placeholder="0.0"
+                                                               value={sk.yearsOfExperience}
+                                                               data-skill-id={sk.id}
+                                                               oninput={handleSkillExperienceChange} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template lwc:else>
+                                    <div class="ss-skills-empty">
+                                        <span>📚</span>
+                                        <p>No subject skills added yet. Click <strong>➕ Add Subject Skill</strong> to begin.</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
 
                         <!-- Salary -->
                         <div class="ss-form-section">
@@ -540,11 +629,18 @@
                         <button class="ss-close-btn" onclick={handleCloseDetail}>✕</button>
                     </div>
                     <div class="ss-modal-body">
+
+                        <!-- Profile Banner -->
                         <div class="ss-profile-banner">
-                            <div class={selectedStaff.avatarClass}
-                                style="width:72px;height:72px;font-size:26px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;flex-shrink:0;">
-                                {selectedStaff.initials}
-                            </div>
+                            <template lwc:if={selectedStaff.hasPhoto}>
+                                <img class="ss-detail-photo" src={selectedStaff.photoUrl} alt={selectedStaff.name} />
+                            </template>
+                            <template lwc:else>
+                                <div class={selectedStaff.avatarClass}
+                                    style="width:72px;height:72px;font-size:26px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;flex-shrink:0;">
+                                    {selectedStaff.initials}
+                                </div>
+                            </template>
                             <div class="spb-info">
                                 <h3>{selectedStaff.name}</h3>
                                 <p>{selectedStaff.designation} · {selectedStaff.department}</p>
@@ -555,6 +651,16 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Loading shimmer -->
+                        <template lwc:if={detailLoading}>
+                            <div class="dd-loading-row">
+                                <lightning-spinner size="small" alternative-text="Loading details"></lightning-spinner>
+                                <span class="dd-loading-text">Loading details…</span>
+                            </div>
+                        </template>
+
+                        <!-- Core info grid -->
                         <div class="ss-detail-grid">
                             <div class="ss-detail-section">
                                 <div class="card-title" style="font-size:14px;margin-bottom:14px;">📋 Personal Info</div>
@@ -580,6 +686,96 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- ══ SUBJECT SKILLS ══ -->
+                        <template lwc:if={hasDetailSkills}>
+                            <div class="dd-section">
+                                <div class="dd-section-title">📚 Subject Skills</div>
+                                <div class="dd-skills-grid">
+                                    <template for:each={detailSkills} for:item="sk">
+                                        <div key={sk.subjectId} class="dd-skill-chip">
+                                            <span class="dd-skill-subject">{sk.subjectName}</span>
+                                            <span class={sk.levelClass}>{sk.skillLevel}</span>
+                                            <template lwc:if={sk.expLabel}>
+                                                <span class="dd-skill-exp">{sk.expLabel}</span>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- ══ PAYROLL INVOICES ══ -->
+                        <div class="dd-section">
+                            <div class="dd-section-title">💳 Salary Invoices</div>
+                            <template lwc:if={hasDetailInvoices}>
+                                <div class="dd-invoices-list">
+                                    <template for:each={detailInvoices} for:item="inv">
+                                        <div key={inv.id} class="dd-invoice-row">
+                                            <div class="dd-inv-month">
+                                                <span class="dd-inv-icon">📅</span>
+                                                <span class="dd-inv-label">{inv.month}</span>
+                                            </div>
+                                            <span class={inv.statusClass}>{inv.status}</span>
+                                            <span class="dd-inv-amount">{inv.amountFmt}</span>
+                                            <template lwc:if={inv.paidDate}>
+                                                <span class="dd-inv-date">{inv.paidDate}</span>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template lwc:else>
+                                <div class="dd-empty-msg">No salary invoices found.</div>
+                            </template>
+                        </div>
+
+                        <!-- ══ TIMETABLE / PERIODS ══ -->
+                        <div class="dd-section">
+                            <div class="dd-section-header">
+                                <div class="dd-section-title">🗓 Schedule
+                                    <template lwc:if={detailWeeklyCount}>
+                                        <span class="dd-weekly-badge">{detailWeeklyCount} periods/week</span>
+                                    </template>
+                                </div>
+                                <template lwc:if={detailShowToggle}>
+                                    <button class="dd-toggle-btn" onclick={handleToggleAllPeriods}>
+                                        {togglePeriodsLabel}
+                                    </button>
+                                </template>
+                            </div>
+
+                            <template lwc:if={hasDetailPeriods}>
+                                <template for:each={detailPeriodRows} for:item="dayGroup">
+                                    <div key={dayGroup.day} class="dd-day-group">
+                                        <div class="dd-day-label">{dayGroup.day}</div>
+                                        <div class="dd-period-cards">
+                                            <template for:each={dayGroup.periods} for:item="p">
+                                                <div key={p.periodId} class="dd-period-card">
+                                                    <div class="dd-period-num">P{p.periodNumber}</div>
+                                                    <div class="dd-period-info">
+                                                        <div class="dd-period-subject">{p.subjectName}</div>
+                                                        <div class="dd-period-class">{p.className}</div>
+                                                    </div>
+                                                    <template lwc:if={p.timeLabel}>
+                                                        <div class="dd-period-time">{p.timeLabel}</div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+                            <template lwc:else>
+                                <template lwc:if={detailLoading}>
+                                    <!-- already showing spinner above -->
+                                </template>
+                                <template lwc:else>
+                                    <div class="dd-empty-msg">No periods assigned for {detailTodayLabel}.</div>
+                                </template>
+                            </template>
+                        </div>
+
                     </div>
                     <div class="ss-modal-footer">
                         <button class="btn btn-secondary" onclick={handleEditFromDetail}>✏️ Edit Profile</button>
@@ -589,11 +785,78 @@
             </div>
         </template>
 
-        <!-- ══ TOAST ══ -->
-        <template lwc:if={showToast}>
-            <div class={toastClass}>
-                <span class="toast-icon">{toastIcon}</span>
-                <span>{toastMessage}</span>
+        <!-- ══ PAYSLIP MODAL ══ -->
+        <template lwc:if={showPayslipModal}>
+            <div class="ss-modal-overlay" onclick={handlePayslipOverlayClick}>
+                <div class="ss-modal ss-payslip-modal" onclick={stopPropagation}>
+                    <div class="ss-modal-header ss-payslip-header">
+                        <div class="card-title"><span>📄</span> Salary Payslip</div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <span class="badge-status badge-paid">✅ Paid</span>
+                            <button class="ss-close-btn" onclick={handleClosePayslip}>✕</button>
+                        </div>
+                    </div>
+                    <div class="ss-modal-body ss-payslip-body">
+                        <div class="payslip-school-band">
+                            <div class="psb-logo">🏫</div>
+                            <div class="psb-info">
+                                <div class="psb-school-name">EduTrack School</div>
+                                <div class="psb-subtitle">Official Salary Payslip · {payslipMonth}</div>
+                            </div>
+                            <div class="psb-inv-id">
+                                <div class="psb-inv-label">Invoice ID</div>
+                                <div class="psb-inv-val">{payslipInvId}</div>
+                            </div>
+                        </div>
+                        <div class="payslip-emp-row">
+                            <div class="per-avatar-wrap">
+                                <div class={payslipAvatarClass} style="width:60px;height:60px;font-size:22px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;">
+                                    {payslipInitials}
+                                </div>
+                            </div>
+                            <div class="per-details">
+                                <div class="per-name">{payslipStaffName}</div>
+                                <div class="per-desig">{payslipDesig}</div>
+                                <div class="per-meta">
+                                    <span class="badge-status badge-partial">{payslipEmpId}</span>
+                                    <span class="badge-status badge-active">{payslipStaffType}</span>
+                                </div>
+                            </div>
+                            <div class="per-month-box">
+                                <div class="per-month-label">Pay Period</div>
+                                <div class="per-month-val">{payslipMonth}</div>
+                                <div class="per-paid-label">Paid on {payslipPaidDate}</div>
+                            </div>
+                        </div>
+                        <div class="payslip-breakdown">
+                            <div class="pbs-section">
+                                <div class="pbs-heading pbs-earn-heading"><span>💚</span> Earnings</div>
+                                <div class="pbs-row"><span>Basic Salary</span><strong>{payslipBasic}</strong></div>
+                                <div class="pbs-row earn-row"><span>HRA</span><strong style="color:var(--success);">{payslipHra}</strong></div>
+                                <div class="pbs-row earn-row"><span>DA</span><strong style="color:var(--success);">{payslipDa}</strong></div>
+                                <div class="pbs-sub-total earn-total"><span>Total Earnings</span><strong>{payslipAllowances}</strong></div>
+                            </div>
+                            <div class="pbs-section">
+                                <div class="pbs-heading pbs-ded-heading"><span>🔴</span> Deductions</div>
+                                <div class="pbs-row ded-row"><span>PF (Provident Fund)</span><strong style="color:var(--danger);">−{payslipPf}</strong></div>
+                                <div class="pbs-sub-total ded-total"><span>Total Deductions</span><strong style="color:var(--danger);">−{payslipDeductions}</strong></div>
+                            </div>
+                        </div>
+                        <div class="payslip-net-banner">
+                            <div class="pnb-label">💰 Net Salary Credited</div>
+                            <div class="pnb-amount">{payslipNet}</div>
+                            <div class="pnb-note">Amount disbursed for {payslipMonth}</div>
+                        </div>
+                        <div class="payslip-footer-note">
+                            This is a computer-generated payslip and does not require a physical signature.
+                            For queries contact the Finance Department.
+                        </div>
+                    </div>
+                    <div class="ss-modal-footer">
+                        <button class="btn btn-secondary" onclick={handleClosePayslip}>✕ Close</button>
+                        <button class="btn btn-primary" onclick={handlePrintPayslip}>🖨️ Print Payslip</button>
+                    </div>
+                </div>
             </div>
         </template>
 
