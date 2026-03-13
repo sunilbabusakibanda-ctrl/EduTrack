@@ -5,6 +5,7 @@
 !force-app/
 !scripts/
 !manifest/
+!.github/
 !sfdx-project.json
 !package.json
 !package-lock.json
