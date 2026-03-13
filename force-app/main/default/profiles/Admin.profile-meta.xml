@@ -2118,7 +2118,7 @@
     </tabVisibilities>
     <tabVisibilities>
         <tab>Dashboard</tab>
-        <visibility>Hidden</visibility>
+        <visibility>DefaultOn</visibility>
     </tabVisibilities>
     <tabVisibilities>
         <tab>Entermarks</tab>
