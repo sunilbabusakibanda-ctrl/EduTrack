@@ -23,9 +23,9 @@
                 <span class="feature-tag new">👥 Staff Directory</span>
             </div>
             <div class="header-actions">
-                <button class="btn btn-secondary" onclick={handleExportStaff}>
+               <!-- <button class="btn btn-secondary" onclick={handleExportStaff}>
                     <span>📤</span> Export
-                </button>
+                </button>-->
                 <button class="btn btn-secondary" onclick={handleAddStaff}>
                     <span>➕</span> Add Staff
                 </button>
@@ -772,6 +772,102 @@
                                 </template>
                                 <template lwc:else>
                                     <div class="dd-empty-msg">No periods assigned for {detailTodayLabel}.</div>
+                                </template>
+                            </template>
+                        </div>
+
+                        <!-- ══ CASES (Complaints & Praises) ══ -->
+                        <div class="dd-section">
+                            <div class="dd-section-header">
+                                <div class="dd-section-title">
+                                    📋 Student Cases
+                                    <template lwc:if={hasDetailCases}>
+                                        <span class="dd-weekly-badge">{detailCaseCounts.all} total</span>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Filter pills -->
+                            <template lwc:if={hasDetailCases}>
+                                <div class="dc-filter-row">
+                                    <button class={caseFilterAllClass}
+                                            data-filter="all"
+                                            onclick={handleCaseFilterChange}>
+                                        All ({detailCaseCounts.all})
+                                    </button>
+                                    <button class={caseFilterComplaintClass}
+                                            data-filter="Complaint"
+                                            onclick={handleCaseFilterChange}>
+                                        ⚠️ Complaints ({detailCaseCounts.complaints})
+                                    </button>
+                                    <button class={caseFilterPraiseClass}
+                                            data-filter="Praise"
+                                            onclick={handleCaseFilterChange}>
+                                        🌟 Praises ({detailCaseCounts.praises})
+                                    </button>
+                                </div>
+
+                                <template lwc:if={hasFilteredDetailCases}>
+                                    <div class="dc-cases-list">
+                                        <template for:each={filteredDetailCases} for:item="c">
+                                            <div key={c.id} class="dc-case-card">
+                                                <!-- Card top row -->
+                                                <div class="dc-case-top">
+                                                    <div class="dc-case-left">
+                                                        <span class="dc-case-icon">{c.typeIcon}</span>
+                                                        <div>
+                                                            <div class="dc-case-subject">{c.subject}</div>
+                                                            <div class="dc-case-num">#{c.caseNumber}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dc-case-badges">
+                                                        <span class={c.typeClass}>{c.type}</span>
+                                                        <span class={c.statusClass}>{c.status}</span>
+                                                        <template lwc:if={c.priority}>
+                                                            <span class={c.priorityClass}>{c.priority}</span>
+                                                        </template>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Meta row: student + class + date -->
+                                                <div class="dc-case-meta">
+                                                    <template lwc:if={c.hasStudent}>
+                                                        <span class="dc-meta-item">
+                                                            <span class="dc-meta-icon">👤</span>
+                                                            {c.studentName}
+                                                        </span>
+                                                    </template>
+                                                    <template lwc:if={c.hasClass}>
+                                                        <span class="dc-meta-item">
+                                                            <span class="dc-meta-icon">🏫</span>
+                                                            {c.className}
+                                                        </span>
+                                                    </template>
+                                                    <span class="dc-meta-item dc-meta-date">
+                                                        <span class="dc-meta-icon">📅</span>
+                                                        {c.createdDate}
+                                                    </span>
+                                                </div>
+
+                                                <!-- Description -->
+                                                <template lwc:if={c.shortDesc}>
+                                                    <div class="dc-case-desc">{c.shortDesc}</div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template lwc:else>
+                                    <div class="dd-empty-msg">No {detailCaseFilter} cases found.</div>
+                                </template>
+                            </template>
+
+                            <template lwc:else>
+                                <template lwc:if={detailLoading}>
+                                    <!-- spinner shown above -->
+                                </template>
+                                <template lwc:else>
+                                    <div class="dd-empty-msg">No cases submitted by this staff member.</div>
                                 </template>
                             </template>
                         </div>

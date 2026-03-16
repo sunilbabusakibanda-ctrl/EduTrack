@@ -1207,3 +1207,178 @@ tr:hover { background: var(--bg-secondary); }
     border-radius: 6px;
     white-space: nowrap;
 }
+
+
+/* ════════════════════════════════════════════════════
+   CASES SECTION — Student Complaints & Praises
+   ════════════════════════════════════════════════════ */
+
+/* Filter pills */
+.dc-filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.dc-filter-btn {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.dc-filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+.dc-filter-active {
+    background: var(--primary);
+    color: white !important;
+    border-color: var(--primary) !important;
+}
+
+/* Cases list */
+.dc-cases-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    padding-right: 2px;
+}
+
+/* Individual case card */
+.dc-case-card {
+    background: var(--bg-primary);
+    border: 1.5px solid var(--border-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+}
+.dc-case-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-sm);
+    transform: translateX(3px);
+}
+
+/* Top row: icon + subject + badges */
+.dc-case-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.dc-case-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.dc-case-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.dc-case-subject {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    word-break: break-word;
+}
+
+.dc-case-num {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    font-family: monospace;
+}
+
+.dc-case-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+/* Type badges */
+.dc-type-badge {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.dc-type-complaint { background: #FFE8EC; color: var(--danger); }
+.dc-type-praise    { background: #FFFBEB; color: #D97706; }
+
+/* Status badges */
+.dc-status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.dc-status-new       { background: #E8EEFF; color: var(--primary); }
+.dc-status-open      { background: #E6FAF5; color: var(--success); }
+.dc-status-working   { background: #FFF8E1; color: var(--warning); }
+.dc-status-escalated { background: #FFE8EC; color: var(--danger); }
+.dc-status-closed    { background: var(--bg-tertiary); color: var(--text-tertiary); }
+
+/* Priority indicator */
+.dc-priority {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+.dc-priority-high   { background: #FFE8EC; color: var(--danger); }
+.dc-priority-medium { background: #FFF8E1; color: var(--warning); }
+.dc-priority-low    { background: var(--bg-tertiary); color: var(--text-tertiary); }
+
+/* Meta row: student / class / date */
+.dc-case-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.dc-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.dc-meta-icon { font-size: 13px; }
+.dc-meta-date { color: var(--text-tertiary); }
+
+/* Description */
+.dc-case-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    background: var(--bg-secondary);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-left: 3px solid var(--border);
+    margin-top: 4px;
+}

@@ -57,6 +57,8 @@ export default class SchoolStaff extends LightningElement {
     @track detailTodayPeriods   = [];   // today only
     @track detailWeeklyCount    = 0;
     @track detailShowAllPeriods = false;
+    @track detailCases          = [];
+    @track detailCaseFilter     = 'all';  // 'all' | 'Complaint' | 'Praise'
 
     _rawStaffList   = [];
     _rawPayrollList = [];
@@ -145,6 +147,24 @@ export default class SchoolStaff extends LightningElement {
     /* ── GETTERS: DETAIL MODAL ── */
     get hasDetailSkills()   { return this.detailSkills.length > 0; }
     get hasDetailInvoices() { return this.detailInvoices.length > 0; }
+    get hasDetailCases()    { return this.detailCases.length > 0; }
+
+    get filteredDetailCases() {
+        if (this.detailCaseFilter === 'all') return this.detailCases;
+        return this.detailCases.filter(c => c.type === this.detailCaseFilter);
+    }
+    get hasFilteredDetailCases() { return this.filteredDetailCases.length > 0; }
+
+    get caseFilterAllClass()       { return `dc-filter-btn${this.detailCaseFilter === 'all'       ? ' dc-filter-active' : ''}`; }
+    get caseFilterComplaintClass() { return `dc-filter-btn${this.detailCaseFilter === 'Complaint' ? ' dc-filter-active' : ''}`; }
+    get caseFilterPraiseClass()    { return `dc-filter-btn${this.detailCaseFilter === 'Praise'    ? ' dc-filter-active' : ''}`; }
+
+    get detailCaseCounts() {
+        const all       = this.detailCases.length;
+        const complaints = this.detailCases.filter(c => c.type === 'Complaint').length;
+        const praises    = this.detailCases.filter(c => c.type === 'Praise').length;
+        return { all, complaints, praises };
+    }
     get hasDetailPeriods()  { return this.detailTodayPeriods.length > 0; }
     get detailTodayLabel()  { return TODAY_DAY; }
     get detailPeriodsLabel(){ return `Today (${TODAY_DAY})`; }
@@ -262,6 +282,8 @@ export default class SchoolStaff extends LightningElement {
         this.detailTodayPeriods  = [];
         this.detailWeeklyCount   = 0;
         this.detailShowAllPeriods = false;
+        this.detailCases         = [];
+        this.detailCaseFilter    = 'all';
         this.showDetailModal     = true;
         this.detailLoading       = true;
 
@@ -292,6 +314,26 @@ export default class SchoolStaff extends LightningElement {
                 .sort((a,b) => a.periodNumber - b.periodNumber);
             this.detailWeeklyCount = allPeriods.length;
 
+            // Cases
+            this.detailCases = (detail.cases || []).map(c => ({
+                ...c,
+                isPraise:    c.type === 'Praise',
+                isComplaint: c.type === 'Complaint',
+                typeClass:   c.type === 'Praise'
+                             ? 'dc-type-badge dc-type-praise'
+                             : 'dc-type-badge dc-type-complaint',
+                statusClass: this._caseStatusClass(c.status),
+                priorityClass: this._casePriorityClass(c.priority),
+                typeIcon: c.type === 'Praise' ? '🌟' : '⚠️',
+                hasStudent: !!c.studentName,
+                hasClass:   !!c.className,
+                shortDesc:  c.description
+                             ? (c.description.length > 100
+                                ? c.description.substring(0, 100) + '…'
+                                : c.description)
+                             : ''
+            }));
+
         } catch (err) {
             // Non-critical — detail still opens with basic info
         } finally {
@@ -301,6 +343,30 @@ export default class SchoolStaff extends LightningElement {
 
     handleToggleAllPeriods() {
         this.detailShowAllPeriods = !this.detailShowAllPeriods;
+    }
+
+    handleCaseFilterChange(e) {
+        this.detailCaseFilter = e.currentTarget.dataset.filter;
+    }
+
+    _caseStatusClass(status) {
+        const map = {
+            'New':      'dc-status-badge dc-status-new',
+            'Open':     'dc-status-badge dc-status-open',
+            'Working':  'dc-status-badge dc-status-working',
+            'Escalated':'dc-status-badge dc-status-escalated',
+            'Closed':   'dc-status-badge dc-status-closed'
+        };
+        return map[status] || 'dc-status-badge dc-status-open';
+    }
+
+    _casePriorityClass(priority) {
+        const map = {
+            'High':   'dc-priority dc-priority-high',
+            'Medium': 'dc-priority dc-priority-medium',
+            'Low':    'dc-priority dc-priority-low'
+        };
+        return map[priority] || 'dc-priority dc-priority-low';
     }
 
     get togglePeriodsLabel() {
@@ -469,18 +535,20 @@ export default class SchoolStaff extends LightningElement {
             JoiningDate:this.formData.joiningDate||'', Status:this.formData.status||'Active',
             BasicSalary:Number(this.formData.basicSalary)||0, Hra:Number(this.formData.hra)||0,
             Da:Number(this.formData.da)||0, Pf:Number(this.formData.pf)||0,
-            AccountNumber:this.formData.accountNumber||'', Ifsc:this.formData.ifsc||'',
-            SubjectSkills: this.formSkills.map(s => ({
-                subjectId:         s.subjectId,
-                subjectName:       s.subjectName,
-                skillLevel:        s.skillLevel,
-                yearsOfExperience: s.yearsOfExperience || 0
-            }))
+            AccountNumber:this.formData.accountNumber||'', Ifsc:this.formData.ifsc||''
         };
 
         try {
             this.isLoading = true;
-            const staffId = await upsertStaff({ jsonData: JSON.stringify(payload) });
+            const staffId = await upsertStaff({
+                jsonData:   JSON.stringify(payload),
+                skillsJson: JSON.stringify(this.formSkills.map(s => ({
+                    subjectId:         s.subjectId,
+                    subjectName:       s.subjectName,
+                    skillLevel:        s.skillLevel,
+                    yearsOfExperience: s.yearsOfExperience || 0
+                })))
+            });
             if (this.photoBase64 && staffId) {
                 try {
                     await uploadStaffPhoto({
@@ -658,7 +726,9 @@ export default class SchoolStaff extends LightningElement {
             basicSalaryFmt:`\u20B9${Number(s.BasicSalary).toLocaleString('en-IN')}`,
             allowancesFmt:`\u20B9${(Number(s.Hra)+Number(s.Da)).toLocaleString('en-IN')}`,
             deductionsFmt:`\u20B9${Number(s.Pf).toLocaleString('en-IN')}`,
-            SubjectSkills: s.SubjectSkills || []
+            SubjectSkills: (() => {
+                try { return JSON.parse(s.SubjectSkillsJson || '[]'); } catch(e) { return []; }
+            })()
         };
     }
 
