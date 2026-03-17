@@ -6,6 +6,8 @@
 
 # Metadata related files
 **/package.xml
+**/profiles/**
+**/layouts/**
 
 # Local configuration files
 .sfdx

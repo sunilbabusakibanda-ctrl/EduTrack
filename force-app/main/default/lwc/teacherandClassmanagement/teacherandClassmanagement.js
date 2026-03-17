@@ -13,6 +13,11 @@ import checkDuplicateClassSection from '@salesforce/apex/ClassManagementControll
 import getPeriodTimings           from '@salesforce/apex/ClassManagementController.getPeriodTimings';
 import AVATAR_IMG from '@salesforce/resourceUrl/avatarImg';
 
+import bulkCreateTeachers from '@salesforce/apex/ClassManagementController.bulkCreateTeachers';
+import bulkCreateSubjects from '@salesforce/apex/ClassManagementController.bulkCreateSubjects';
+import createClass        from '@salesforce/apex/ClassManagementController.createClass';
+import createSection      from '@salesforce/apex/ClassManagementController.createSection';
+
 // Workload Apex
 import getWorkloadSummary      from '@salesforce/apex/ClassManagementController.getWorkloadSummary';
 import getAllTeacherWorkloads   from '@salesforce/apex/ClassManagementController.getAllTeacherWorkloads';
@@ -168,6 +173,23 @@ export default class ClassManagement extends LightningElement {
     @track subModalTeacherOptions  = [];
     @track subModalLoading         = false;
 
+    // ── Missing Actions Modals ──
+    @track showImportTeachersModal = false;
+    @track showImportSubjectsModal = false;
+    @track showCreateClassModal    = false;
+    @track showCreateSectionModal  = false;
+    @track showInlineAddClass      = false;
+    @track newClassNameInline      = '';
+    @track modalSubjects           = [{ id: 1, name: '', label: 'Subject Name', showAdd: true, showDelete: false }];
+    @track modalClasses            = [{ id: 1, name: '', label: 'Class Name', showAdd: true, showDelete: false }];
+
+    @track newClassName = '';
+    @track newSectionName = '';
+    @track newSubjectName = '';
+    
+    @track teachersCsvPayload = [];
+    @track subjectsCsvPayload = [];
+
     _allClassSectionRecords = [];
     _allTeacherRecords      = [];
     _subjectTeacherCache    = {};
@@ -223,7 +245,7 @@ export default class ClassManagement extends LightningElement {
         try {
             const years = await getAcademicYears();
             this.academicYearOptions = years.map(y => ({ label: y.Name, value: y.Id }));
-            const cur = years.find(y => y.Is_Current__c);
+            const cur = years.find(y => y.Is_Current__c) || years[0];
             if (cur) {
                 this.selectedAcademicYear       = cur.Id;
                 this.ttSelectedAcademicYear     = cur.Id;
@@ -1809,6 +1831,365 @@ export default class ClassManagement extends LightningElement {
     _loadBg(pct) {
         if (pct >= 90) return '#fef2f2';
         return '#ecfdf5';
+    }
+
+    // ── MISSING ACTIONS HANDLERS ──
+    handleOpenImportTeachers() { this.showImportTeachersModal = true; }
+    handleCloseImportTeachers() { this.showImportTeachersModal = false; this.teachersCsvPayload = []; }
+
+    handleOpenImportSubjects() { 
+        this.showImportSubjectsModal = true; 
+        this.modalSubjects = [{ id: 1, name: '', label: 'Subject Name', showAdd: true, showDelete: false }];
+    }
+    handleCloseImportSubjects() { this.showImportSubjectsModal = false; this.subjectsCsvPayload = []; }
+
+    handleOpenCreateClass() { 
+        this.showCreateClassModal = true; 
+        this.modalClasses = [{ id: 1, name: '', label: 'Class Name', showAdd: true, showDelete: false }];
+    }
+    handleCloseCreateClass() { this.showCreateClassModal = false; this.newClassName = ''; }
+
+    handleOpenCreateSection() { this.showCreateSectionModal = true; }
+    handleCloseCreateSection() { this.showCreateSectionModal = false; this.newSectionName = ''; }
+
+    handleNewClassNameChange(event) { this.newClassName = event.target.value; }
+    handleNewSectionNameChange(event) { this.newSectionName = event.target.value; }
+
+    /* --- Create Class Submit --- */
+    handleCreateClassSubmit() {
+        if (!this.newClassName) { this.showToast('Error', 'Class Name is required', 'error'); return; }
+        createClass({ className: this.newClassName })
+            .then(() => {
+                this.showToast('Success', 'Class created successfully', 'success');
+                this.handleCloseCreateClass();
+                this.loadClasses(); // Refresh picks
+            })
+            .catch(error => { this.showToast('Error', this.getErrorMessage(error), 'error'); });
+    }
+
+    /* --- Create Section Submit --- */
+    handleCreateSectionSubmit() {
+        if (!this.newSectionName) { this.showToast('Error', 'Section Name is required', 'error'); return; }
+        createSection({ sectionName: this.newSectionName })
+            .then(() => {
+                this.showToast('Success', 'Section created successfully', 'success');
+                this.handleCloseCreateSection();
+                this.loadSections(); // Refresh picks
+            })
+            .catch(error => { this.showToast('Error', this.getErrorMessage(error), 'error'); });
+    }
+
+    /* --- CSV File Handlers --- */
+    handleTeachersFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const csvStr = reader.result;
+                this.teachersCsvPayload = this.parseCsvToJson(csvStr, ['firstName','lastName','email','phone','qualification','subject1','skillLevel1']);
+            };
+            reader.readAsText(file);
+        }
+    }
+
+    handleSubjectsFileChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const csvStr = reader.result;
+                this.subjectsCsvPayload = this.parseCsvToJson(csvStr, ['name']);
+            };
+            reader.readAsText(file);
+        }
+    }
+
+    /* --- Bulk Submit Handlers --- */
+    handleImportTeachersSubmit() {
+        if (this.teachersCsvPayload.length === 0) { this.showToast('Error', 'No data to import', 'error'); return; }
+        
+        this.isLoading = true;
+        bulkCreateTeachers({ teachersData: this.teachersCsvPayload })
+            .then(result => {
+                console.log('Import Result:', result);
+                let message = '';
+                if (result.created > 0) message += `created ${result.created} teachers. `;
+                if (result.skipped > 0) message += `skipped ${result.skipped} (duplicates). `;
+                if (result.errors > 0)  message += `failed ${result.errors} rows. `;
+
+                if (result.errors > 0) {
+                    this.showToast('Warning', 'Import finished with issues: ' + message, 'warning');
+                    // Alert first error details if any
+                    if (result.errorDetails && result.errorDetails.length > 0) {
+                        this.showToast('Error Details', result.errorDetails[0], 'error');
+                    }
+                } else if (result.created > 0) {
+                    this.showToast('Success', 'Successfully ' + message, 'success');
+                } else {
+                    this.showToast('Information', 'No records were added: ' + message, 'info');
+                }
+
+                this.handleCloseImportTeachers();
+                this.loadWorkloadDashboard(); 
+            })
+            .catch(error => { this.showToast('Error', this.getErrorMessage(error), 'error'); })
+            .finally(() => { this.isLoading = false; });
+    }
+
+    handleImportSubjectsSubmit() {
+        if (this.subjectsCsvPayload.length === 0) { this.showToast('Error', 'No data to import', 'error'); return; }
+        bulkCreateSubjects({ subjectsData: this.subjectsCsvPayload })
+            .then(() => {
+                this.showToast('Success', 'Subjects imported successfully', 'success');
+                this.handleCloseImportSubjects();
+                this.loadWorkloadDashboard(); // Fixed method
+            })
+            .catch(error => { this.showToast('Error', this.getErrorMessage(error), 'error'); });
+    }
+
+    /* --- Preview Getters --- */
+    get teachersCount() {
+        return this.teachersCsvPayload ? this.teachersCsvPayload.length : 0;
+    }
+    get showTeachersPreview() {
+        return this.teachersCount > 0;
+    }
+
+    get subjectsCount() {
+        return this.subjectsCsvPayload ? this.subjectsCsvPayload.length : 0;
+    }
+    get showSubjectsPreview() {
+        return this.subjectsCount > 0;
+    }
+
+    handleDownloadTeacherTemplate() {
+        const csvContent = "data:text/csv;charset=utf-8,firstName,lastName,email,phone,qualification,subject1,skillLevel1\n";
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "teacher_template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    handleDownloadSubjectTemplate() {
+        const csvContent = "data:text/csv;charset=utf-8,name\n";
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "subject_template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    handleNewSubjectNameChange(event) {
+        this.newSubjectName = event.target.value;
+    }
+
+    handleSaveNewSubject() {
+        if (!this.newSubjectName) {
+            this.showToast('Error', 'Please enter a Subject Name', 'error');
+            return;
+        }
+
+        const payload = [{ name: this.newSubjectName.trim() }];
+        this.isLoading = true;
+
+        bulkCreateSubjects({ subjectsData: payload })
+            .then(result => {
+                this.showToast('Success', 'Subject added successfully', 'success');
+                this.newSubjectName = '';
+                this.showImportSubjectsModal = false; 
+                this.loadSubjects(); 
+            })
+            .catch(error => {
+                this.showToast('Error', 'Error adding subject: ' + (error.body ? error.body.message : error.message), 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
+    }
+
+    /* --- Inline Add Class Methods --- */
+    handleToggleInlineAddClass() {
+        this.showInlineAddClass = !this.showInlineAddClass;
+        this.newClassNameInline = '';
+    }
+
+    handleNewClassNameInlineChange(event) {
+        this.newClassNameInline = event.target.value;
+    }
+
+    handleSaveNewClassInline() {
+        if (!this.newClassNameInline) {
+            this.showToast('Error', 'Class Name is required', 'error');
+            return;
+        }
+        this.isLoading = true;
+        createClass({ className: this.newClassNameInline })
+            .then(() => {
+                this.showToast('Success', 'Class created successfully', 'success');
+                this.handleToggleInlineAddClass();
+                this.loadClasses(); // Refresh picks
+            })
+            .catch(error => {
+                this.showToast('Error', 'Error creating class: ' + (error.body ? error.body.message : error.message), 'error');
+            })
+            .finally(() => { this.isLoading = false; });
+    }
+
+    /* --- Inline Add Subject Methods (Iterative) --- */
+    handleToggleInlineAddSubject(event) {
+        const id = event.target.dataset.skillId;
+        this.teacherSkills = this.teacherSkills.map(s => 
+            s.id === id ? { ...s, showInlineAddSubject: !s.showInlineAddSubject, newSubjectNameInline: '' } : s
+        );
+    }
+
+    handleNewSubjectInlineChange(event) {
+        const id = event.target.dataset.skillId;
+        const val = event.target.value;
+        this.teacherSkills = this.teacherSkills.map(s => 
+            s.id === id ? { ...s, newSubjectNameInline: val } : s
+        );
+    }
+
+    handleSaveNewSubjectInline(event) {
+        const id = event.target.dataset.skillId;
+        const skill = this.teacherSkills.find(s => s.id === id);
+        if (!skill || !skill.newSubjectNameInline) {
+            this.showToast('Error', 'Please enter a Subject Name', 'error');
+            return;
+        }
+
+        const payload = [{ name: skill.newSubjectNameInline.trim() }];
+        this.isLoading = true;
+
+        bulkCreateSubjects({ subjectsData: payload })
+            .then(() => {
+                this.showToast('Success', 'Subject added successfully', 'success');
+                this.teacherSkills = this.teacherSkills.map(s => 
+                    s.id === id ? { ...s, showInlineAddSubject: false, newSubjectNameInline: '' } : s
+                );
+                this.loadSubjects(); 
+            })
+            .catch(error => {
+                this.showToast('Error', 'Error adding subject: ' + (error.body ? error.body.message : error.message), 'error');
+            })
+            .finally(() => { this.isLoading = false; });
+    }
+
+    /* --- Dynamic Subject Modal Methods --- */
+    handleAddSubjectModalRow() {
+        const newId = this.modalSubjects.length + 1;
+        this.modalSubjects = [...this.modalSubjects, { id: newId, name: '', label: `Subject Name ${newId}`, showAdd: false, showDelete: true }];
+    }
+
+    handleModalSubjectNameChange(event) {
+        const id = parseInt(event.target.dataset.id, 10);
+        const val = event.target.value;
+        this.modalSubjects = this.modalSubjects.map(s => s.id === id ? { ...s, name: val } : s);
+    }
+
+    handleRemoveSubjectModalRow(event) {
+        const id = parseInt(event.target.dataset.id, 10);
+        this.modalSubjects = this.modalSubjects.filter(s => s.id !== id);
+        // Re-index
+        this.modalSubjects = this.modalSubjects.map((s, index) => ({ 
+            ...s, 
+            label: index === 0 ? 'Subject Name' : `Subject Name ${index + 1}`, 
+            showAdd: index === 0,
+            showDelete: index > 0 
+        }));
+    }
+
+    handleSaveNewSubjectBulk() {
+        const payload = this.modalSubjects
+            .filter(s => s.name && s.name.trim())
+            .map(s => ({ name: s.name.trim() }));
+
+        if (payload.length === 0) {
+            this.showToast('Error', 'Please enter at least one Subject Name', 'error');
+            return;
+        }
+
+        this.isLoading = true;
+        bulkCreateSubjects({ subjectsData: payload })
+            .then(() => {
+                this.showToast('Success', 'Subject added successfully', 'success');
+                this.modalSubjects = [{ id: 1, name: '', label: 'Subject Name', showAdd: true, showDelete: false }];
+                this.showImportSubjectsModal = false; 
+                this.loadSubjects(); 
+            })
+            .catch(error => {
+                this.showToast('Error', 'Error adding subjects: ' + (error.body ? error.body.message : error.message), 'error');
+            })
+            .finally(() => { this.isLoading = false; });
+    }
+
+    /* --- Dynamic Class Modal Methods --- */
+    handleAddClassModalRow() {
+        const newId = this.modalClasses.length + 1;
+        this.modalClasses = [...this.modalClasses, { id: newId, name: '', label: `Class Name ${newId}`, showAdd: false, showDelete: true }];
+    }
+
+    handleModalClassNameChange(event) {
+        const id = parseInt(event.target.dataset.id, 10);
+        const val = event.target.value;
+        this.modalClasses = this.modalClasses.map(c => c.id === id ? { ...c, name: val } : c);
+    }
+
+    handleRemoveClassModalRow(event) {
+        const id = parseInt(event.target.dataset.id, 10);
+        this.modalClasses = this.modalClasses.filter(c => c.id !== id);
+        // Re-index labels
+        this.modalClasses = this.modalClasses.map((c, idx) => ({ 
+            ...c, 
+            label: idx === 0 ? 'Class Name' : `Class Name ${idx + 1}`, 
+            showAdd: idx === 0,
+            showDelete: idx > 0 
+        }));
+    }
+
+    handleSaveNewClassBulk() {
+        const payload = this.modalClasses
+            .filter(c => c.name && c.name.trim())
+            .map(c => c.name.trim());
+
+        if (payload.length === 0) {
+            this.showToast('Error', 'Please enter at least one Class Name', 'error');
+            return;
+        }
+
+        this.isLoading = true;
+        const promises = payload.map(className => createClass({ className }));
+
+        Promise.all(promises)
+            .then(() => {
+                this.showToast('Success', 'Classes created successfully', 'success');
+                this.modalClasses = [{ id: 1, name: '', label: 'Class Name', showAdd: true, showDelete: false }];
+                this.showCreateClassModal = false;
+                this.loadClasses(); 
+            })
+            .catch(error => {
+                this.showToast('Error', 'Error creating classes: ' + (error.body ? error.body.message : error.message), 'error');
+            })
+            .finally(() => { this.isLoading = false; });
+    }
+    parseCsvToJson(csvStr, headers) {
+        const rows = csvStr.split('\n');
+        const result = [];
+        // Skip header row 0
+        for (let i = 1; i < rows.length; i++) {
+            if (!rows[i].trim()) continue;
+            const cells = rows[i].split(',');
+            const obj = { id: i }; // Added for loop keys
+            headers.forEach((h, idx) => { obj[h] = cells[idx] ? cells[idx].trim() : ''; });
+            result.push(obj);
+        }
+        return result;
     }
 
     showToast(title, message, variant) {

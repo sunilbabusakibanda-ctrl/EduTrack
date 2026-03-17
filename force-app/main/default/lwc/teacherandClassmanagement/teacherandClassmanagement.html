@@ -30,7 +30,23 @@
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 Add Teacher
                             </button>
-                            <button class="action-pill action-pill-secondary" onclick={handleSkipTeacherCreation}>
+                            <button class="action-pill action-pill-primary" onclick={handleOpenImportTeachers}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>
+                                Import Teachers
+                            </button>
+                            <button class="action-pill action-pill-primary" onclick={handleOpenImportSubjects}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>
+                                Add Subject
+                            </button>
+                            <button class="action-pill action-pill-secondary" onclick={handleOpenCreateClass}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                Create Class
+                            </button>
+                            <button class="action-pill action-pill-secondary" onclick={handleOpenCreateSection}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                Create Section
+                            </button>
+                            <button class="action-pill action-pill-timetable action-pill-primary" onclick={handleSkipTeacherCreation}>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 Add Class Section
                             </button>
@@ -652,7 +668,17 @@
                                                     <lightning-button-icon icon-name="utility:delete" variant="bare" alternative-text="Remove skill" data-skill-id={skill.id} onclick={handleRemoveSkill} class="delete-skill-btn"></lightning-button-icon>
                                                 </div>
                                                 <div class="skill-fields">
-                                                    <div class="skill-field"><lightning-combobox name="subject" label="Subject" value={skill.subjectId} placeholder="Select Subject" options={availableSubjects} data-skill-id={skill.id} onchange={handleSkillSubjectChange} required class="premium-input"></lightning-combobox></div>
+                                                    <div class="skill-field">
+                                                        <div class="slds-grid slds-grid_vertical-align-center slds-nowrap">
+                                                            <div class="slds-grow">
+                                                                <lightning-combobox name="subject" label="Subject" value={skill.subjectId} placeholder="Select Subject" options={availableSubjects} data-skill-id={skill.id} onchange={handleSkillSubjectChange} required class="premium-input"></lightning-combobox>
+                                                            </div>
+                                                            <div class="slds-p-left_xx-small slds-no-flex" style="padding-top: 20px;">
+                                                                <lightning-button-icon icon-name="utility:add" variant="border-filled" size="medium" onclick={handleOpenImportSubjects} alternative-text="Add Subject" title="Add Subject"></lightning-button-icon>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                     </div>
                                                     <div class="skill-field"><lightning-combobox name="skillLevel" label="Skill Level" value={skill.skillLevel} placeholder="Select Level" options={skillLevelOptions} data-skill-id={skill.id} onchange={handleSkillLevelChange} required class="premium-input"></lightning-combobox></div>
                                                     <div class="skill-field"><lightning-input name="experience" label="Years of Experience" type="number" value={skill.yearsOfExperience} min="0" max="50" step="0.5" placeholder="e.g., 5" data-skill-id={skill.id} onchange={handleSkillExperienceChange} class="premium-input"></lightning-input></div>
                                                 </div>
@@ -679,7 +705,27 @@
                     <div class="section-header"><h2 class="section-title">Create New Class Section</h2><p class="section-subtitle">Select academic year, class and section</p></div>
                     <div class="form-grid">
                         <div class="form-group"><lightning-combobox name="academicYear" label="Academic Year" value={selectedAcademicYear} placeholder="Select Academic Year" options={academicYearOptions} onchange={handleAcademicYearChange} required class="premium-input"></lightning-combobox></div>
-                        <div class="form-group"><lightning-combobox name="class" label="Class" value={selectedClassId} placeholder="Select Class" options={classOptions} onchange={handleClassChange} required class="premium-input"></lightning-combobox></div>
+                        <div class="form-group">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-nowrap">
+                                <div class="slds-grow">
+                                    <lightning-combobox name="class" label="Class" value={selectedClassId} placeholder="Select Class" options={classOptions} onchange={handleClassChange} required class="premium-input"></lightning-combobox>
+                                </div>
+                                <div class="slds-p-left_xx-small slds-no-flex" style="padding-top: 20px;">
+                                    <lightning-button-icon icon-name="utility:add" variant="border-filled" size="medium" onclick={handleToggleInlineAddClass} alternative-text="Add Class Inline" title="Add Class Inline"></lightning-button-icon>
+                                </div>
+                            </div>
+                            <template if:true={showInlineAddClass}>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-m-top_xx-small">
+                                    <div class="slds-grow">
+                                        <lightning-input name="newClassNameInline" type="text" placeholder="New class name..." value={newClassNameInline} onchange={handleNewClassNameInlineChange} class="premium-input"></lightning-input>
+                                    </div>
+                                    <div class="slds-p-left_xx-small slds-no-flex">
+                                        <lightning-button-icon icon-name="utility:check" variant="border-filled" size="small" onclick={handleSaveNewClassInline} alternative-text="Save" title="Save" class="slds-m-right_xx-small"></lightning-button-icon>
+                                        <lightning-button-icon icon-name="utility:close" variant="bare" size="small" onclick={handleToggleInlineAddClass} alternative-text="Cancel" title="Cancel"></lightning-button-icon>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                         <div class="form-group"><lightning-combobox name="section" label="Section" value={selectedSectionId} placeholder="Select Section" options={sectionOptions} onchange={handleSectionChange} required class="premium-input"></lightning-combobox></div>
                         <div class="form-group"><lightning-input name="classStrength" label="Class Strength (Optional)" type="number" value={classStrength} placeholder="e.g., 40" onchange={handleClassStrengthChange} class="premium-input"></lightning-input></div>
                     </div>
@@ -1118,6 +1164,181 @@
                                 <lightning-button label="Done" onclick={handleTimetableDone} class="secondary-button"></lightning-button>
                             </div>
                         </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- ==========================================
+                 MISSING ACTION MODALS
+                 ========================================== -->
+            <!-- Create Class Modal -->
+            <template if:true={showCreateClassModal}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleCloseCreateClass} title="Close"><lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon></button>
+                            <h2 class="slds-text-heading_medium">Create Class</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <!-- Dynamic Rows -->
+                            <template for:each={modalClasses} for:item="cls" for:index="index">
+                                <div key={cls.id} class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                    <div class="slds-grow">
+                                        <lightning-input label={cls.label} type="text" value={cls.name} data-id={cls.id} onchange={handleModalClassNameChange} required class="premium-input" placeholder="e.g., Grade 10"></lightning-input>
+                                    </div>
+                                    <div class="slds-p-left_xx-small slds-no-flex" style="padding-top: 20px;">
+                                        <template if:true={cls.showAdd}>
+                                            <lightning-button-icon icon-name="utility:add" variant="border-filled" size="small" onclick={handleAddClassModalRow} class="slds-m-right_xxx-small" title="Add another class"></lightning-button-icon>
+                                        </template>
+                                        <template if:true={cls.showDelete}>
+                                            <lightning-button-icon icon-name="utility:delete" alternative-text="Delete" size="small" variant="bare" data-id={cls.id} onclick={handleRemoveClassModalRow} title="Delete row"></lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" onclick={handleCloseCreateClass} class="slds-m-right_x-small"></lightning-button>
+                            <lightning-button label="Create" variant="brand" onclick={handleSaveNewClassBulk}></lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- Create Section Modal -->
+            <template if:true={showCreateSectionModal}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleCloseCreateSection} title="Close"><lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon></button>
+                            <h2 class="slds-text-heading_medium">Create Section</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <lightning-input label="Section Name" value={newSectionName} onchange={handleNewSectionNameChange} required placeholder="e.g., Section A"></lightning-input>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" onclick={handleCloseCreateSection} class="slds-m-right_x-small"></lightning-button>
+                            <lightning-button label="Create" variant="brand" onclick={handleCreateSectionSubmit}></lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- Import Teachers Modal -->
+            <template if:true={showImportTeachersModal}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close" onclick={handleCloseImportTeachers} title="Close">
+                                <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                            </button>
+                            <h2 class="slds-text-heading_medium">Import Teachers (CSV)</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <lightning-input type="file" label="Upload CSV File" accept=".csv" onchange={handleTeachersFileChange}></lightning-input>
+                            <p class="slds-m-top_small slds-text-color_weak">💡 Template headers: `firstName`, `lastName`, `email`, `phone`, `qualification`, `subject1`, `skillLevel1`</p>
+                            <div class="slds-m-top_small">
+                                <lightning-button label="Download Sample Template" icon-name="utility:download" variant="neutral" onclick={handleDownloadTeacherTemplate}></lightning-button>
+                            </div>
+
+                            <template if:true={showTeachersPreview}>
+                                <div class="slds-m-top_small slds-scoped-notification slds-media slds-media_center slds-theme_success slds-theme_alert-texture">
+                                    <div class="slds-media__figure">
+                                        <lightning-icon icon-name="utility:success" size="small" variant="inverse"></lightning-icon>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <p>✅ Found <strong>{teachersCount}</strong> teachers ready to import.</p>
+                                    </div>
+                                </div>
+
+                                <div class="slds-m-top_medium slds-scrollable_y" style="max-height: 250px; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover slds-table_striped">
+                                        <thead>
+                                            <tr class="slds-line-height_reset" style="background: #f4f6f9;">
+                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Teacher Name">Name</div></th>
+                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Contact Info">Contact Info</div></th>
+                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Qualification">Qualification</div></th>
+                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Subject & Skill">Subject & Skill</div></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={teachersCsvPayload} for:item="row">
+                                                <tr class="slds-hint-parent" key={row.id}>
+                                                    <td style="vertical-align: middle; padding: 12px;">
+                                                        <div class="slds-truncate slds-text-title_bold slds-text-color_default" style="font-size: 14px;">{row.firstName} {row.lastName}</div>
+                                                    </td>
+                                                    <td style="vertical-align: middle; padding: 12px;">
+                                                        <div class="slds-grid slds-grid_vertical">
+                                                            <div class="slds-grid slds-grid_vertical-align-center">
+                                                                <lightning-icon icon-name="utility:email" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                <span class="slds-truncate slds-text-color_weak">{row.email}</span>
+                                                            </div>
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-m-top_xx-small">
+                                                                <lightning-icon icon-name="utility:call" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                <span class="slds-truncate slds-text-color_weak">{row.phone}</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td style="vertical-align: middle; padding: 12px;">
+                                                        <span class="slds-badge slds-theme_shade slds-badge_lightest" style="font-weight: 600; padding: 4px 12px;">{row.qualification}</span>
+                                                    </td>
+                                                    <td style="vertical-align: middle; padding: 12px;">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="slds-badge slds-theme_inverse" style="padding: 4px 12px;">{row.subject1}</span>
+                                                            <span class="slds-m-left_x-small slds-text-color_weak" style="font-style: italic;">({row.skillLevel1})</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" onclick={handleCloseImportTeachers} class="slds-m-right_x-small"></lightning-button>
+                            <lightning-button label="Import" variant="brand" onclick={handleImportTeachersSubmit}></lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!-- Add Subject Modal -->
+            <template if:true={showImportSubjectsModal}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close" onclick={handleCloseImportSubjects} title="Close">
+                                <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                            </button>
+                            <h2 class="slds-text-heading_medium">Add Subject</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <!-- Dynamic Rows -->
+                            <template for:each={modalSubjects} for:item="sub" for:index="index">
+                                <div key={sub.id} class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                    <div class="slds-grow">
+                                        <lightning-input label={sub.label} type="text" value={sub.name} data-id={sub.id} onchange={handleModalSubjectNameChange} required class="premium-input"></lightning-input>
+                                    </div>
+                                    <div class="slds-p-left_xx-small slds-no-flex" style="padding-top: 20px;">
+                                        <template if:true={sub.showAdd}>
+                                            <lightning-button-icon icon-name="utility:add" variant="border-filled" size="small" onclick={handleAddSubjectModalRow} class="slds-m-right_xxx-small" title="Add another subject"></lightning-button-icon>
+                                        </template>
+                                        <template if:true={sub.showDelete}>
+                                            <lightning-button-icon icon-name="utility:delete" alternative-text="Delete" size="small" variant="bare" data-id={sub.id} onclick={handleRemoveSubjectModalRow} title="Delete row"></lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" onclick={handleCloseImportSubjects} class="slds-m-right_x-small"></lightning-button>
+                            <lightning-button label="Save" variant="brand" onclick={handleSaveNewSubjectBulk}></lightning-button>
+                        </footer>
                     </div>
                 </section>
                 <div class="slds-backdrop slds-backdrop_open"></div>

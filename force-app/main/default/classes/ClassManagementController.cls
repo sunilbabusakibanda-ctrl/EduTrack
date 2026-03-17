@@ -16,7 +16,7 @@ public without sharing class ClassManagementController {
     /* ═══════════════════════════════════════════════════════════════
        GET ALL CLASSES
        ═══════════════════════════════════════════════════════════════ */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<Map<String, Object>> getAllClasses() {
         return NamespaceUtils.stripNamespaceList([
             SELECT Id, Name
@@ -174,7 +174,7 @@ public without sharing class ClassManagementController {
     /* ═══════════════════════════════════════════════════════════════
        GET ALL ACTIVE SUBJECTS
        ═══════════════════════════════════════════════════════════════ */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<Map<String, Object>> getAllSubjects() {
         return NamespaceUtils.stripNamespaceList([
             SELECT Id, Name
