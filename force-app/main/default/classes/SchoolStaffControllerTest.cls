@@ -139,7 +139,7 @@ private class SchoolStaffControllerTest {
         Test.startTest();
         String staffId;
         try {
-            staffId = SchoolStaffController.upsertStaff(JSON.serialize(payload));
+            staffId = SchoolStaffController.upsertStaff(JSON.serialize(payload), null);
         } catch (Exception e) {
             System.assert(false, 'Exception: ' + e.getMessage());
         }
