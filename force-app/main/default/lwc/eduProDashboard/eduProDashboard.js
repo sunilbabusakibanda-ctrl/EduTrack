@@ -123,10 +123,19 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
     get isStudentPage() { return this.currentPage === 'student'; }
     get isPromotionPage() { return this.currentPage === 'promotion'; }
     get isGradesPage() { return this.currentPage === 'grades'; }
+    get isComplaintBoxPage() { return this.currentPage === 'complaintbox'; }
     get isSetupPage() { return this.currentPage === 'setup'; }
+    get isExpensePage() { return this.currentPage === 'expense'; }
+    get isEnterMarksPage() { return this.currentPage === 'entermarks'; }
 
     get feeNavClass() {
         return `nav-item ${this.currentNav === 'paybill' ? 'active' : ''}`;
+    }
+    get expenseNavClass() {
+        return `nav-item ${this.currentNav === 'expense' ? 'active' : ''}`;
+    }
+    get enterMarksNavClass() {
+        return `nav-item ${this.currentNav === 'entermarks' ? 'active' : ''}`;
     }
 
     get dashboardNavClass() {
@@ -161,6 +170,9 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
     }
     get gradesNavClass() {
         return `nav-item ${this.currentNav === 'grades' ? 'active' : ''}`;
+    }
+    get complaintBoxNavClass() {
+        return `nav-item ${this.currentNav === 'complaintbox' ? 'active' : ''}`;
     }
     get setupNavClass() {
         return `nav-item ${this.currentNav === 'setup' ? 'active' : ''}`;
@@ -268,11 +280,25 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
         this.showBulkImport = false;
     }
 
+    handleEnterMarksClick(event) {
+        if (event) event.preventDefault();
+        this.currentPage = 'entermarks';
+        this.currentNav = 'entermarks';
+        this.closeSidebar();
+    }
+
     handlePayBill(event) {
         if (event) event.preventDefault();
         this.selectedStudentIdForBilling = event.detail?.studentId || null;
         this.currentPage = 'paybill';
         this.currentNav = 'paybill';
+        this.closeSidebar();
+    }
+
+    handleExpenseClick(event) {
+        if (event) event.preventDefault();
+        this.currentPage = 'expense';
+        this.currentNav = 'expense';
         this.closeSidebar();
     }
 
@@ -323,6 +349,13 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
         if (event) event.preventDefault();
         this.currentPage = 'grades';
         this.currentNav = 'grades';
+        this.closeSidebar();
+    }
+
+    handleComplaintBoxClick(event) {
+        if (event) event.preventDefault();
+        this.currentPage = 'complaintbox';
+        this.currentNav = 'complaintbox';
         this.closeSidebar();
     }
 

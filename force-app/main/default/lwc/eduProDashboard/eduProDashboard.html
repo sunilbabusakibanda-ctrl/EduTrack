@@ -53,6 +53,10 @@
                                 <span class="icon">💳</span>
                                 Fee Management
                             </a>
+                            <a href="#" class={expenseNavClass} onclick={handleExpenseClick}>
+                                <span class="icon">🧾</span>
+                                Expense Management
+                            </a>
                         </div>
 
                         <div class="nav-section">
@@ -61,9 +65,17 @@
                                 <span class="icon">📝</span>
                                 Grades & Marks
                             </a>
+                            <a href="#" class={enterMarksNavClass} onclick={handleEnterMarksClick}>
+                                <span class="icon">✍️</span>
+                                Enter Marks
+                            </a>
                             <a href="#" class={attendanceNavClass} onclick={handleAttendanceClick}>
                                 <span class="icon">📅</span>
                                 Attendance
+                            </a>
+                            <a href="#" class={complaintBoxNavClass} onclick={handleComplaintBoxClick}>
+                                <span class="icon">📥</span>
+                                Complaint Box
                             </a>
                             <a href="#" class={setupNavClass} onclick={handleSetupClick}>
                                 <span class="icon">⚙️</span>
@@ -395,6 +407,14 @@
                             <c-pay-the-bill student-id={selectedStudentIdForBilling}></c-pay-the-bill>
                         </template>
 
+                        <template if:true={isExpensePage}>
+                            <c-expense-management></c-expense-management>
+                        </template>
+
+                        <template if:true={isEnterMarksPage}>
+                            <c-enter-marks></c-enter-marks>
+                        </template>
+
                         <template lwc:if={isPriceBookPage}>
                             <c-price-book-setup></c-price-book-setup>
                         </template>
@@ -436,6 +456,10 @@
 
                         <template lwc:if={isGradesPage}>
                             <c-grades-module></c-grades-module>
+                        </template>
+
+                        <template lwc:if={isComplaintBoxPage}>
+                            <c-complaintbox></c-complaintbox>
                         </template>
 
                         <template lwc:if={isSetupPage}>
