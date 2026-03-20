@@ -3,6 +3,7 @@
 
 # But keep these standard files/folders
 !force-app/
+!packaged-src/
 !scripts/
 !manifest/
 !.github/
