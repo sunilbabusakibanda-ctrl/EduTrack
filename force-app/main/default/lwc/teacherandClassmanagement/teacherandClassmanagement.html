@@ -1216,7 +1216,22 @@
                             <h2 class="slds-text-heading_medium">Create Section</h2>
                         </header>
                         <div class="slds-modal__content slds-p-around_medium">
-                            <lightning-input label="Section Name" value={newSectionName} onchange={handleNewSectionNameChange} required placeholder="e.g., Section A"></lightning-input>
+                            <!-- Dynamic Rows -->
+                            <template for:each={modalSections} for:item="sec" for:index="index">
+                                <div key={sec.id} class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                    <div class="slds-grow">
+                                        <lightning-input label={sec.label} type="text" value={sec.name} data-id={sec.id} onchange={handleModalSectionNameChange} required class="premium-input" placeholder="e.g., Section A"></lightning-input>
+                                    </div>
+                                    <div class="slds-p-left_xx-small slds-no-flex" style="padding-top: 20px;">
+                                        <template if:true={sec.showAdd}>
+                                            <lightning-button-icon icon-name="utility:add" variant="border-filled" size="small" onclick={handleAddSectionModalRow} class="slds-m-right_xxx-small" title="Add another section"></lightning-button-icon>
+                                        </template>
+                                        <template if:true={sec.showDelete}>
+                                            <lightning-button-icon icon-name="utility:delete" alternative-text="Delete" size="small" variant="bare" data-id={sec.id} onclick={handleRemoveSectionModalRow} title="Delete row"></lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                         <footer class="slds-modal__footer">
                             <lightning-button label="Cancel" onclick={handleCloseCreateSection} class="slds-m-right_x-small"></lightning-button>

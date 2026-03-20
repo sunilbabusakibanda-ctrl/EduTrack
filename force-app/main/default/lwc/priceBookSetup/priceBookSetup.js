@@ -6,6 +6,8 @@ import getAllFeeProducts from '@salesforce/apex/AddFeesController.getAllFeeProdu
 import getExistingPrices from '@salesforce/apex/AddFeesController.getExistingPrices';
 import checkProductExists from '@salesforce/apex/AddFeesController.checkProductExists';
 import getActiveAcademicYears from '@salesforce/apex/AddFeesController.getActiveAcademicYears';
+import getAllPriceBooks from '@salesforce/apex/AddFeesController.getAllPriceBooks';
+import getSuggestedFeeProductNames from '@salesforce/apex/AddFeesController.getSuggestedFeeProductNames';
 
 export default class AddFees extends LightningElement {
     @track inputCount = 1;
@@ -14,6 +16,8 @@ export default class AddFees extends LightningElement {
     @track activeTab = 'addFees';
     @track priceListItems = [];
     @track selectedYear = '';
+    @track selectedPriceBookId = '';
+    @track priceBookOptions = [];
     @track academicYears = [];
     @track inputFields = [{ id: 1, value: '', isFirst: true }];
     @track isLoading = false;
@@ -194,10 +198,19 @@ export default class AddFees extends LightningElement {
 
     async handleYearChange(event) {
         this.selectedYear = event.target.value;
+        this.selectedPriceBookId = ''; // Reset
+        await this.loadPriceBooks();
         if (this.selectedClass && this.selectedYear) {
             await this.loadExistingPricesForClass();
         } else {
             this.clearPrices();
+        }
+    }
+
+    async handlePriceBookChange(event) {
+        this.selectedPriceBookId = event.target.value;
+        if (this.selectedClass && this.selectedYear) {
+            await this.loadExistingPricesForClass();
         }
     }
 
@@ -208,6 +221,21 @@ export default class AddFees extends LightningElement {
             await this.loadExistingPricesForClass();
         } else {
             this.clearPrices();
+        }
+    }
+
+    async loadPriceBooks() {
+        if (!this.selectedYear) return;
+        try {
+            const result = await getAllPriceBooks({ academicYearId: this.selectedYear });
+            if (result && result.length > 0) {
+                this.priceBookOptions = result;
+            } else {
+                const suggests = await getSuggestedFeeProductNames();
+                this.priceBookOptions = suggests.map(name => ({ label: 'Suggest: ' + name, value: 'SUGGEST_' + name }));
+            }
+        } catch (error) {
+            console.error('Error loading price books', error);
         }
     }
 
@@ -226,7 +254,8 @@ export default class AddFees extends LightningElement {
 
             const existingPrices = await getExistingPrices({
                 className: this.selectedClass,
-                academicYearId: this.selectedYear
+                academicYearId: this.selectedYear,
+                priceBookId: this.selectedPriceBookId
             });
 
             console.log('Existing prices:', existingPrices);

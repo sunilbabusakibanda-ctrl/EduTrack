@@ -440,24 +440,23 @@ public with sharing class AddFeesController {
         
         return code;
     }
-    @AuraEnabled
-    public static List<String> getSuggestedFeeProductNames() {
-        try {
-            List<String> names = new List<String>();
-            List<Product2> products = [
-                SELECT Name 
-                FROM Product2 
-                WHERE Family = 'Fee' AND IsActive = true
-                ORDER BY Name ASC
-                LIMIT 200
-            ];
-            for (Product2 p : products) {
-                names.add(p.Name);
-            }
-            return names;
-        } catch (Exception e) {
-            throw new AuraHandledException('Error fetching suggestions: ' + e.getMessage());
+  @AuraEnabled
+public static List<String> getSuggestedFeeProductNames() {
+    try {
+        List<String> names = new List<String>();
+        List<Product2> products = [
+            SELECT Name 
+            FROM Product2 
+            WHERE Family = 'Fee' AND IsActive = true
+            ORDER BY Name ASC
+            LIMIT 200
+        ];
+        for (Product2 p : products) {
+            names.add(p.Name);
         }
+        return names;
+    } catch (Exception e) {
+        throw new AuraHandledException('Error fetching suggestions: ' + e.getMessage());
     }
 
     @AuraEnabled(cacheable=true)
@@ -473,4 +472,5 @@ public with sharing class AddFeesController {
         }
         return options;
     }
+}
 }

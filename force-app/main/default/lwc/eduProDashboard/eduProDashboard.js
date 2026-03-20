@@ -71,8 +71,12 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
         }
     }
 
+    wiredMetricsResult;
+
     @wire(getDashboardMetrics)
-    wiredMetrics({ error, data }) {
+    wiredMetrics(result) {
+        this.wiredMetricsResult = result;
+        const { error, data } = result;
         if (data) {
             this.totalStudents = data.totalStudents || 0;
             // Format revenue in Lakhs (L) if large enough, or just formatted string
@@ -270,6 +274,12 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
         this.currentNav = 'admission';
         this.admissionActiveTab = 'admission';
         this.closeSidebar();
+    }
+
+    handleStudentAdmitted() {
+        if (this.wiredMetricsResult) {
+            refreshApex(this.wiredMetricsResult);
+        }
     }
 
     handleImportStudents() {

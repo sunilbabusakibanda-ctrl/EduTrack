@@ -9,9 +9,28 @@ public without sharing class AdmissionInvoiceController {
     public String schoolLogo { get; private set; }
     public String schoolSubtitle { get; private set; }
 
+    public String studentName { get; set; }
+    public String fatherName { get; set; }
+    public String motherName { get; set; }
+    public String className { get; set; }
+    public String sectionName { get; set; }
+    public String studentDob { get; set; }
+    public String addressVillage { get; set; }
+    public String addressCityPostal { get; set; }
+    public String addressState { get; set; }
+    public String addressCountry { get; set; }
+    public String admissionRef { get; set; }
+
+    public class InvoiceItemWrapper {
+        public String particulars { get; set; }
+        public Decimal amount { get; set; }
+    }
+    public List<InvoiceItemWrapper> wrappedItems { get; set; }
+
     public AdmissionInvoiceController() {
         invoice = new Invoice__c();
         invoiceItems = new List<Invoice_Item__c>();
+        wrappedItems = new List<InvoiceItemWrapper>();
         totalAmount = 0;
 
         // Fetch School Details from Custom Setting
@@ -42,17 +61,40 @@ public without sharing class AdmissionInvoiceController {
             ];
             if (!invs.isEmpty()) {
                 invoice = invs[0];
+                
+                // Populating wrapper bindings
+                if (invoice.Student__r != null) {
+                    studentName = invoice.Student__r.Name;
+                    fatherName = invoice.Student__r.Father_Name__c;
+                    motherName = invoice.Student__r.Mother_Name__c;
+                    addressVillage = invoice.Student__r.Village__c;
+                    addressCityPostal = (invoice.Student__r.PersonMailingCity != null ? invoice.Student__r.PersonMailingCity : '') + 
+                                       (invoice.Student__r.PersonMailingPostalCode != null ? ' - ' + invoice.Student__r.PersonMailingPostalCode : '');
+                    addressState = invoice.Student__r.State__c;
+                    addressCountry = invoice.Student__r.Country__c;
+                    if (invoice.Student__r.PersonBirthdate != null) {
+                        studentDob = invoice.Student__r.PersonBirthdate.format();
+                    }
+                }
+                
+                if (invoice.Opportunity__r != null) {
+                    className = invoice.Opportunity__r.Class__c;
+                    sectionName = invoice.Opportunity__r.Section__c;
+                    admissionRef = invoice.Opportunity__r.Name;
+                }
+
                 invoiceItems = [
                     SELECT Product__r.Name, Amount__c 
                     FROM Invoice_Item__c 
                     WHERE Invoice__c = :invoiceId
                 ];
                 
-                // totalAmount is already initialized to 0 at the beginning of the constructor.
-                // If invoice items are found, we calculate the sum.
-                // If no items are found, totalAmount remains 0.
                 for (Invoice_Item__c item : invoiceItems) {
                     totalAmount += (item.Amount__c != null ? item.Amount__c : 0);
+                    InvoiceItemWrapper wrap = new InvoiceItemWrapper();
+                    wrap.particulars = item.Product__r != null ? item.Product__r.Name : '';
+                    wrap.amount = item.Amount__c;
+                    wrappedItems.add(wrap);
                 }
 
                 // Resolve Academic Year Name

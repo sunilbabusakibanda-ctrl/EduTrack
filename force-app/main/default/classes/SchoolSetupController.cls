@@ -143,12 +143,12 @@ public with sharing class SchoolSetupController {
             ay.Is_Active__c = isActive;
             
             if (isActive) {
-                // Deactivate all other years
-                List<Academic_Year__c> others = [SELECT Id, Is_Active__c FROM Academic_Year__c WHERE Is_Active__c = true];
-                for (Academic_Year__c other : others) {
-                    other.Is_Active__c = false;
+                // Allow up to 2 active years. Deactivate oldest if exceeding limit.
+                List<Academic_Year__c> others = [SELECT Id, Is_Active__c FROM Academic_Year__c WHERE Is_Active__c = true AND Id != :ay.Id ORDER BY Start_Date__c ASC];
+                if (others.size() >= 2) {
+                    others[0].Is_Active__c = false;
+                    update others[0];
                 }
-                update others;
             }
             
             upsert ay;

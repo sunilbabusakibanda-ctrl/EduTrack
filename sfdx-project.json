@@ -1,12 +1,14 @@
 {
+  "namespace": "EduTrack",
   "packageDirectories": [
     {
-      "path": "force-app",
+      "versionName": "Version 1.3",
+      "versionNumber": "1.3.0.NEXT",
+      "path": "packaged-src",
       "default": true,
       "package": "EduTrack",
-      "versionName": "Version 1.1",
-      "versionNumber": "1.1.0.NEXT",
-      "definitionFile": "config/project-scratch-def.json"
+      "versionDescription": "",
+      "ancestorVersion": "1.2.0.5"
     }
   ],
   "name": "VikasSchool",
@@ -15,6 +17,12 @@
   "packageAliases": {
     "EduTrack": "0HoOS00000002LB0AY",
     "EduTrack@1.0.0-1": "04tOS00000MFB1hYAH",
-    "EduTrack@1.1.0-1": "04tOS00000MFHtVYAX"
+    "EduTrack@1.1.0-1": "04tOS00000MFHtVYAX",
+    "EduTrack@1.2.0-1": "04tOS00000MFKg5YAH",
+    "EduTrack@1.2.0-2": "04tOS00000MFL97YAH",
+    "EduTrack@1.2.0-3": "04tOS00000MFLM1YAP",
+    "EduTrack@1.2.0-4": "04tOS00000MFLyjYAH",
+    "EduTrack@1.2.0-5": "04tOS00000MFM0LYAX",
+    "EduTrackUnlocked": "0HoOS00000002TF0AY"
   }
 }

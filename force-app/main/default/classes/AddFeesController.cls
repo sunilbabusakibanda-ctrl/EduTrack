@@ -44,36 +44,42 @@ public with sharing class AddFeesController {
      * @return Map of Product ID to Price
      */
     @AuraEnabled
-    public static Map<String, Decimal> getExistingPrices(String className, String academicYearId) {
+    public static Map<String, Decimal> getExistingPrices(String className, String academicYearId, String priceBookId) {
         try {
             Map<String, Decimal> priceMap = new Map<String, Decimal>();
             
             if (String.isBlank(academicYearId)) return priceMap;
 
-            // Convert "Class-1" to "Class 1" for Pricebook lookup
-            String classBaseName = className.replace('-', ' ');
-
-            // Find the price book for this class and specific year
-            List<Pricebook2> priceBooks = [
-                SELECT Id, Name
-                FROM Pricebook2
-                WHERE Academic_Year__c = :academicYearId
-                AND Name LIKE :classBaseName + '%'
-                LIMIT 1
-            ];
+            Id targetPriceBookId = null;
+            if (String.isNotBlank(priceBookId)) {
+                targetPriceBookId = priceBookId;
+            } else {
+                // Convert "Class-1" to "Class 1" for Pricebook lookup
+                String classBaseName = className != null ? className.replace('-', ' ') : '';
+                // Find the price book for this class and specific year
+                List<Pricebook2> priceBooks = [
+                    SELECT Id, Name
+                    FROM Pricebook2
+                    WHERE Academic_Year__c = :academicYearId
+                    AND Name LIKE :classBaseName + '%'
+                    LIMIT 1
+                ];
+                if (!priceBooks.isEmpty()) {
+                    targetPriceBookId = priceBooks[0].Id;
+                }
+            }
             
-            if (priceBooks.isEmpty()) {
-                System.debug('No price book found for class: ' + className);
+            if (targetPriceBookId == null) {
                 return priceMap;
             }
             
-            Id priceBookId = priceBooks[0].Id;
+            Id finalPriceBookId = targetPriceBookId;
             
             // Get all price book entries for this price book
             List<PricebookEntry> entries = [
                 SELECT Id, Product2Id, UnitPrice, IsActive
                 FROM PricebookEntry
-                WHERE Pricebook2Id = :priceBookId
+                WHERE Pricebook2Id = :finalPriceBookId
                 AND IsActive = true
             ];
             
@@ -451,6 +457,20 @@ public static List<String> getSuggestedFeeProductNames() {
         return names;
     } catch (Exception e) {
         throw new AuraHandledException('Error fetching suggestions: ' + e.getMessage());
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Map<String, String>> getAllPriceBooks(String academicYearId) {
+        List<Map<String, String>> options = new List<Map<String, String>>();
+        try {
+            List<Pricebook2> pbs = [SELECT Id, Name FROM Pricebook2 WHERE IsActive = true AND Academic_Year__c = :academicYearId ORDER BY Name];
+            for (Pricebook2 pb : pbs) {
+                options.add(new Map<String, String>{'label' => pb.Name, 'value' => pb.Id});
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+        return options;
     }
 }
 }

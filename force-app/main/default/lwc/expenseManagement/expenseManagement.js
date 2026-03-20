@@ -175,8 +175,8 @@ export default class ExpenseManagement extends LightningElement {
         // Ensure amount is safe parsed
         this.currentExpense = { ...this.currentExpense, Amount__c: parseFloat(this.currentExpense.Amount__c) };
 
-        saveExpense({ exp: this.currentExpense })
-        .then(() => {
+        saveExpense({ expMap: this.currentExpense })
+        .then(result => {
             this.showToast('Success', 'Expense saved successfully', 'success');
             this.showModal = false;
             this.loadExpenses();

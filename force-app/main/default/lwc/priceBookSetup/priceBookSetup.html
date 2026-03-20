@@ -126,6 +126,13 @@
                                 disabled={isLoading}>
                             </lightning-combobox>
                         </div>
+                        <div class="selector-group">
+                            <label>Price Book (Optional)</label>
+                            <lightning-combobox name="priceBook" value={selectedPriceBookId} placeholder="Select Price Book..."
+                                options={priceBookOptions} onchange={handlePriceBookChange} class="custom-combobox"
+                                disabled={isLoading}>
+                            </lightning-combobox>
+                        </div>
                     </div>
 
                     <div class="price-list-container">

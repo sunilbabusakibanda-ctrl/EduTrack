@@ -46,13 +46,31 @@ public with sharing class ExpenseController {
             exp.Id = (Id)expMap.get('Id');
         }
         
+        Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.Expense__c.fields.getMap();
+        
         for (String key : expMap.keySet()) {
             if (key == 'Id') continue;
             String fieldApiName = key;
             if (key.endsWith('__c') && !key.startsWith(prefix)) {
                 fieldApiName = prefix + key;
             }
-            exp.put(fieldApiName, expMap.get(key));
+            
+            Object val = expMap.get(key);
+            Schema.SObjectField field = fieldsMap.get(fieldApiName);
+            if (field != null && val instanceof String) {
+                Schema.DisplayType dt = field.getDescribe().getType();
+                if (dt == Schema.DisplayType.DATE) {
+                    exp.put(fieldApiName, Date.valueOf((String)val));
+                    continue;
+                } else if (dt == Schema.DisplayType.DATETIME) {
+                    exp.put(fieldApiName, DateTime.valueOf((String)val));
+                    continue;
+                } else if (dt == Schema.DisplayType.CURRENCY || dt == Schema.DisplayType.DOUBLE) {
+                    exp.put(fieldApiName, Decimal.valueOf((String)val));
+                    continue;
+                }
+            }
+            exp.put(fieldApiName, val);
         }
         
         upsert exp;

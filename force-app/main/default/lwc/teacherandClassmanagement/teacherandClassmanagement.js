@@ -182,6 +182,7 @@ export default class ClassManagement extends LightningElement {
     @track newClassNameInline      = '';
     @track modalSubjects           = [{ id: 1, name: '', label: 'Subject Name', showAdd: true, showDelete: false }];
     @track modalClasses            = [{ id: 1, name: '', label: 'Class Name', showAdd: true, showDelete: false }];
+    @track modalSections           = [{ id: 1, name: '', label: 'Section Name', showAdd: true, showDelete: false }];
 
     @track newClassName = '';
     @track newSectionName = '';
@@ -1849,11 +1850,35 @@ export default class ClassManagement extends LightningElement {
     }
     handleCloseCreateClass() { this.showCreateClassModal = false; this.newClassName = ''; }
 
-    handleOpenCreateSection() { this.showCreateSectionModal = true; }
-    handleCloseCreateSection() { this.showCreateSectionModal = false; this.newSectionName = ''; }
+    handleOpenCreateSection() { 
+        this.showCreateSectionModal = true; 
+        this.modalSections = [{ id: 1, name: '', label: 'Section Name', showAdd: true, showDelete: false }];
+    }
+    handleCloseCreateSection() { this.showCreateSectionModal = false; }
 
     handleNewClassNameChange(event) { this.newClassName = event.target.value; }
-    handleNewSectionNameChange(event) { this.newSectionName = event.target.value; }
+
+    handleModalSectionNameChange(event) {
+        const id = parseInt(event.target.dataset.id, 10);
+        const val = event.target.value;
+        this.modalSections = this.modalSections.map(s => s.id === id ? { ...s, name: val } : s);
+    }
+
+    handleAddSectionModalRow() {
+        const newId = this.modalSections.length + 1;
+        this.modalSections = [...this.modalSections, { id: newId, name: '', label: `Section Name ${newId}`, showAdd: false, showDelete: true }];
+    }
+
+    handleRemoveSectionModalRow(event) {
+        const id = parseInt(event.target.dataset.id, 10);
+        this.modalSections = this.modalSections.filter(s => s.id !== id);
+        this.modalSections = this.modalSections.map((s, index) => ({ 
+            ...s, 
+            label: index === 0 ? 'Section Name' : `Section Name ${index + 1}`, 
+            showAdd: index === 0,
+            showDelete: index > 0 
+        }));
+    }
 
     /* --- Create Class Submit --- */
     handleCreateClassSubmit() {
@@ -1869,14 +1894,27 @@ export default class ClassManagement extends LightningElement {
 
     /* --- Create Section Submit --- */
     handleCreateSectionSubmit() {
-        if (!this.newSectionName) { this.showToast('Error', 'Section Name is required', 'error'); return; }
-        createSection({ sectionName: this.newSectionName })
+        const payload = this.modalSections
+            .filter(s => s.name && s.name.trim())
+            .map(s => s.name.trim());
+
+        if (payload.length === 0) {
+            this.showToast('Error', 'Please enter at least one Section Name', 'error');
+            return;
+        }
+
+        this.isLoading = true;
+        const promises = payload.map(sectionName => createSection({ sectionName }));
+
+        Promise.all(promises)
             .then(() => {
-                this.showToast('Success', 'Section created successfully', 'success');
-                this.handleCloseCreateSection();
-                this.loadSections(); // Refresh picks
+                this.showToast('Success', 'Sections created successfully', 'success');
+                this.modalSections = [{ id: 1, name: '', label: 'Section Name', showAdd: true, showDelete: false }];
+                this.showCreateSectionModal = false;
+                this.loadSections(); 
             })
-            .catch(error => { this.showToast('Error', this.getErrorMessage(error), 'error'); });
+            .catch(error => { this.showToast('Error', 'Error creating sections: ' + this.getErrorMessage(error), 'error'); })
+            .finally(() => { this.isLoading = false; });
     }
 
     /* --- CSV File Handlers --- */

@@ -302,6 +302,10 @@ export default class AdmissionManager extends NavigationMixin(LightningElement) 
             });
             this.lastAccountId = result.accountId;
             this.showToast('Success', 'Admission process completed successfully!', 'success');
+            this.dispatchEvent(new CustomEvent('studentadmitted', {
+                bubbles: true,
+                composed: true
+            }));
             this.currentStep = 'success';
         } catch (error) {
             this.showToast('Error', error, 'error');

@@ -372,10 +372,12 @@ public static String submitStudentBehavior(
                 System.debug('Class filter applied');
             }
 
+            /*
             if (String.isNotBlank(academicYear)) {
                 baseQuery += 'AND Academic_Year__c = :academicYear ';
                 System.debug('Year filter applied');
             }
+            */
 
             baseQuery += 'ORDER BY CreatedDate DESC LIMIT 50';
             

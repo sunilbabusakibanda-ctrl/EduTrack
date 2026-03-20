@@ -278,9 +278,7 @@ export default class EduProDashboard extends NavigationMixin(LightningElement) {
 
     handleStudentAdmitted() {
         if (this.wiredMetricsResult) {
-            import('@salesforce/apex').then(({ refreshApex }) => {
-                refreshApex(this.wiredMetricsResult);
-            });
+            refreshApex(this.wiredMetricsResult);
         }
     }
 

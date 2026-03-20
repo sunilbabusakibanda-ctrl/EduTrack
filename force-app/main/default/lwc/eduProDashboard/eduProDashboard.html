@@ -400,7 +400,7 @@
                         </template>
 
                         <template lwc:if={isAdmissionPage}>
-                            <c-admission-manager onnavtopaybill={handlePayBill}></c-admission-manager>
+                            <c-admission-manager onnavtopaybill={handlePayBill} onstudentadmitted={handleStudentAdmitted}></c-admission-manager>
                         </template>
 
                         <template if:true={isPayBillPage}>

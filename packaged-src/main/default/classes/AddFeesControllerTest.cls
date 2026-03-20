@@ -44,13 +44,13 @@ public class AddFeesControllerTest {
         insert pbEntryCust;
         
         Test.startTest();
-        Map<String, Decimal> prices = AddFeesController.getExistingPrices('Class-1', ay.Id, null);
+        Map<String, Decimal> prices = AddFeesController.getExistingPrices('Class-1', ay.Id);
         Test.stopTest();
         
         Assert.isTrue(prices.containsKey(prod.Id), 'Should contain the product');
         Assert.areEqual(150, prices.get(prod.Id), 'Price should be 150');
         
-        Map<String, Decimal> emptyPrices = AddFeesController.getExistingPrices('Class-1', null, null);
+        Map<String, Decimal> emptyPrices = AddFeesController.getExistingPrices('Class-1', null);
         Assert.isTrue(emptyPrices.isEmpty(), 'Should return empty map');
     }
     

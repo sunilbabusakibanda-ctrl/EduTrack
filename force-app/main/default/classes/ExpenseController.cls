@@ -4,7 +4,7 @@ public with sharing class ExpenseController {
        GET EXPENSES
        ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled(cacheable=false)
-    public static List<Expense__c> getExpenses(String category, String status, String monthFilter, Boolean showAll) {
+    public static List<Map<String, Object>> getExpenses(String category, String status, String monthFilter, Boolean showAll) {
         String query = 'SELECT Id, Name, Category__c, Amount__c, Date__c, Status__c, Description__c, Payment_mode__c FROM Expense__c';
         List<String> conditions = new List<String>();
 
@@ -26,19 +26,55 @@ public with sharing class ExpenseController {
         }
         query += ' ORDER BY Date__c DESC LIMIT 1000';
 
-        return Database.query(query);
+        return NamespaceUtils.stripNamespaceList(Database.query(query));
     }
 
     /* ═══════════════════════════════════════════════════════════════
        SAVE EXPENSE
        ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled
-    public static Expense__c saveExpense(Expense__c exp) {
-        if (exp == null) {
+    public static Map<String, Object> saveExpense(Map<String, Object> expMap) {
+        if (expMap == null) {
             throw new AuraHandledException('Expense record cannot be null.');
         }
+        
+        String ns = NamespaceUtils.class.getName().replace('NamespaceUtils', '').replace('.', '');
+        String prefix = (String.isNotBlank(ns)) ? ns + '__' : '';
+        
+        Expense__c exp = new Expense__c();
+        if (expMap.containsKey('Id') && String.isNotBlank((String)expMap.get('Id'))) {
+            exp.Id = (Id)expMap.get('Id');
+        }
+        
+        Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.Expense__c.fields.getMap();
+        
+        for (String key : expMap.keySet()) {
+            if (key == 'Id') continue;
+            String fieldApiName = key;
+            if (key.endsWith('__c') && !key.startsWith(prefix)) {
+                fieldApiName = prefix + key;
+            }
+            
+            Object val = expMap.get(key);
+            Schema.SObjectField field = fieldsMap.get(fieldApiName);
+            if (field != null && val instanceof String) {
+                Schema.DisplayType dt = field.getDescribe().getType();
+                if (dt == Schema.DisplayType.DATE) {
+                    exp.put(fieldApiName, Date.valueOf((String)val));
+                    continue;
+                } else if (dt == Schema.DisplayType.DATETIME) {
+                    exp.put(fieldApiName, DateTime.valueOf((String)val));
+                    continue;
+                } else if (dt == Schema.DisplayType.CURRENCY || dt == Schema.DisplayType.DOUBLE) {
+                    exp.put(fieldApiName, Decimal.valueOf((String)val));
+                    continue;
+                }
+            }
+            exp.put(fieldApiName, val);
+        }
+        
         upsert exp;
-        return exp;
+        return NamespaceUtils.stripNamespace(exp);
     }
 
     /* ═══════════════════════════════════════════════════════════════

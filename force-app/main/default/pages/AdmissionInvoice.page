@@ -282,39 +282,35 @@
                         <tr>
                             <td width="35%" style="vertical-align: top;">
                                 <div class="student-label">Student Name</div>
-                                <div class="student-value">{!invoice.Student__r.Name}</div>
+                                <div class="student-value">{!studentName}</div>
                                 <div class="student-label" style="margin-top: 10px;">Parent Details</div>
                                 <div style="font-size: 10pt; text-transform: capitalize;">
-                                    Father's Name: {!invoice.Student__r.Father_Name__c}<br/>
-                                    Mother's Name: {!invoice.Student__r.Mother_Name__c}
+                                    Father's Name: {!fatherName}<br/>
+                                    Mother's Name: {!motherName}
                                 </div>
                             </td>
                             <td width="30%" style="vertical-align: top;">
                                 <div class="student-label">Class &amp; Section</div>
-                                <div class="student-value">{!invoice.Opportunity__r.Class__c} - {!invoice.Opportunity__r.Section__c}</div>
+                                <div class="student-value">{!className} - {!sectionName}</div>
                                 <div class="student-label" style="margin-top: 10px;">Date of Birth</div>
-                                <div class="student-value">
-                                    <apex:outputText value="{0,date,dd/MM/yyyy}">
-                                        <apex:param value="{!invoice.Student__r.PersonBirthdate}" />
-                                    </apex:outputText>
-                                </div>
+                                <div class="student-value">{!studentDob}</div>
                                 <!--<div class="student-label" style="margin-top: 10px;">Roll Number</div>
                                 <div class="student-value">{!invoice.Student__r.Roll_No__c}</div>-->
                             </td>
                             <td width="35%" style="vertical-align: top;">
                                 <div class="student-label" style="font-weight: bold; color: #000;">Address</div>
                                 <div class="address-block">
-                                    {!invoice.Student__r.Village__c}<br/>
-                                    {!invoice.Student__r.PersonMailingCity} - {!invoice.Student__r.PersonMailingPostalCode}<br/>
-                                    {!invoice.Student__r.State__c}<br/>
-                                    {!invoice.Student__r.Country__c}
+                                    {!addressVillage}<br/>
+                                    {!addressCityPostal}<br/>
+                                    {!addressState}<br/>
+                                    {!addressCountry}
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <div class="student-label">Admission Ref</div>
-                                <div class="student-value" style="font-size: 9pt;">{!invoice.Opportunity__r.Name}</div>
+                                <div class="student-value" style="font-size: 9pt;">{!admissionRef}</div>
                             </td>
                            <td></td><td></td>
                         </tr>
@@ -332,13 +328,13 @@
                     </thead>
                     <tbody>
                         <apex:variable var="index" value="{!1}"/>
-                        <apex:repeat value="{!invoiceItems}" var="item">
+                        <apex:repeat value="{!wrappedItems}" var="item">
                             <tr>
                                 <td>{!index}</td>
-                                <td>{!item.Product__r.Name}</td>
+                                <td>{!item.particulars}</td>
                                 <td class="amount-col">
                                     <apex:outputText value="{0, number, ###,###,##0.00}">
-                                        <apex:param value="{!item.Amount__c}" />
+                                        <apex:param value="{!item.amount}" />
                                     </apex:outputText>
                                 </td>
                             </tr>

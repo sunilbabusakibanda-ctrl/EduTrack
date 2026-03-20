@@ -344,7 +344,7 @@ public without sharing class SchoolStaffController {
     ───────────────────────────────────────── */
     @AuraEnabled(cacheable=true)
     public static List<StaffWrapper> getAllStaff() {
-        List<Account> accounts = [
+        List<Account> allAccounts = [
             SELECT Id, FirstName, LastName, Name, PersonEmail, PersonMobilePhone,
                    PersonBirthdate, PersonMailingStreet, Type, Employee_ID__c,
                    PersonGenderIdentity, Designation__c, PersonDepartment,
@@ -352,9 +352,15 @@ public without sharing class SchoolStaffController {
                    Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c,
                    Bank_Account_Number__c, IFSC_Code__c, Staff_Status__c
             FROM Account
-            WHERE IsPersonAccount = true AND Type IN ('Teacher', 'Non Teaching Staff')
+            WHERE IsPersonAccount = true
             ORDER BY CreatedDate DESC
         ];
+        List<Account> accounts = new List<Account>();
+        for (Account acc : allAccounts) {
+            if (acc.Type == 'Teacher' || acc.Type == 'Non Teaching Staff') {
+                accounts.add(acc);
+            }
+        }
         Set<Id> accountIds = new Map<Id, Account>(accounts).keySet();
         Map<Id, String> salaryStatusMap = getSalaryStatusMap(accountIds);
         Map<Id, String> photoUrlMap     = getPhotoUrlMap(accountIds);
@@ -387,12 +393,18 @@ public without sharing class SchoolStaffController {
     ───────────────────────────────────────── */
     @AuraEnabled(cacheable=false)
     public static List<PayrollWrapper> getPayrollRecords(String invoiceMonth) {
-        List<Account> accounts = [
+        List<Account> allAccounts = [
             SELECT Id, Name, FirstName, LastName, Type, Employee_ID__c, Designation__c,
                    Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c
-            FROM Account WHERE IsPersonAccount = true AND Type IN ('Teacher', 'Non Teaching Staff')
+            FROM Account WHERE IsPersonAccount = true
             ORDER BY Name ASC
         ];
+        List<Account> accounts = new List<Account>();
+        for (Account acc : allAccounts) {
+            if (acc.Type == 'Teacher' || acc.Type == 'Non Teaching Staff') {
+                accounts.add(acc);
+            }
+        }
         Map<Id, Invoice__c> invoiceByAccount = new Map<Id, Invoice__c>();
         for (Invoice__c inv : [
             SELECT Id, Account__c, Status__c, Invoice_Month__c, Invoice_Date__c, CreatedDate
@@ -567,7 +579,9 @@ public without sharing class SchoolStaffController {
     public static void processAllPayroll(String invoiceMonth) {
         try {
             if (String.isBlank(invoiceMonth)) throw new AuraHandledException('Invoice month is required.');
-            List<Account> accounts = [SELECT Id, Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c FROM Account WHERE IsPersonAccount = true AND Type IN ('Teacher', 'Non Teaching Staff')];
+            List<Account> allAccounts = [SELECT Id, Basic_Salary__c, HRA__c, DA__c, PF_Deduction__c FROM Account WHERE IsPersonAccount = true];
+            List<Account> accounts = new List<Account>();
+            for (Account acc : allAccounts) { if (acc.Type == 'Teacher' || acc.Type == 'Non Teaching Staff') { accounts.add(acc); } }
             if (accounts.isEmpty()) return;
             Set<Id> ids = new Map<Id, Account>(accounts).keySet();
             Map<Id, Invoice__c> existing = new Map<Id, Invoice__c>();

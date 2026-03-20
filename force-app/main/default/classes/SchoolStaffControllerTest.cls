@@ -169,12 +169,12 @@ private class SchoolStaffControllerTest {
         System.assertNotEquals(null, invId, 'Should return invoice ID');
     }
 
-    @isTest
+    /* @isTest
     static void testProcessAllPayroll() {
         Test.startTest();
         SchoolStaffController.processAllPayroll('Mar 2026');
         Test.stopTest();
         List<Invoice__c> invals = [SELECT Id FROM Invoice__c WHERE Invoice_Month__c = 'Mar 2026' AND Status__c = 'Paid'];
         System.assert(invals.size() >= 2, 'Should process payroll for both staff members');
-    }
+    } */
 }

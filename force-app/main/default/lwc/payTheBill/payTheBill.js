@@ -169,7 +169,14 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         return this.isUPISelected && parseFloat(this.billingTotal) > 0;
     }
 
+    get uploadedQrUrl() {
+        return this.schoolConfig.UPI_QR_ID__c ? `/sfc/servlet.shepherd/version/download/${this.schoolConfig.UPI_QR_ID__c}` : '';
+    }
+
     get qrCodeUrl() {
+        if (this.uploadedQrUrl) {
+            return this.uploadedQrUrl;
+        }
         if (this.qrCodeBase64) {
             return `data:image/png;base64,${this.qrCodeBase64}`;
         }
