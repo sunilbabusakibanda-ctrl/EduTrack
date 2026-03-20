@@ -458,6 +458,7 @@ public static List<String> getSuggestedFeeProductNames() {
     } catch (Exception e) {
         throw new AuraHandledException('Error fetching suggestions: ' + e.getMessage());
     }
+}
 
     @AuraEnabled(cacheable=true)
     public static List<Map<String, String>> getAllPriceBooks(String academicYearId) {
@@ -472,5 +473,4 @@ public static List<String> getSuggestedFeeProductNames() {
         }
         return options;
     }
-}
 }
