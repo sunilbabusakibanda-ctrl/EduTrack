@@ -121,6 +121,31 @@ sf project deploy start -o SunilDev --wait 60
 
 ---
 
+## ✅ Phase 1.5: Structured Feature-Branch & PR Workflow (Recommended)
+
+To maintain stability, all developers should avoid pushing directly to the `main` branch:
+
+1. **Develop & Test** inside `Sunil@DevOrg1` (`sunil@devorg1.com`) flawlessly.
+2. **Verify** your components on `DevOrg1`.
+3. **Create a Dedicated Feature Branch** from `main`:
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout -b feature/your-feature-name
+   ```
+4. **Commit & Push** your specific files to that Sub-Branch Node flawlessly:
+   ```bash
+   git add .
+   git commit -m "Describe your specific changes"
+   git push origin feature/your-feature-name
+   ```
+5. **Create a Pull Request (PR)** on GitHub to merge `feature/your-feature-name` into `main`.
+6. **Code Review & Validation**: Perform safety checks and QA approvals before merging the PR Node flawless.
+7. **Pipeline Auto-Deploy**: Merging into `main` automatically triggers the YAML Workflow to deploy over to `Sunil@DevOrg` (`sunil@devorg.com`).
+8. **Final Verification**: Confirm options inside `Sunil@DevOrg` accurately flawlessly Node flawless Node stream flawlessly!
+
+---
+
 ## Summary of Commands for Future Use
 
 | Task | Command |
