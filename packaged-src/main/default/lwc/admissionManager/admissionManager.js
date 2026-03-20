@@ -98,7 +98,7 @@ export default class AdmissionManager extends NavigationMixin(LightningElement) 
     @wire(getObjectInfo, { objectApiName: ACCOUNT_OBJECT })
     accountInfo;
 
-    @wire(getPicklistValues, { recordTypeId: '$accountInfo.data.defaultRecordTypeId', fieldApiName: STATE_FIELD })
+    @wire(getPicklistValues, { recordTypeId: '012000000000000AAA', fieldApiName: STATE_FIELD })
     wiredStateValues({ error, data }) {
         if (data) {
             this.stateOptions = data.values;
@@ -107,7 +107,7 @@ export default class AdmissionManager extends NavigationMixin(LightningElement) 
         }
     }
 
-    @wire(getPicklistValues, { recordTypeId: '$accountInfo.data.defaultRecordTypeId', fieldApiName: COUNTRY_FIELD })
+    @wire(getPicklistValues, { recordTypeId: '012000000000000AAA', fieldApiName: COUNTRY_FIELD })
     wiredCountryValues({ error, data }) {
         if (data) {
             this.countryOptions = data.values;
