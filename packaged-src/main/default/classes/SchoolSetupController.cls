@@ -121,9 +121,8 @@ public with sharing class SchoolSetupController {
     @AuraEnabled
     public static void saveAcademicYear(String yearRange, Boolean isActive) {
         try {
-            // Parse "2025–2026" or "2025-2026"
-            String delimiter = yearRange.contains('–') ? '–' : '-';
-            List<String> years = yearRange.split(delimiter);
+            String cleanYearRange = yearRange.replace('–', '-');
+            List<String> years = cleanYearRange.split('-');
             if (years.size() != 2) throw new AuraHandledException('Invalid year range format.');
             
             Integer startYear = Integer.valueOf(years[0].trim());
@@ -134,10 +133,10 @@ public with sharing class SchoolSetupController {
             Date endDate = Date.newInstance(endYear, 5, 31);
             
             // Check if record already exists
-            List<Academic_Year__c> existing = [SELECT Id FROM Academic_Year__c WHERE Name = :yearRange LIMIT 1];
+            List<Academic_Year__c> existing = [SELECT Id FROM Academic_Year__c WHERE Name = :cleanYearRange LIMIT 1];
             Academic_Year__c ay = existing.isEmpty() ? new Academic_Year__c() : existing[0];
             
-            ay.Name = yearRange;
+            ay.Name = cleanYearRange;
             ay.Start_Date__c = startDate;
             ay.End_Date__c = endDate;
             ay.Is_Active__c = isActive;
