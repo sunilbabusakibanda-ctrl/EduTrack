@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'force-app/**'
+      - 'packaged-src/**'
       - 'manifest/**'
       - 'sfdx-project.json'
 
@@ -33,6 +34,6 @@ jobs:
       - name: Deploy Source to Target Org
         run: |
           sf project deploy start \
-            --source-dir force-app \
+            --source-dir packaged-src \
             --target-org SunilDev \
             --wait 30
