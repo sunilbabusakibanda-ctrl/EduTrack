@@ -46,8 +46,7 @@ public with sharing class PricebookAutomationHandler {
         List<Pricebook2> toDeactivate = [
             SELECT Id, IsActive 
             FROM Pricebook2 
-            WHERE Academic_Year__c NOT IN :activeYearIds 
-            AND Academic_Year__c != null
+            WHERE Academic_Year__c IN (SELECT Id FROM Academic_Year__c WHERE Is_Active__c = false)
             AND IsActive = true
             AND IsStandard = false
         ];
