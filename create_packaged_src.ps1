@@ -84,11 +84,11 @@ if (Test-Path "packaged-src/main/default/permissionsets") {
     $permsets = Get-ChildItem "packaged-src/main/default/permissionsets" -Filter "*.permissionset-meta.xml" -File
 
     foreach ($ps in $permsets) {
-        [xml]$xml = Get-Content $ps.FullName
+        [xml]$xml = Get-Content $ps.FullName -Raw
         $root = $xml.PermissionSet
         $nodesToRemove = @()
         if ($root) {
-            foreach ($ca in $root.classAccesses) {
+            foreach ($ca in @($root.classAccesses)) {
                 $className = $ca.apexClass
                 if ($className -and (-not (Test-Path "packaged-src/main/default/classes/$className.cls"))) {
 
