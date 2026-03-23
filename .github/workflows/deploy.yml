@@ -31,6 +31,10 @@ jobs:
           sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias SunilDev --set-default
           rm ./SFDX_AUTH_URL.txt
 
+      - name: Prepare Packaged Source
+        shell: pwsh
+        run: ./create_packaged_src.ps1
+
       - name: Deploy Source to Target Org
         run: |
           sf project deploy start \
