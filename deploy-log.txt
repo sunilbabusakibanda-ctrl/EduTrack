@@ -1,0 +1,46 @@
+───── Deploying Metadata ─────
+Stages:
+1. Preparing
+2. Waiting for the org to respond
+3. Deploying Metadata
+4. Running Tests
+5. Updating Source Tracking
+6. Done
+
+▶ Preparing…
+   Deploying v60.0 metadata to sunil@devorg.com using the v66.0 SOAP API.
+   Deploy ID: 0Aff6000004Bu1NCAS
+   Target Org: sunil@devorg.com
+✔ Preparing (253ms)
+◯ Waiting for the org to respond - Skipped
+▶ Deploying Metadata…
+   Components: 0/475 (0%)
+   Components: 46/475 (10%)
+   Components: 71/475 (15%)
+   Components: 430/475 (91%)
+   Components: 471/475 (99%)
+✘ Deploying Metadata (31.21s)
+   Components: 471/478 (99%)
+
+Deploying v60.0 metadata to sunil@devorg.com using the v66.0 SOAP API.
+Status: Failed
+Deploy ID: 0Aff6000004Bu1NCAS
+Target Org: sunil@devorg.com
+
+Elapsed time: 31.47s
+
+[1m[31mComponent Failures [6][39m[22m
+ Type                      Name                      Problem                                                                                                                                                                                                                                 Line:Column 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ ApexClass                 AttendanceController      Subject__c FROM Contact WHERE Type__c = 'Teacher' ORDER BY Name                                                                                                                                                                         47:26       
+                                                     ^                                                                                                                                                                                                                                                   
+                                                     ERROR at Row:1:Column:48                                                                                                                                                                                                                            
+                                                     No such column 'Type__c' on entity 'Contact'. If you are attempting to use a custom field, be sure to append the '__c' after the custom field name. Please reference your WSDL or the describe call for the appropriate names. (47:26)              
+ ApexClass                 AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (49:46)                                                  49:46       
+ ApexClass                 AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (53:49)                                                  53:49       
+ ApexClass                 AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (60:30)                                                  60:30       
+ ApexClass                 AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(NULL, NULL, String, NULL, Integer, Integer, Integer) from the type EduTrack.AttendanceController (63:34)                                                              63:34       
+ LightningComponentBundle  attendance                Unable to find Apex action method referenced as 'AttendanceController.getTeachers'.                                                                                                                                                                 
+                                                     Unable to find Apex action method referenced as 'AttendanceController.getRecentSubmissions'.                                                                                                                                                        
+
+
