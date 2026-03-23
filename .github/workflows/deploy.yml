@@ -9,6 +9,8 @@ on:
       - 'packaged-src/**'
       - 'manifest/**'
       - 'sfdx-project.json'
+      - '.github/workflows/**'
+      - 'create_packaged_src.ps1'
 
 jobs:
   deploy:

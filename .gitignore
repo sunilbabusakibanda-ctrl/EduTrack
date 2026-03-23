@@ -13,6 +13,7 @@
 !.gitignore
 !.forceignore
 !Git_Deployment_Workflow.md
+!create_packaged_src.ps1
 !package_installation_guide.md
 !package_installation_guide.html
 
