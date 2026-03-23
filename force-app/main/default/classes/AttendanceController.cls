@@ -1,6 +1,26 @@
 public without sharing class AttendanceController {
     
     // Wrapper for Combobox Options
+    @AuraEnabled(cacheable=true)
+    public static List<Map<String, String>> getRecentSubmissions() {
+        List<Map<String, String>> results = new List<Map<String, String>>();
+        for (Attendance_Session__c s : [
+            SELECT Class__r.Name, Section__c, Attendance_Taken_By__r.Name 
+            FROM Attendance_Session__c 
+            WHERE Attendance_Taken_By__c != null 
+            ORDER BY CreatedDate DESC 
+            LIMIT 10
+        ]) {
+            Map<String, String> item = new Map<String, String>();
+            item.put('id', s.Id);
+            String className = s.Class__r != null ? s.Class__r.Name : 'N/A';
+            String teacherName = s.Attendance_Taken_By__r != null ? s.Attendance_Taken_By__r.Name : 'N/A';
+            item.put('text', className + ' - ' + s.Section__c + ' submitted by ' + teacherName);
+            results.add(item);
+        }
+        return results;
+    }
+
     public class Option {
         @AuraEnabled public String label; 
         @AuraEnabled public String value; 
@@ -19,6 +39,19 @@ public without sharing class AttendanceController {
     @AuraEnabled(cacheable=true)
     public static List<Option> getSections() {
         return getPicklistValues('Account', 'Section__c');
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Map<String, String>> getTeachers() {
+        List<Map<String, String>> teacherList = new List<Map<String, String>>();
+        for (Contact c : [SELECT Id, Name, Subject__c FROM Contact WHERE Type__c = 'Teacher' ORDER BY Name]) {
+            Map<String, String> teacher = new Map<String, String>();
+            teacher.put('id', c.Id);
+            teacher.put('name', c.Name);
+            teacher.put('subject', c.Subject__c != null ? c.Subject__c : 'N/A');
+            teacherList.add(teacher);
+        }
+        return teacherList;
     }
 
     private static List<Option> getPicklistValues(String objectName, String fieldName) {
@@ -64,6 +97,7 @@ public without sharing class AttendanceController {
         @AuraEnabled public Integer total;
         @AuraEnabled public Integer present;
         @AuraEnabled public Integer absent;
+        @AuraEnabled public String teacherName;
 
         public SessionData() {
             this.sessionExists = false;
@@ -79,7 +113,7 @@ public without sharing class AttendanceController {
         SessionData data = new SessionData();
         
         // 1. Find Session
-        List<Attendance_Session__c> sessions = [SELECT Id, Total_Students__c, Present_Count__c, Absent_Count__c 
+        List<Attendance_Session__c> sessions = [SELECT Id, Total_Students__c, Present_Count__c, Absent_Count__c, Attendance_Taken_By__r.Name 
                                                 FROM Attendance_Session__c 
                                                 WHERE Class__r.Name = :classVal 
                                                 AND Section__c = :sectionVal 
@@ -92,6 +126,7 @@ public without sharing class AttendanceController {
             data.total = (Integer)sess.Total_Students__c;
             data.present = (Integer)sess.Present_Count__c;
             data.absent = (Integer)sess.Absent_Count__c;
+            data.teacherName = sess.Attendance_Taken_By__r != null ? sess.Attendance_Taken_By__r.Name : '';
             
             // 2. Get Absentees IF session exists
             for(Attendance__c att : [SELECT Student__c FROM Attendance__c 
@@ -110,7 +145,7 @@ public without sharing class AttendanceController {
     }
 
     @AuraEnabled
-    public static String saveAttendance(String classVal, String sectionVal, String dateStr, List<String> absentStudentIds, Integer totalStudents, Integer absentCount, Integer presentCount) {
+    public static String saveAttendance(String classVal, String sectionVal, String dateStr, List<String> absentStudentIds, Integer totalStudents, Integer absentCount, Integer presentCount, String teacherId) {
         // Validations
         if(classVal != null) classVal = classVal.trim();
         if(sectionVal != null) sectionVal = sectionVal.trim();
@@ -185,8 +220,9 @@ public without sharing class AttendanceController {
             // Map to existing String fields requested by user
             session.Number_Of_Present__c = String.valueOf(presentCount);
             session.Number_Of_Absent__c = String.valueOf(absentCount);
-            
-            session.Attendance_Taken_By__c = UserInfo.getUserId();
+            if (String.isNotBlank(teacherId)) {
+                session.Attendance_Taken_By__c = teacherId;
+            }
             
             upsert session;
             

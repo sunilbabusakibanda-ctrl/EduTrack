@@ -4,6 +4,8 @@ import getSessionData from '@salesforce/apex/AttendanceController.getSessionData
 import saveAttendance from '@salesforce/apex/AttendanceController.saveAttendance';
 import getClasses from '@salesforce/apex/AttendanceController.getClasses';
 import getSections from '@salesforce/apex/AttendanceController.getSections';
+import getTeachers from '@salesforce/apex/AttendanceController.getTeachers';
+import getRecentSubmissions from '@salesforce/apex/AttendanceController.getRecentSubmissions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AttendanceScreen extends LightningElement {
@@ -19,9 +21,58 @@ export default class AttendanceScreen extends LightningElement {
     @track pinnedIds = []; // IDs of students whose status changed in the current filter view
     @track showReport = false; // Toggles between Tracker and Report view
 
+    // Teacher Selection State
+    @track showTeacherSelection = true;
+    @track teachers = [];
+    @track filteredTeachers = [];
+    @track selectedTeacher = null;
+    @track teacherSearchTerm = '';
+    @track isTeacherDropdownOpen = false;
+    @track recentSubmissions = [];
+    @track submittedTeacherName = '';
+
     // Wired Options
     @track classOptions = [];
     @track sectionOptions = [];
+
+
+    fetchRecentSubmissions() {
+        // Method kept for manual refresh after submission
+        getRecentSubmissions()
+            .then(result => {
+                this.recentSubmissions = result;
+            })
+            .catch(error => {
+                console.error('Error fetching recent submissions:', error);
+            });
+    }
+
+    @wire(getRecentSubmissions)
+    wiredRecentSubmissions({ error, data }) {
+        if (data) {
+            // Duplicate the list 3 times to ensure a smooth infinite loop without gaps
+            this.recentSubmissions = [...data, ...data, ...data];
+        } else if (error) {
+            console.error('Error loading recent submissions', error);
+        }
+    }
+
+    @wire(getTeachers)
+    wiredTeachers({ error, data }) {
+        if (data) {
+            this.teachers = data.map(t => {
+                const colorClass = this.getRandomColorClass();
+                return {
+                    ...t,
+                    initials: this.getInitials(t.name),
+                    colorClass: colorClass
+                };
+            });
+            this.filteredTeachers = [...this.teachers];
+        } else if (error) {
+            console.error('Error loading teachers', error);
+        }
+    }
 
     @wire(getClasses)
     wiredClasses({ error, data }) {
@@ -94,6 +145,10 @@ export default class AttendanceScreen extends LightningElement {
                 ]);
                 
                 this.sessionExists = sessionData.sessionExists;
+                if (this.sessionExists) {
+                    this.submittedTeacherName = sessionData.teacherName || '';
+                }
+                
                 this.students = studentsData.map(student => {
                     // Auto-mark absent if session exists
                     const absentIds = sessionData.absentIds || [];
@@ -189,16 +244,18 @@ export default class AttendanceScreen extends LightningElement {
                 sectionVal: this.selectedSection.trim(), 
                 dateStr: this.selectedDate,
                 absentStudentIds: absentStudentIds,
-                totalCount: total,
+                totalStudents: total,
                 presentCount: present,
-                absentCount: absent
+                absentCount: absent,
+                teacherId: this.selectedTeacher ? this.selectedTeacher.id : ''
             });
 
+            this.submittedTeacherName = this.selectedTeacher ? this.selectedTeacher.name : '';
             this.showToast('Success', 'Attendance saved successfully', 'success');
             
             // Force Refresh to get new Session ID/Data
             await this.loadStudentsIfReady();
-            this.forceRefresh = true; // Flag to ensure UI updates if needed
+            this.fetchRecentSubmissions();
             this.isSuccess = true; // Show Summary
 
         } catch (error) {
@@ -340,6 +397,83 @@ export default class AttendanceScreen extends LightningElement {
 
     getInitials(name) {
         return name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+    }
+
+    handleTeacherSearch(event) {
+        this.teacherSearchTerm = event.target.value.toLowerCase();
+        if (this.teacherSearchTerm) {
+            this.isTeacherDropdownOpen = true;
+            this.filteredTeachers = this.teachers.filter(t => 
+                t.name.toLowerCase().includes(this.teacherSearchTerm) || 
+                t.subject.toLowerCase().includes(this.teacherSearchTerm)
+            );
+        } else {
+            this.filteredTeachers = [...this.teachers];
+            this.isTeacherDropdownOpen = false;
+        }
+    }
+
+    handleTeacherInputChange(event) {
+        this.teacherSearchTerm = event.target.value;
+        if (!this.teacherSearchTerm) {
+            this.isTeacherDropdownOpen = false;
+        }
+    }
+
+    openTeacherDropdown() {
+        if (!this.selectedTeacher) {
+            this.isTeacherDropdownOpen = true;
+        }
+    }
+
+    handleTeacherSelect(event) {
+        const teacherId = event.currentTarget.dataset.id;
+        this.selectedTeacher = this.teachers.find(t => t.id === teacherId);
+        this.isTeacherDropdownOpen = false;
+        this.teacherSearchTerm = this.selectedTeacher.name;
+    }
+
+    handleClearTeacher() {
+        this.selectedTeacher = null;
+        this.teacherSearchTerm = '';
+        this.isTeacherDropdownOpen = false;
+    }
+
+    handleProceed() {
+        if (this.selectedTeacher) {
+            this.showTeacherSelection = false;
+        }
+    }
+
+    handleTeacherChange() {
+        this.handleClearTeacher();
+        this.isTeacherDropdownOpen = true;
+    }
+
+    get isProceedDisabled() {
+        return !this.selectedTeacher;
+    }
+
+    get teacherSearchInputClass() {
+        return `search-input ${this.teacherSearchTerm ? 'has-value' : ''}`;
+    }
+
+    get teacherDropdownClass() {
+        return `dropdown ${this.isTeacherDropdownOpen ? 'open' : ''}`;
+    }
+
+    get showNoTeacherMatch() {
+        return this.isTeacherDropdownOpen && this.filteredTeachers.length === 0;
+    }
+
+    get contactDate() {
+        const d = new Date();
+        return d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }
+
+    getRandomColorClass() {
+        const classes = ['bg-indigo', 'bg-purple', 'bg-sky', 'bg-rose', 'bg-amber', 'bg-emerald', 'bg-pink', 'bg-teal', 'bg-orange', 'bg-violet'];
+        return classes[Math.floor(Math.random() * classes.length)];
     }
 
     showToast(title, message, variant) {
