@@ -86,7 +86,7 @@ public class EnterMarksControllerTest {
     static void testGetStudentsForMarksEntryEmpty() {
         // Create Class without matching students to fire the empty-return branch
         String validNextClass = TestDataFactory.getValidNextClass();
-        Class__c cls2 = new Class__c(Name=validNextClass, Class__c=validNextClass, Section__c='Z');
+        Class__c cls2 = new Class__c(Name=validNextClass, Class__c=validNextClass, Section__c='A');
         insert cls2;
         
         List<Map<String, Object>> students = EnterMarksController.getStudentsForMarksEntry(cls2.Id, 'Maths', 'Quarterly');
