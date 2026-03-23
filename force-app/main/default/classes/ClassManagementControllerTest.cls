@@ -202,13 +202,64 @@ private class ClassManagementControllerTest {
     }
 
     /* ═══════════════════════════════════════════════════════════
-       TESTS: getAllSections
+       TESTS: getAllSections and getSections
        ═══════════════════════════════════════════════════════════ */
     @isTest
     static void testGetAllSections() {
         createSection();
         Test.startTest();
         List<Map<String, Object>> result = ClassManagementController.getAllSections();
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testGetClasses() {
+        createClass();
+        Test.startTest();
+        List<Map<String, Object>> result = ClassManagementController.getClasses();
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testGetSections() {
+        createSection();
+        Test.startTest();
+        List<Map<String, Object>> result = ClassManagementController.getSections();
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testBulkCreateSubjects() {
+        List<Map<String, Object>> data = new List<Map<String, Object>>{
+            new Map<String, Object>{ 'name' => 'BulkSubj1' },
+            new Map<String, Object>{ 'name' => '' },
+            new Map<String, Object>{ 'name' => 'BulkSubj1' } // Duplicate
+        };
+        Test.startTest();
+        Map<String, Object> res = ClassManagementController.bulkCreateSubjects(data);
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testBulkCreateTeachers() {
+        Subject__c sub = createSubject('BulkSubj');
+        List<Map<String, Object>> data = new List<Map<String, Object>>{
+            new Map<String, Object>{
+                'firstName' => 'Bulk',
+                'lastName' => 'Teacher',
+                'email' => 'bulk@test.com',
+                'phone' => '1234',
+                'qualification' => 'BS',
+                'subject1' => 'BulkSubj',
+                'skillLevel1' => 'Expert'
+            },
+            new Map<String, Object>{ // Error row missing email
+                'firstName' => 'Bulk2',
+                'lastName' => 'Teacher2'
+            }
+        };
+        Test.startTest();
+        Map<String, Object> res = ClassManagementController.bulkCreateTeachers(data);
         Test.stopTest();
     }
 

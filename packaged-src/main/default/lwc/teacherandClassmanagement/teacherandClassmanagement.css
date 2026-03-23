@@ -823,10 +823,66 @@
 
 .button-group { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
 
-/* ==================== REASSIGN MODAL ==================== */
-.slds-modal    { z-index: 9050; }
-.slds-backdrop { z-index: 9040; }
+/* ==================== MODALS — FIXED ALIGNMENT ==================== */
+/*
+ * In Salesforce LWC, modals rendered inside a component are affected
+ * by the left navigation sidebar (~280px). The modal backdrop must
+ * cover the full viewport and the container must be truly centered
+ * relative to the full screen, not just the component area.
+ */
 
+/* Backdrop: full viewport, sits behind modal */
+.slds-backdrop,
+.sub-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9040 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Modal wrapper: full viewport overlay */
+.slds-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9050 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    /* Override any inherited margin/transform from parent */
+    margin: 0 !important;
+    transform: none !important;
+}
+
+/* Modal container: centered child, no left offset */
+.slds-modal__container {
+    position: relative !important;
+    margin: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    border-radius: var(--r-xl) !important;
+}
+
+/* Fix header/footer/content inside modal to not shift */
+.slds-modal__header,
+.slds-modal__content,
+.slds-modal__footer {
+    position: relative !important;
+    left: auto !important;
+}
+
+/* ==================== REASSIGN MODAL ==================== */
 .reassign-modal-container { max-width: 500px; }
 
 .reassign-modal {
@@ -1231,7 +1287,6 @@
     letter-spacing: 0.6px;
 }
 
-/* ── NEW: Weekly Schedule section heading above timetable cards ── */
 .tt-weekly-schedule-heading {
     display: flex;
     align-items: center;
@@ -1273,7 +1328,6 @@
     color: var(--text-secondary);
 }
 
-/* Day group */
 .tt-day-group {
     margin-bottom: 10px;
 }
@@ -1309,7 +1363,6 @@
     color: var(--text-secondary);
 }
 
-/* Period cards row */
 .tt-period-chips {
     display: flex;
     flex-wrap: wrap;
@@ -1449,7 +1502,7 @@
     border-top-color: var(--success-mid);
 }
 
-/* ==================== TEACHER SKILLS PANEL (shown when no assignments) ==================== */
+/* ==================== TEACHER SKILLS PANEL ==================== */
 .dd-skills-section {
     padding: 10px 16px 14px;
     border-top: 1.5px dashed var(--border);
@@ -1564,6 +1617,55 @@
     font-style: italic;
 }
 
+/* ==================== COLLAPSIBLE HEADINGS ==================== */
+.collapsible-heading {
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapsible-heading:hover {
+    opacity: 0.85;
+}
+
+.collapsible-chevron-wrap {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.collapsible-chevron-ml-auto {
+    margin-left: auto;
+}
+
+.collapsible-chevron {
+    color: var(--primary);
+    transition: transform 0.2s ease;
+}
+
+.collapsible-chevron-open {
+    transform: rotate(0deg);
+}
+
+.collapsible-chevron-green {
+    color: var(--success);
+}
+
+.tt-collapsible-today {
+    cursor: pointer;
+    user-select: none;
+    border-radius: var(--r-sm);
+    padding: 6px 8px;
+    transition: background 0.15s ease;
+}
+
+.tt-collapsible-today:hover {
+    background: rgba(46, 91, 255, 0.06);
+}
+
+.tt-collapsible-today-green:hover {
+    background: rgba(16, 185, 129, 0.06);
+}
+
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 1024px) {
     .kpi-strip { grid-template-columns: repeat(2, 1fr); }
@@ -1593,7 +1695,6 @@
 }
 
 /* ==================== LEASER PERIOD STYLES ==================== */
-
 .tt-period-card-leaser {
     border: 2px solid #f59e0b !important;
     background: linear-gradient(135deg, #fffbeb 0%, #fff7e0 100%) !important;
@@ -1704,7 +1805,6 @@
     pointer-events: none;
 }
 
-/* ── FREE period card ── */
 .tt-period-card-free {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
     border-left: 3px solid #16a34a !important;
@@ -1739,7 +1839,6 @@
     animation: none !important;
 }
 
-/* ── SUB period card in CLASS view ── */
 .tt-period-card-sub {
     background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%) !important;
     border-left: 3px solid #ea580c !important;
@@ -1804,19 +1903,8 @@
     border: 1px solid #86efac !important;
     animation: leaserPulse 2.5s ease-in-out infinite !important;
 }
-/* ═══════════════════════════════════════════════════════════════════════════
-   TIMETABLE LEAVE HIGHLIGHTING + SUBSTITUTE MODAL
-   Add these styles to your classManagement.css file
-   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Timetable grid wrapper ── */
-.tt-grid-wrapper {
-    overflow-x: auto;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-}
-
+/* ==================== TIMETABLE GRID (NEW LAYOUT) ==================== */
 .tt-grid-header-row,
 .tt-grid-day-row {
     display: flex;
@@ -1851,7 +1939,6 @@
 .tt-header-period-num { font-size: 13px; font-weight: 700; }
 .tt-header-time { font-size: 10px; opacity: 0.75; }
 
-/* Day label cell */
 .tt-day-label-cell {
     display: flex;
     flex-direction: column;
@@ -1871,7 +1958,6 @@
     letter-spacing: 0.5px;
 }
 
-/* ── Leave day badge (shows count on the day row header) ── */
 .tt-leave-day-badge {
     background: #fef3c7;
     color: #92400e;
@@ -1885,7 +1971,6 @@
     white-space: nowrap;
 }
 
-/* ── Period cell base ── */
 .tt-grid-cell {
     flex: 1 1 0;
     padding: 6px;
@@ -1899,7 +1984,6 @@
     transition: background 0.2s ease;
 }
 
-/* ── LEAVE CELL — no substitute yet: warm amber-red ── */
 .tt-grid-cell-on-leave {
     background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
     border: 2px solid #f59e0b !important;
@@ -1913,7 +1997,6 @@
     50%       { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.30); }
 }
 
-/* ── LEAVE CELL — substitute assigned: soft green ── */
 .tt-grid-cell-substituted {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     border: 2px solid #22c55e !important;
@@ -1921,7 +2004,6 @@
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12);
 }
 
-/* Inner layout of a leave cell */
 .tt-leave-cell-inner {
     display: flex;
     flex-direction: column;
@@ -1930,7 +2012,6 @@
     cursor: pointer;
 }
 
-/* Leave banner (red/amber strip at top of cell) */
 .tt-leave-banner {
     display: flex;
     align-items: center;
@@ -1957,7 +2038,6 @@
     text-transform: uppercase;
 }
 
-/* Name of teacher on leave */
 .tt-on-leave-name {
     font-size: 11px;
     font-weight: 600;
@@ -1974,7 +2054,6 @@
     opacity: 0.7;
 }
 
-/* Substitute already assigned chip */
 .tt-sub-assigned-chip {
     display: flex;
     align-items: center;
@@ -1995,7 +2074,6 @@
 
 .tt-sub-assigned-chip:hover { background: #16a34a; }
 
-/* "Assign Substitute" button on leave cells */
 .tt-assign-sub-btn {
     border: 1.5px dashed #f59e0b;
     background: transparent;
@@ -2017,11 +2095,7 @@
     transform: translateY(-1px);
 }
 
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   SUBSTITUTE ASSIGNMENT MODAL
-   ═══════════════════════════════════════════════════════════════════════════ */
-
+/* ==================== SUBSTITUTE MODAL ==================== */
 .sub-modal-overlay {
     z-index: 9100;
 }
@@ -2036,7 +2110,6 @@
     overflow: hidden;
 }
 
-/* Modal header */
 .sub-modal-header {
     background: linear-gradient(135deg, #1e3a5f 0%, #1e4976 100%) !important;
     padding: 20px 24px !important;
@@ -2078,7 +2151,6 @@
     margin: 3px 0 0;
 }
 
-/* Modal body */
 .sub-modal-body {
     padding: 24px !important;
     display: flex;
@@ -2087,7 +2159,6 @@
     background: #f8fafc;
 }
 
-/* Leave info card */
 .sub-modal-leave-card {
     display: flex;
     align-items: center;
@@ -2150,7 +2221,6 @@
     flex-shrink: 0;
 }
 
-/* Substitute picker area */
 .sub-modal-field-wrap {
     background: #fff;
     border-radius: 12px;
@@ -2167,7 +2237,6 @@
     padding: 8px 0;
 }
 
-/* Modal footer */
 .sub-modal-footer {
     padding: 16px 24px !important;
     background: #f8fafc !important;
@@ -2196,4 +2265,611 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
+}
+/* ============================================================
+   MODAL PORTAL — Full-viewport overlay that escapes the
+   LWC component layout and Salesforce sidebar (~280px).
+   These styles should be added to classManagement.css
+   ============================================================ */
+
+/* ── Full-screen overlay wrapper ── */
+.modal-portal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Semi-transparent backdrop ── */
+.modal-portal-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.52) !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    cursor: pointer;
+}
+
+/* ── Modal card (sits above backdrop) ── */
+.modal-portal-container {
+    position: relative !important;
+    z-index: 1 !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22) !important;
+    width: 100% !important;
+    max-width: 620px !important;
+    max-height: 90vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    animation: modalPortalIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes modalPortalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+/* ── Header ── */
+.modal-portal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+.modal-portal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.modal-portal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    padding: 0;
+}
+.modal-portal-close:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+/* ── Body (scrollable) ── */
+.modal-portal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+.modal-portal-body::-webkit-scrollbar { width: 4px; }
+.modal-portal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 100px; }
+
+/* ── Field group ── */
+.modal-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ── Hint box ── */
+.modal-hint-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #78350f;
+    line-height: 1.6;
+    flex-shrink: 0;
+}
+.modal-hint-box svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #f59e0b;
+}
+.modal-hint-box code {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #92400e;
+}
+
+/* ── Download template row ── */
+.modal-template-row {
+    display: flex;
+    align-items: center;
+}
+
+/* ── Success banner ── */
+.modal-success-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ecfdf5;
+    border: 1.5px solid #a7f3d0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #065f46;
+}
+.modal-success-banner svg {
+    flex-shrink: 0;
+    color: #10b981;
+}
+.modal-success-banner strong {
+    color: #047857;
+}
+
+/* ── Table wrapper ── */
+.modal-table-wrapper {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: auto;
+    max-height: 240px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ── Preview table ── */
+.modal-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.modal-preview-table thead tr {
+    background: #f4f6f9;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.modal-preview-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.modal-preview-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.modal-preview-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.modal-preview-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ── Table cell content ── */
+.modal-table-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.modal-contact-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modal-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ── Badges ── */
+.modal-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+.modal-badge-gray {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.modal-badge-blue {
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+}
+
+.modal-subject-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-skill-level {
+    font-size: 11px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* ── Footer ── */
+.modal-portal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+.modal-btn-cancel {
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #ffffff;
+    color: #475569;
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.modal-btn-cancel:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+/* ============================================================
+   ADD these styles to classManagement.css
+   They power the multi-row section/class modal inputs
+   ============================================================ */
+
+/* ── Modal portal base (shared across all portal modals) ── */
+.modal-portal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+.modal-portal-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.50) !important;
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    cursor: pointer;
+}
+
+.modal-portal-container {
+    position: relative !important;
+    z-index: 1 !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.20) !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    max-height: 88vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    animation: modalPortalIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes modalPortalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);    }
+}
+
+/* ── Header ── */
+.modal-portal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+.modal-header-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #eef2ff;
+    color: #4338ca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #c7d2fe;
+}
+
+.modal-portal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+    letter-spacing: -0.2px;
+}
+
+.modal-portal-subtitle {
+    font-size: 11px;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+}
+
+.modal-portal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    padding: 0;
+    margin-left: auto;
+}
+.modal-portal-close:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+/* ── Body ── */
+.modal-portal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+.modal-portal-body::-webkit-scrollbar { width: 4px; }
+.modal-portal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 100px; }
+
+/* ── Rows container ── */
+.modal-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ── Single input row ── */
+.modal-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: rowSlideIn 0.18s ease;
+}
+
+@keyframes rowSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Row number badge ── */
+.modal-row-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1.5px solid #c7d2fe;
+}
+
+/* ── Input wrapper (fills remaining space) ── */
+.modal-row-input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── + Add button ── */
+.modal-row-add-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px dashed #4338ca;
+    background: #eef2ff;
+    color: #4338ca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.18s ease;
+    padding: 0;
+}
+.modal-row-add-btn:hover {
+    background: #4338ca;
+    border-style: solid;
+    border-color: #4338ca;
+    color: #ffffff;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.35);
+}
+
+/* ── Delete button ── */
+.modal-row-del-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid #fecaca;
+    background: #fef2f2;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+.modal-row-del-btn:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.30);
+}
+
+/* ── Count indicator ── */
+.modal-count-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: #f0fdf4;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #065f46;
+}
+.modal-count-indicator svg {
+    flex-shrink: 0;
+    color: #10b981;
+}
+
+/* ── Footer ── */
+.modal-portal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 22px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+.modal-btn-cancel {
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #ffffff;
+    color: #475569;
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.modal-btn-cancel:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+.modal-btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #2E5BFF;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(46, 91, 255, 0.35);
+    transition: all 0.15s ease;
+}
+.modal-btn-create:hover {
+    background: #1E3FCC;
+    box-shadow: 0 6px 20px rgba(46, 91, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+/* ── Hint / info box (reusable) ── */
+.modal-hint-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #78350f;
+    line-height: 1.6;
+}
+.modal-hint-box svg { flex-shrink: 0; margin-top: 1px; color: #f59e0b; }
+.modal-hint-box code {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #92400e;
 }

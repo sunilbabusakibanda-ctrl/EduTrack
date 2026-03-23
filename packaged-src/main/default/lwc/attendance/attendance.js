@@ -50,8 +50,8 @@ export default class AttendanceScreen extends LightningElement {
     @wire(getRecentSubmissions)
     wiredRecentSubmissions({ error, data }) {
         if (data) {
-            // Duplicate the list 3 times to ensure a smooth infinite loop without gaps
-            this.recentSubmissions = [...data, ...data, ...data];
+            // Duplicate once for a seamless infinite loop
+            this.recentSubmissions = [...data, ...data];
         } else if (error) {
             console.error('Error loading recent submissions', error);
         }
