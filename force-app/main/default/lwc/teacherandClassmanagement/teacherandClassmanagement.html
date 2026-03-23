@@ -1209,119 +1209,256 @@
 
             <!-- Create Section Modal -->
             <template if:true={showCreateSectionModal}>
-                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
-                    <div class="slds-modal__container">
-                        <header class="slds-modal__header">
-                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleCloseCreateSection} title="Close"><lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon></button>
-                            <h2 class="slds-text-heading_medium">Create Section</h2>
-                        </header>
-                        <div class="slds-modal__content slds-p-around_medium">
-                            <!-- Dynamic Rows -->
-                            <template for:each={modalSections} for:item="sec" for:index="index">
-                                <div key={sec.id} class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
-                                    <div class="slds-grow">
-                                        <lightning-input label={sec.label} type="text" value={sec.name} data-id={sec.id} onchange={handleModalSectionNameChange} required class="premium-input" placeholder="e.g., Section A"></lightning-input>
-                                    </div>
-                                    <div class="slds-p-left_xx-small slds-no-flex" style="padding-top: 20px;">
-                                        <template if:true={sec.showAdd}>
-                                            <lightning-button-icon icon-name="utility:add" variant="border-filled" size="small" onclick={handleAddSectionModalRow} class="slds-m-right_xxx-small" title="Add another section"></lightning-button-icon>
-                                        </template>
-                                        <template if:true={sec.showDelete}>
-                                            <lightning-button-icon icon-name="utility:delete" alternative-text="Delete" size="small" variant="bare" data-id={sec.id} onclick={handleRemoveSectionModalRow} title="Delete row"></lightning-button-icon>
-                                        </template>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                        <footer class="slds-modal__footer">
-                            <lightning-button label="Cancel" onclick={handleCloseCreateSection} class="slds-m-right_x-small"></lightning-button>
-                            <lightning-button label="Create" variant="brand" onclick={handleCreateSectionSubmit}></lightning-button>
-                        </footer>
-                    </div>
-                </section>
-                <div class="slds-backdrop slds-backdrop_open"></div>
-            </template>
+    <div class="modal-portal-overlay">
 
-            <!-- Import Teachers Modal -->
-            <template if:true={showImportTeachersModal}>
-                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium">
-                    <div class="slds-modal__container">
-                        <header class="slds-modal__header">
-                            <button class="slds-button slds-button_icon slds-modal__close" onclick={handleCloseImportTeachers} title="Close">
-                                <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
-                            </button>
-                            <h2 class="slds-text-heading_medium">Import Teachers (CSV)</h2>
-                        </header>
-                        <div class="slds-modal__content slds-p-around_medium">
-                            <lightning-input type="file" label="Upload CSV File" accept=".csv" onchange={handleTeachersFileChange}></lightning-input>
-                            <p class="slds-m-top_small slds-text-color_weak">💡 Template headers: `firstName`, `lastName`, `email`, `phone`, `qualification`, `subject1`, `skillLevel1`</p>
-                            <div class="slds-m-top_small">
-                                <lightning-button label="Download Sample Template" icon-name="utility:download" variant="neutral" onclick={handleDownloadTeacherTemplate}></lightning-button>
+        <!-- Backdrop -->
+        <div class="modal-portal-backdrop" onclick={handleCloseCreateSection}></div>
+
+        <!-- Modal Container -->
+        <div class="modal-portal-container" style="max-width: 520px;">
+
+            <!-- Header -->
+            <div class="modal-portal-header">
+                <div class="modal-header-icon-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                </div>
+                <div class="modal-header-text">
+                    <h2 class="modal-portal-title">Create Section</h2>
+                    <p class="modal-portal-subtitle">Add one or more sections at once</p>
+                </div>
+                <button class="modal-portal-close" onclick={handleCloseCreateSection} title="Close">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-portal-body">
+                <div class="modal-rows-container">
+                    <template for:each={modalSections} for:item="sec">
+                        <div key={sec.id} class="modal-input-row">
+
+                            <!-- Row number badge -->
+                            <div class="modal-row-num">{sec.rowNum}</div>
+
+                            <!-- Input -->
+                            <div class="modal-row-input">
+                                <lightning-input
+                                    label=""
+                                    type="text"
+                                    value={sec.name}
+                                    placeholder="e.g., Section A"
+                                    data-id={sec.id}
+                                    onchange={handleModalSectionNameChange}
+                                    class="premium-input">
+                                </lightning-input>
                             </div>
 
-                            <template if:true={showTeachersPreview}>
-                                <div class="slds-m-top_small slds-scoped-notification slds-media slds-media_center slds-theme_success slds-theme_alert-texture">
-                                    <div class="slds-media__figure">
-                                        <lightning-icon icon-name="utility:success" size="small" variant="inverse"></lightning-icon>
-                                    </div>
-                                    <div class="slds-media__body">
-                                        <p>✅ Found <strong>{teachersCount}</strong> teachers ready to import.</p>
-                                    </div>
-                                </div>
-
-                                <div class="slds-m-top_medium slds-scrollable_y" style="max-height: 250px; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
-                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover slds-table_striped">
-                                        <thead>
-                                            <tr class="slds-line-height_reset" style="background: #f4f6f9;">
-                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Teacher Name">Name</div></th>
-                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Contact Info">Contact Info</div></th>
-                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Qualification">Qualification</div></th>
-                                                <th scope="col" style="padding: 12px;"><div class="slds-truncate slds-text-title_caps slds-text-color_weak" title="Subject & Skill">Subject & Skill</div></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <template for:each={teachersCsvPayload} for:item="row">
-                                                <tr class="slds-hint-parent" key={row.id}>
-                                                    <td style="vertical-align: middle; padding: 12px;">
-                                                        <div class="slds-truncate slds-text-title_bold slds-text-color_default" style="font-size: 14px;">{row.firstName} {row.lastName}</div>
-                                                    </td>
-                                                    <td style="vertical-align: middle; padding: 12px;">
-                                                        <div class="slds-grid slds-grid_vertical">
-                                                            <div class="slds-grid slds-grid_vertical-align-center">
-                                                                <lightning-icon icon-name="utility:email" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
-                                                                <span class="slds-truncate slds-text-color_weak">{row.email}</span>
-                                                            </div>
-                                                            <div class="slds-grid slds-grid_vertical-align-center slds-m-top_xx-small">
-                                                                <lightning-icon icon-name="utility:call" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
-                                                                <span class="slds-truncate slds-text-color_weak">{row.phone}</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td style="vertical-align: middle; padding: 12px;">
-                                                        <span class="slds-badge slds-theme_shade slds-badge_lightest" style="font-weight: 600; padding: 4px 12px;">{row.qualification}</span>
-                                                    </td>
-                                                    <td style="vertical-align: middle; padding: 12px;">
-                                                        <div class="slds-grid slds-grid_vertical-align-center">
-                                                            <span class="slds-badge slds-theme_inverse" style="padding: 4px 12px;">{row.subject1}</span>
-                                                            <span class="slds-m-left_x-small slds-text-color_weak" style="font-style: italic;">({row.skillLevel1})</span>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <!-- ADD button — only on last row -->
+                            <template if:true={sec.showAdd}>
+                                <button
+                                    class="modal-row-add-btn"
+                                    onclick={handleAddSectionModalRow}
+                                    title="Add another section">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <line x1="12" y1="5" x2="12" y2="19"/>
+                                        <line x1="5" y1="12" x2="19" y2="12"/>
+                                    </svg>
+                                </button>
                             </template>
-                        </div>
-                        <footer class="slds-modal__footer">
-                            <lightning-button label="Cancel" onclick={handleCloseImportTeachers} class="slds-m-right_x-small"></lightning-button>
-                            <lightning-button label="Import" variant="brand" onclick={handleImportTeachersSubmit}></lightning-button>
-                        </footer>
-                    </div>
-                </section>
-                <div class="slds-backdrop slds-backdrop_open"></div>
-            </template>
 
+                            <!-- DELETE button — all rows except first -->
+                            <!-- CRITICAL: data-id is on the button itself so currentTarget always has it -->
+                            <template if:true={sec.showDelete}>
+                                <button
+                                    class="modal-row-del-btn"
+                                    data-id={sec.id}
+                                    onclick={handleRemoveSectionModalRow}
+                                    title="Remove this section">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="pointer-events:none;">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6l-1 14H6L5 6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                        <path d="M9 6V4h6v2"/>
+                                    </svg>
+                                </button>
+                            </template>
+
+                            <!-- Spacer: first row with no delete shown -->
+                            <template if:false={sec.showDelete}>
+                                <template if:false={sec.showAdd}>
+                                    <div class="modal-row-spacer"></div>
+                                </template>
+                            </template>
+
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Count indicator -->
+                <div class="modal-count-indicator">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>{modalSectionsCount} section(s) will be created</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-portal-footer">
+                <button class="modal-btn-cancel" onclick={handleCloseCreateSection}>Cancel</button>
+                <button class="modal-btn-create" onclick={handleCreateSectionSubmit}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="pointer-events:none;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <template if:true={modalSectionsCountGt1}>
+                        Create ({modalSectionsCount})
+                    </template>
+                    <template if:false={modalSectionsCountGt1}>
+                        Create
+                    </template>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</template>
+            <!-- Import Teachers Modal -->
+           <template if:true={showImportTeachersModal}>
+    <!-- FIXED WRAPPER: Full-viewport overlay div that escapes component layout -->
+    <div class="modal-portal-overlay">
+
+        <!-- Backdrop -->
+        <div class="modal-portal-backdrop" onclick={handleCloseImportTeachers}></div>
+
+        <!-- Modal Container -->
+        <div class="modal-portal-container">
+
+            <!-- Header -->
+            <div class="modal-portal-header">
+                <h2 class="modal-portal-title">Import Teachers (CSV)</h2>
+                <button class="modal-portal-close" onclick={handleCloseImportTeachers} title="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-portal-body">
+
+                <!-- File Upload -->
+                <div class="modal-field-group">
+                    <lightning-input
+                        type="file"
+                        label="Upload CSV File"
+                        accept=".csv"
+                        onchange={handleTeachersFileChange}>
+                    </lightning-input>
+                </div>
+
+                <!-- Hint -->
+                <div class="modal-hint-box">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span>Template headers: <code>firstName</code>, <code>lastName</code>, <code>email</code>, <code>phone</code>, <code>qualification</code>, <code>subject1</code>, <code>skillLevel1</code></span>
+                </div>
+
+                <!-- Download Template -->
+                <div class="modal-template-row">
+                    <lightning-button
+                        label="Download Sample Template"
+                        icon-name="utility:download"
+                        variant="neutral"
+                        onclick={handleDownloadTeacherTemplate}>
+                    </lightning-button>
+                </div>
+
+                <!-- Preview Table -->
+                <template if:true={showTeachersPreview}>
+
+                    <!-- Success Banner -->
+                    <div class="modal-success-banner">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span>Found <strong>{teachersCount}</strong> teachers ready to import.</span>
+                    </div>
+
+                    <!-- Preview Table -->
+                    <div class="modal-table-wrapper">
+                        <table class="modal-preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Contact Info</th>
+                                    <th>Qualification</th>
+                                    <th>Subject &amp; Skill</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={teachersCsvPayload} for:item="row">
+                                    <tr key={row.id}>
+                                        <td>
+                                            <span class="modal-table-name">{row.firstName} {row.lastName}</span>
+                                        </td>
+                                        <td>
+                                            <div class="modal-contact-cell">
+                                                <div class="modal-contact-row">
+                                                    <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                    <span>{row.email}</span>
+                                                </div>
+                                                <div class="modal-contact-row">
+                                                    <lightning-icon icon-name="utility:call" size="xx-small"></lightning-icon>
+                                                    <span>{row.phone}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="modal-badge modal-badge-gray">{row.qualification}</span>
+                                        </td>
+                                        <td>
+                                            <div class="modal-subject-cell">
+                                                <span class="modal-badge modal-badge-blue">{row.subject1}</span>
+                                                <span class="modal-skill-level">({row.skillLevel1})</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </template>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-portal-footer">
+                <button class="modal-btn-cancel" onclick={handleCloseImportTeachers}>Cancel</button>
+                <lightning-button
+                    label="Import"
+                    variant="brand"
+                    onclick={handleImportTeachersSubmit}>
+                </lightning-button>
+            </div>
+
+        </div>
+    </div>
+</template>
             <!-- Add Subject Modal -->
             <template if:true={showImportSubjectsModal}>
                 <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small">

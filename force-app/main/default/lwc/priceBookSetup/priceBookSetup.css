@@ -830,3 +830,98 @@ input[type="number"]:disabled {
         padding: 25px 20px;
     }
 }
+/* ─── Autocomplete Wrapper ────────────────────────────────────────────────── */
+
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Dropdown container */
+.suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 2px solid #667eea;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(102,126,234,0.18), 0 4px 12px rgba(0,0,0,0.08);
+    z-index: 9999;
+    overflow: hidden;
+    animation: dropdownReveal 0.18s ease-out;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+@keyframes dropdownReveal {
+    from { opacity: 0; transform: translateY(-8px) scaleY(0.95); }
+    to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+/* Individual suggestion row */
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s ease, padding-left 0.15s ease;
+    border-bottom: 1px solid #f0f4ff;
+}
+
+.suggestion-item:last-child { border-bottom: none; }
+
+.suggestion-item:hover {
+    background: linear-gradient(90deg, rgba(102,126,234,0.08) 0%, rgba(118,75,162,0.06) 100%);
+    padding-left: 22px;
+}
+
+/* Icon */
+.suggestion-icon {
+    font-size: 18px;
+    width: 26px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Main label */
+.suggestion-text {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2d3748;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* "Existing" / "Suggested" badge */
+.suggestion-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(102,126,234,0.12);
+    color: #667eea;
+    flex-shrink: 0;
+}
+
+/* Empty state inside dropdown */
+.suggestion-empty {
+    padding: 16px;
+    text-align: center;
+    color: #a0aec0;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* Scrollbar for dropdown */
+.suggestions-dropdown::-webkit-scrollbar { width: 6px; }
+.suggestions-dropdown::-webkit-scrollbar-track { background: #f7fafc; }
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+}

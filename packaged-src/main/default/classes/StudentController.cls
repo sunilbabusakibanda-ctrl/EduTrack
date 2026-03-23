@@ -248,7 +248,6 @@ public with sharing class StudentController {
             for (Academic_Year__c ay : [
                 SELECT Id, Name
                 FROM Academic_Year__c
-                WHERE Is_Active__c = true
                 ORDER BY Start_Date__c DESC
             ]) {
                 options.add(new Map<String, String>{
