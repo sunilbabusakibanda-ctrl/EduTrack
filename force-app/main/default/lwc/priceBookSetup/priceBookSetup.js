@@ -6,8 +6,25 @@ import getAllFeeProducts from '@salesforce/apex/AddFeesController.getAllFeeProdu
 import getExistingPrices from '@salesforce/apex/AddFeesController.getExistingPrices';
 import checkProductExists from '@salesforce/apex/AddFeesController.checkProductExists';
 import getActiveAcademicYears from '@salesforce/apex/AddFeesController.getActiveAcademicYears';
-import getAllPriceBooks from '@salesforce/apex/AddFeesController.getAllPriceBooks';
-import getSuggestedFeeProductNames from '@salesforce/apex/AddFeesController.getSuggestedFeeProductNames';
+
+// Fallback hardcoded suggestions shown when no org products exist
+const HARDCODED_SUGGESTIONS = [
+    'School Fee',
+    'Tuition Fee',
+    'Exam Fee',
+    'Library Fee',
+    'Sports Fee',
+    'Lab Fee',
+    'Transport Fee',
+    'Hostel Fee',
+    'Activity Fee',
+    'Admission Fee',
+    'Annual Fee',
+    'Development Fee',
+    'Computer Lab Fee',
+    'Stationery Fee',
+    'Miscellaneous Fee'
+];
 
 export default class AddFees extends LightningElement {
     @track inputCount = 1;
@@ -16,13 +33,13 @@ export default class AddFees extends LightningElement {
     @track activeTab = 'addFees';
     @track priceListItems = [];
     @track selectedYear = '';
-    @track selectedPriceBookId = '';
-    @track priceBookOptions = [];
     @track academicYears = [];
-    @track inputFields = [{ id: 1, value: '', isFirst: true }];
+    @track inputFields = [{ id: 1, value: '', isFirst: true, showSuggestions: false, suggestions: [], hasSuggestions: false }];
     @track isLoading = false;
 
     allProducts = [];
+    // All available suggestion labels (org products + hardcoded fallback)
+    _suggestionPool = [];
 
     get yearOptions() {
         return [
@@ -73,28 +90,136 @@ export default class AddFees extends LightningElement {
         return this.priceListItems.length === 0;
     }
 
-    handleTabClick(event) {
-        const tabName = event.target.dataset.tab;
-        this.activeTab = tabName;
+    // ─── Lifecycle ───────────────────────────────────────────────────────────────
 
-        if (tabName === 'setPriceBook') {
-            this.loadAllProductsForPriceBook();
+    connectedCallback() {
+        this.loadAcademicYears();
+        this.loadAllProductsForPriceBook();
+        this.loadSuggestionPool();
+    }
+
+    // ─── Suggestion Pool ─────────────────────────────────────────────────────────
+
+    /**
+     * Loads org products as suggestion pool.
+     * Falls back to HARDCODED_SUGGESTIONS if no org products exist.
+     */
+    async loadSuggestionPool() {
+        try {
+            const products = await getAllFeeProducts();
+            if (products && products.length > 0) {
+                this._suggestionPool = products.map(p => ({ label: p.Name, isOrgProduct: true }));
+            } else {
+                this._suggestionPool = HARDCODED_SUGGESTIONS.map(name => ({ label: name, isOrgProduct: false }));
+            }
+        } catch (error) {
+            // On error fall back to hardcoded suggestions
+            this._suggestionPool = HARDCODED_SUGGESTIONS.map(name => ({ label: name, isOrgProduct: false }));
         }
     }
+
+    /**
+     * Filters suggestion pool against the current input value.
+     * Shows all suggestions on empty input (focus), filters on typing.
+     */
+    _getFilteredSuggestions(value) {
+        const query = (value || '').trim().toLowerCase();
+
+        // Already selected values in OTHER fields — avoid duplicates
+        const usedValues = this.inputFields
+            .map(f => f.value.trim().toLowerCase())
+            .filter(v => v !== '');
+
+        let pool = this._suggestionPool;
+
+        // Filter by query
+        if (query.length > 0) {
+            pool = pool.filter(s => s.label.toLowerCase().includes(query));
+        }
+
+        // Sort: starts-with first, then contains
+        pool = pool.slice().sort((a, b) => {
+            const aStarts = a.label.toLowerCase().startsWith(query);
+            const bStarts = b.label.toLowerCase().startsWith(query);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+            return a.label.localeCompare(b.label);
+        });
+
+        // Max 8 visible suggestions
+        return pool.slice(0, 8).map((s, idx) => ({
+            label: s.label,
+            icon: s.isOrgProduct ? '📦' : '💡',
+            badge: s.isOrgProduct ? 'Existing' : 'Suggested',
+            itemClass: 'suggestion-item' + (idx === 0 ? ' suggestion-item-first' : '')
+        }));
+    }
+
+    _updateFieldSuggestions(fieldId, value, show) {
+        this.inputFields = this.inputFields.map(f => {
+            if (f.id === fieldId) {
+                const suggestions = show ? this._getFilteredSuggestions(value) : [];
+                return {
+                    ...f,
+                    value: value !== undefined ? value : f.value,
+                    showSuggestions: show && suggestions.length > 0,
+                    suggestions: suggestions,
+                    hasSuggestions: suggestions.length > 0
+                };
+            }
+            return f;
+        });
+    }
+
+    // ─── Input Handlers ──────────────────────────────────────────────────────────
 
     handleInputChange(event) {
         const fieldId = parseInt(event.target.dataset.id);
         const value = event.target.value;
+        this._updateFieldSuggestions(fieldId, value, true);
+    }
 
-        const field = this.inputFields.find(f => f.id === fieldId);
-        if (field) {
-            field.value = value;
+    handleInputFocus(event) {
+        const fieldId = parseInt(event.target.dataset.id);
+        const value = event.target.value;
+        this._updateFieldSuggestions(fieldId, value, true);
+    }
+
+    handleInputBlur(event) {
+        // Small delay so click on suggestion fires first
+        const fieldId = parseInt(event.target.dataset.id);
+        // eslint-disable-next-line @lwc/lwc/no-async-operation
+        setTimeout(() => {
+            this._updateFieldSuggestions(fieldId, undefined, false);
+        }, 200);
+    }
+
+    handleKeyDown(event) {
+        // Close suggestions on Escape
+        if (event.key === 'Escape') {
+            const fieldId = parseInt(event.target.dataset.id);
+            this._updateFieldSuggestions(fieldId, undefined, false);
         }
+    }
+
+    handleSuggestionClick(event) {
+        const fieldId = parseInt(event.currentTarget.dataset.fieldId);
+        const selectedValue = event.currentTarget.dataset.value;
+
+        this.inputFields = this.inputFields.map(f => {
+            if (f.id === fieldId) {
+                return { ...f, value: selectedValue, showSuggestions: false, suggestions: [], hasSuggestions: false };
+            }
+            return f;
+        });
     }
 
     addInputField() {
         this.inputCount++;
-        this.inputFields = [...this.inputFields, { id: this.inputCount, value: '', isFirst: false }];
+        this.inputFields = [
+            ...this.inputFields,
+            { id: this.inputCount, value: '', isFirst: false, showSuggestions: false, suggestions: [], hasSuggestions: false }
+        ];
     }
 
     removeInputField(event) {
@@ -102,6 +227,8 @@ export default class AddFees extends LightningElement {
         this.inputFields = this.inputFields.filter(field => field.id !== fieldId);
         this.inputCount--;
     }
+
+    // ─── Submit Products ─────────────────────────────────────────────────────────
 
     async submitProducts() {
         const products = this.inputFields
@@ -135,11 +262,7 @@ export default class AddFees extends LightningElement {
             }
 
             if (existingProducts.length > 0) {
-                this.showToast(
-                    'Info',
-                    `The following products already exist: ${existingProducts.join(', ')}`,
-                    'info'
-                );
+                this.showToast('Info', `The following products already exist: ${existingProducts.join(', ')}`, 'info');
             }
 
             if (newProducts.length > 0) {
@@ -160,9 +283,11 @@ export default class AddFees extends LightningElement {
                         'success'
                     );
 
-                    this.inputFields = [{ id: 1, value: '', isFirst: true }];
+                    this.inputFields = [{ id: 1, value: '', isFirst: true, showSuggestions: false, suggestions: [], hasSuggestions: false }];
                     this.inputCount = 1;
 
+                    // Refresh suggestion pool with newly created products
+                    await this.loadSuggestionPool();
                     this.loadAllProductsForPriceBook();
                 } else {
                     this.showToast('Error', 'No products were created.', 'error');
@@ -173,11 +298,7 @@ export default class AddFees extends LightningElement {
 
         } catch (error) {
             console.error('Error creating products:', error);
-            this.showToast(
-                'Error',
-                'Error creating products: ' + (error.body?.message || error.message),
-                'error'
-            );
+            this.showToast('Error', 'Error creating products: ' + (error.body?.message || error.message), 'error');
         } finally {
             this.isLoading = false;
         }
@@ -186,7 +307,7 @@ export default class AddFees extends LightningElement {
     handleDone() {
         this.showProductsList = false;
         this.displayedProducts = [];
-        this.inputFields = [{ id: 1, value: '', isFirst: true }];
+        this.inputFields = [{ id: 1, value: '', isFirst: true, showSuggestions: false, suggestions: [], hasSuggestions: false }];
         this.inputCount = 1;
 
         this.showToast(
@@ -196,27 +317,30 @@ export default class AddFees extends LightningElement {
         );
     }
 
+    // ─── Tab Handling ────────────────────────────────────────────────────────────
+
+    handleTabClick(event) {
+        const tabName = event.target.dataset.tab;
+        this.activeTab = tabName;
+
+        if (tabName === 'setPriceBook') {
+            this.loadAllProductsForPriceBook();
+        }
+    }
+
+    // ─── Price Book ──────────────────────────────────────────────────────────────
+
     async handleYearChange(event) {
         this.selectedYear = event.target.value;
-        this.selectedPriceBookId = ''; // Reset
-        await this.loadPriceBooks();
         if (this.selectedClass && this.selectedYear) {
             await this.loadExistingPricesForClass();
         } else {
             this.clearPrices();
-        }
-    }
-
-    async handlePriceBookChange(event) {
-        this.selectedPriceBookId = event.target.value;
-        if (this.selectedClass && this.selectedYear) {
-            await this.loadExistingPricesForClass();
         }
     }
 
     async handleClassChange(event) {
         this.selectedClass = event.target.value;
-
         if (this.selectedClass && this.selectedYear) {
             await this.loadExistingPricesForClass();
         } else {
@@ -224,78 +348,35 @@ export default class AddFees extends LightningElement {
         }
     }
 
-    async loadPriceBooks() {
-        if (!this.selectedYear) return;
-        try {
-            const result = await getAllPriceBooks({ academicYearId: this.selectedYear });
-            if (result && result.length > 0) {
-                this.priceBookOptions = result;
-            } else {
-                const suggests = await getSuggestedFeeProductNames();
-                this.priceBookOptions = suggests.map(name => ({ label: 'Suggest: ' + name, value: 'SUGGEST_' + name }));
-            }
-        } catch (error) {
-            console.error('Error loading price books', error);
-        }
-    }
-
     clearPrices() {
         this.priceListItems = this.priceListItems.map(item => ({
-            ...item,
-            price: '',
-            selected: false,
-            disabled: true
+            ...item, price: '', selected: false, disabled: true
         }));
     }
 
     async loadExistingPricesForClass() {
         try {
-            console.log('Loading existing prices for class:', this.selectedClass, 'Year:', this.selectedYear);
-
             const existingPrices = await getExistingPrices({
                 className: this.selectedClass,
-                academicYearId: this.selectedYear,
-                priceBookId: this.selectedPriceBookId
+                academicYearId: this.selectedYear
             });
-
-            console.log('Existing prices:', existingPrices);
 
             this.priceListItems = this.priceListItems.map(item => {
                 const existingPrice = existingPrices[item.productId];
-
                 if (existingPrice !== undefined && existingPrice !== null) {
-                    return {
-                        ...item,
-                        price: existingPrice.toString(),
-                        selected: true,
-                        disabled: false
-                    };
-                } else {
-                    return {
-                        ...item,
-                        price: '',
-                        selected: false,
-                        disabled: true
-                    };
+                    return { ...item, price: existingPrice.toString(), selected: true, disabled: false };
                 }
+                return { ...item, price: '', selected: false, disabled: true };
             });
 
             const pricesFound = Object.keys(existingPrices).length;
             if (pricesFound > 0) {
-                this.showToast(
-                    'Info',
-                    `Loaded ${pricesFound} existing price(s) for ${this.selectedClass}`,
-                    'info'
-                );
+                this.showToast('Info', `Loaded ${pricesFound} existing price(s) for ${this.selectedClass}`, 'info');
             }
 
         } catch (error) {
             console.error('Error loading existing prices:', error);
-            this.showToast(
-                'Error',
-                'Error loading existing prices: ' + (error.body?.message || error.message),
-                'error'
-            );
+            this.showToast('Error', 'Error loading existing prices: ' + (error.body?.message || error.message), 'error');
         }
     }
 
@@ -316,9 +397,7 @@ export default class AddFees extends LightningElement {
         const price = event.target.value;
 
         this.priceListItems = this.priceListItems.map((item, idx) => {
-            if (idx === index) {
-                return { ...item, price: price };
-            }
+            if (idx === index) return { ...item, price: price };
             return item;
         });
     }
@@ -329,11 +408,8 @@ export default class AddFees extends LightningElement {
 
             const products = await getAllFeeProducts();
 
-            console.log('Loaded products:', products);
-
             if (products && products.length > 0) {
                 this.allProducts = products;
-
                 this.priceListItems = products.map((product, index) => ({
                     id: index,
                     name: product.Name,
@@ -347,41 +423,28 @@ export default class AddFees extends LightningElement {
                 if (this.selectedClass && this.selectedYear) {
                     await this.loadExistingPricesForClass();
                 }
-
             } else {
                 this.priceListItems = [];
-                this.showToast(
-                    'Info',
-                    'No products found. Please create products in the "Add Fees" tab first.',
-                    'info'
-                );
+                this.showToast('Info', 'No products found. Please create products in the "Add Fees" tab first.', 'info');
             }
 
         } catch (error) {
             console.error('Error loading products:', error);
-            this.showToast(
-                'Error',
-                'Error loading products: ' + (error.body?.message || error.message),
-                'error'
-            );
+            this.showToast('Error', 'Error loading products: ' + (error.body?.message || error.message), 'error');
         } finally {
             this.isLoading = false;
         }
     }
 
     async submitPriceBook() {
-        console.log('Submit Price Book called');
-
         if (!this.selectedClass) {
             this.showToast('Error', 'Please select a class!', 'error');
             return;
         }
-
         if (!this.selectedYear) {
             this.showToast('Error', 'Please select an academic year!', 'error');
             return;
         }
-
         if (this.priceListItems.length === 0) {
             this.showToast('Error', 'No products available! Please create products in "Add Fees" tab first.', 'error');
             return;
@@ -394,35 +457,22 @@ export default class AddFees extends LightningElement {
         this.priceListItems.forEach(item => {
             if (item.selected) {
                 const price = parseFloat(item.price);
-
-                console.log('Item:', item.name, 'Price:', price, 'Type:', typeof price);
-
                 if (!price || price <= 0 || isNaN(price)) {
                     this.showToast('Error', `Please enter a valid price for ${item.name}!`, 'error');
                     hasError = true;
                     return;
                 }
-
-                selectedProducts.push({
-                    productId: item.productId,
-                    productName: item.name,
-                    price: price
-                });
+                selectedProducts.push({ productId: item.productId, productName: item.name, price: price });
                 total += price;
             }
         });
 
-        if (hasError) {
-            return;
-        }
+        if (hasError) return;
 
         if (selectedProducts.length === 0) {
             this.showToast('Error', 'Please select at least one product and enter its price!', 'error');
             return;
         }
-
-        console.log('Selected Products:', JSON.stringify(selectedProducts));
-        console.log('Class Name:', this.selectedClass);
 
         try {
             this.isLoading = true;
@@ -433,11 +483,8 @@ export default class AddFees extends LightningElement {
                 priceBookData: selectedProducts
             });
 
-            console.log('Result from Apex:', result);
-
             if (result && result.success) {
                 this.displaySuccessMessage(this.selectedClass, selectedProducts, total, result);
-
                 this.showToast(
                     'Success',
                     `Price Book updated successfully! ${result.entriesCreated} entries processed for "${result.priceBookName}"`,
@@ -449,21 +496,8 @@ export default class AddFees extends LightningElement {
 
         } catch (error) {
             console.error('Error creating price book:', error);
-            console.error('Error body:', error.body);
-            console.error('Error message:', error.message);
-
-            let errorMessage = 'Unknown error occurred';
-            if (error.body && error.body.message) {
-                errorMessage = error.body.message;
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
-
-            this.showToast(
-                'Error',
-                'Error creating price book: ' + errorMessage,
-                'error'
-            );
+            let errorMessage = error.body?.message || error.message || 'Unknown error occurred';
+            this.showToast('Error', 'Error creating price book: ' + errorMessage, 'error');
         } finally {
             this.isLoading = false;
         }
@@ -488,28 +522,19 @@ export default class AddFees extends LightningElement {
     resetPriceBook() {
         this.showSuccessMessage = false;
         this.selectedClass = '';
-
         this.priceListItems = this.priceListItems.map(item => ({
-            ...item,
-            selected: false,
-            disabled: true,
-            price: ''
+            ...item, selected: false, disabled: true, price: ''
         }));
     }
 
     showToast(title, message, variant) {
-        const event = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant,
-        });
+        const event = new ShowToastEvent({ title, message, variant });
         this.dispatchEvent(event);
     }
 
     async loadAcademicYears() {
         try {
             this.academicYears = await getActiveAcademicYears();
-            // Auto-select active year if available
             const activeYear = this.academicYears.find(ay => ay.Is_Active__c);
             if (activeYear) {
                 this.selectedYear = activeYear.Id;
@@ -517,10 +542,5 @@ export default class AddFees extends LightningElement {
         } catch (error) {
             console.error('Error loading academic years:', error);
         }
-    }
-
-    connectedCallback() {
-        this.loadAcademicYears();
-        this.loadAllProductsForPriceBook();
     }
 }
