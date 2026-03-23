@@ -77,21 +77,21 @@ jobs:
           find packaged-src/main/default/permissionsets -name "standard__*" -delete 2>/dev/null || true
           find packaged-src/main/default/permissionsets -name "sfdcInternalInt__*" -delete 2>/dev/null || true
 
-      - name: Print Script Logs on Failure
-        if: failure()
-        shell: pwsh
-        run: |
-          Get-Content script-log.txt
-          git config --global user.name "Actions Bot"
-          git config --global user.email "actions@github.com"
-          git add script-log.txt
-          git commit -m "Add failing script logs [skip ci]"
-          git checkout -b diagnostic-logs
-          git push origin diagnostic-logs --force
-
       - name: Deploy Source to Target Org
         run: |
           sf project deploy start \
             --source-dir packaged-src \
             --target-org SunilDev \
-            --wait 30
+            --wait 30 > deploy-log.txt 2>&1
+
+      - name: Print and Push Deployment Logs on Failure
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-Content deploy-log.txt
+          git config --global user.name "Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add -f deploy-log.txt
+          git commit -m "Add failing deployment logs [skip ci]"
+          git checkout -b diagnostic-logs 2>/dev/null || git checkout diagnostic-logs
+          git push origin diagnostic-logs --force
