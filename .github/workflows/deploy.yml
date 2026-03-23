@@ -40,7 +40,13 @@ jobs:
       - name: Print Script Logs on Failure
         if: failure()
         shell: pwsh
-        run: Get-Content script-log.txt
+        run: |
+          Get-Content script-log.txt
+          git config --global user.name "Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add script-log.txt
+          git commit -m "Add failing script logs [skip ci]"
+          git push origin main
 
       - name: Deploy Source to Target Org
         run: |
