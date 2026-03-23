@@ -294,7 +294,7 @@ public with sharing class PromotionController {
                     
                     List<PricebookEntry> selectedPbes = (selectedPricebookEntryIds != null && !selectedPricebookEntryIds.isEmpty())
                         ? [SELECT Id, UnitPrice, Pricebook2Id, Product2.Name, Product2.ProductCode FROM PricebookEntry WHERE Id IN :selectedPricebookEntryIds]
-                        : new List<PricebookEntry>();
+                        : [SELECT Id, UnitPrice, Pricebook2Id, Product2.Name, Product2.ProductCode FROM PricebookEntry WHERE Pricebook2Id = :singlePbId AND IsActive = true AND Product2.ProductCode != 'PREV_DUES' AND (NOT Product2.Name LIKE '%Previous%')];
                         
                     pbIdToPBEs.put(singlePbId, selectedPbes);
                     
