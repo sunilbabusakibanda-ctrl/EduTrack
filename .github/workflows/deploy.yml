@@ -37,12 +37,10 @@ jobs:
         shell: pwsh
         run: ./create_packaged_src.ps1 > script-log.txt 2>&1
 
-      - name: Upload Script Logs on Failure
+      - name: Print Script Logs on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: script-logs
-          path: script-log.txt
+        shell: pwsh
+        run: Get-Content script-log.txt
 
       - name: Deploy Source to Target Org
         run: |
