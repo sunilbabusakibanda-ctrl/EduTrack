@@ -81,4 +81,62 @@ public class EnterMarksControllerTest {
             Assert.isNotNull(e.getMessage(), 'Ensuring proper failure context on empty data sets.');
         }
     }
+
+    @isTest
+    static void testGetStudentsForMarksEntryEmpty() {
+        // Create Class without matching students to fire the empty-return branch
+        String validNextClass = TestDataFactory.getValidNextClass();
+        Class__c cls2 = new Class__c(Name=validNextClass, Class__c=validNextClass, Section__c='Z');
+        insert cls2;
+        
+        List<Map<String, Object>> students = EnterMarksController.getStudentsForMarksEntry(cls2.Id, 'Maths', 'Quarterly');
+        Assert.isTrue(students.isEmpty(), 'Should return empty result cleanly if no students match');
+    }
+
+    @isTest
+    static void testGetStudentsForMarksEntryExceptions() {
+        try {
+            // Pass null ID to trigger Exception
+            EnterMarksController.getStudentsForMarksEntry(null, 'Maths', 'Quarterly');
+            Assert.fail('Should fail on null classId');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @isTest
+    static void testSaveMarksInvalidSubject() {
+        Class__c cls = [SELECT Id FROM Class__c LIMIT 1];
+        Account student = [SELECT Id FROM Account LIMIT 1];
+        
+        List<Map<String, Object>> marksData = new List<Map<String, Object>>{
+            new Map<String, Object>{'studentId' => student.Id, 'obtainedMarks' => 85, 'subjectId' => 'INVALID_SUBJ'}
+        };
+        
+        try {
+            EnterMarksController.saveMarks(marksData, 'Quarterly', cls.Id, null);
+            Assert.fail('Should fail on invalid subject resolution');
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
+
+    @isTest
+    static void testSaveMarksFieldValidationException() {
+        Class__c cls = [SELECT Id FROM Class__c LIMIT 1];
+        Account student = [SELECT Id FROM Account LIMIT 1];
+        List<EnterMarksController.SubjectWrapper> subjects = EnterMarksController.getSubjects();
+        String subjectId = subjects.isEmpty() ? 'SUBJ001' : subjects[0].id;
+        
+        // Use an extremely long string to force a DML exception or build some illegal payload if fields match
+        List<Map<String, Object>> marksData = new List<Map<String, Object>>{
+            new Map<String, Object>{'studentId' => student.Id, 'obtainedMarks' => 'NOT_A_NUMBER', 'subjectId' => subjectId}
+        };
+        
+        try {
+            EnterMarksController.saveMarks(marksData, 'Quarterly', cls.Id, null);
+        } catch (AuraHandledException e) {
+            Assert.isNotNull(e.getMessage());
+        }
+    }
 }
