@@ -158,6 +158,15 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         Map<Id, Exam__c> examMarksMap = new Map<Id, Exam__c>();
         String subjectFieldName = subjectName.replace(' ', '_') + '__c';
         
+        // Setup namespace aware check
+        String ns = EnterMarksController.class.getName().contains('.') ? EnterMarksController.class.getName().substringBefore('.') : '';
+        String prefix = String.isNotBlank(ns) ? ns + '__' : '';
+        Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
+        
+        if (!examFields.containsKey(subjectFieldName.toLowerCase()) && examFields.containsKey((prefix + subjectFieldName).toLowerCase())) {
+            subjectFieldName = prefix + subjectFieldName;
+        }
+
         try {
             String query = 'SELECT Id, Student__c, Exam_Type__c, ' + subjectFieldName + 
                           ' FROM Exam__c ' +
@@ -238,12 +247,24 @@ public static String saveMarks(
             throw new AuraHandledException('Could not resolve subject name for ID: ' + subjectId);
         }
 
-        // ✅ Build field API name — try both with and without space replacement
+        // ✅ Build field API name
         String subjectField = subjectName.replace(' ', '_') + '__c';
+
+        // Setup namespace aware check
+        String ns = EnterMarksController.class.getName().contains('.') ? EnterMarksController.class.getName().substringBefore('.') : '';
+        String prefix = String.isNotBlank(ns) ? ns + '__' : '';
 
         // ✅ Validate field exists on Exam__c
         Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
-        if (!examFields.containsKey(subjectField.toLowerCase())) {
+        Boolean hasField = examFields.containsKey(subjectField.toLowerCase());
+        Boolean hasNsField = examFields.containsKey((prefix + subjectField).toLowerCase());
+
+        if (!hasField && hasNsField) {
+            subjectField = prefix + subjectField;
+            hasField = true; 
+        }
+
+        if (!hasField) {
             throw new AuraHandledException(
                 'Subject field "' + subjectField + '" does not exist on Exam__c. ' +
                 'Available fields: ' + String.join(new List<String>(examFields.keySet()), ', ')
