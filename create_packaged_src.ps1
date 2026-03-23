@@ -79,10 +79,10 @@ foreach ($folder in $cleanupFolders) {
     }
 }
 
+<#
 Write-Host "`n--- Cleaning up Permission Sets XML ---"
 if (Test-Path "packaged-src/main/default/permissionsets") {
     $permsets = Get-ChildItem "packaged-src/main/default/permissionsets" -Filter "*.permissionset-meta.xml" -File
-
     foreach ($ps in $permsets) {
         [xml]$xml = Get-Content $ps.FullName -Raw
         $root = $xml.PermissionSet
@@ -91,7 +91,6 @@ if (Test-Path "packaged-src/main/default/permissionsets") {
             foreach ($ca in @($root.classAccesses)) {
                 $className = $ca.apexClass
                 if ($className -and (-not (Test-Path "packaged-src/main/default/classes/$className.cls"))) {
-
                     $nodesToRemove += $ca
                     Write-Host "Removing missing Class access from $($ps.Name): $className"
                 }
@@ -103,5 +102,7 @@ if (Test-Path "packaged-src/main/default/permissionsets") {
         }
     }
 }
+#>
+
 
 Write-Host "`nDone!"
