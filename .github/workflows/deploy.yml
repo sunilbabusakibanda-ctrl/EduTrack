@@ -1,5 +1,8 @@
 name: Deploy to SunilDev
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
