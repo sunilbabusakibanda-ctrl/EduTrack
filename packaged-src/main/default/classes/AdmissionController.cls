@@ -250,6 +250,19 @@ public with sharing class AdmissionController {
 
     @AuraEnabled
     public static Id createInvoice(Id opportunityId, Id studentId, List<Map<String, Object>> selectedItems, String paymentMethod, Map<String, String> bankDetails) {
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            throw new AuraHandledException('No fee items selected for payment.');
+        }
+
+        Decimal totalAmount = 0;
+        for(Map<String, Object> itemData : selectedItems) {
+            totalAmount += Decimal.valueOf(String.valueOf(itemData.get('amount')));
+        }
+
+        if (totalAmount <= 0) {
+            throw new AuraHandledException('The total payment amount must be greater than zero.');
+        }
+
         try {
             Invoice__c inv = new Invoice__c(
                 Opportunity__c = opportunityId, 

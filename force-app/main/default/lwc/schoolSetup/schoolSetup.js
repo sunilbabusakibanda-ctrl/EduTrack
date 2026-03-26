@@ -27,6 +27,7 @@ export default class SchoolSetup extends LightningElement {
         schoolSubtitle: ''
     };
     @track bankAccounts = [];
+    @track deletedBankIds = [];
     @track academicYears = [];
     @track selectedYear = '';
     @track isYearActive = true;
@@ -34,7 +35,7 @@ export default class SchoolSetup extends LightningElement {
     @track isReadOnly = true;
     @track isSetupInitiallyDone = false;
     wiredSetupResult;
-    wiredBankAccountsResult;
+    wiredSetupResult;
     wiredAcademicYearsResult;
 
     @wire(getSetup)
@@ -65,25 +66,29 @@ export default class SchoolSetup extends LightningElement {
         }
     }
 
-    @wire(getBankAccounts)
-    wiredBankAccounts(result) {
-        this.wiredBankAccountsResult = result;
-        if (result.data) {
-            this.bankAccounts = result.data.map(acc => ({
-                id: acc.Id,
-                name: acc.Name,
-                bankName: acc.Bank_Name__c,
-                ifsc: acc.IFSC_Code__c,
-                accountNumber: acc.Account_Number__c,
-                branch: acc.Branch__c || '',
-                isPrimary: acc.Is_Primary__c || false
-            }));
+    connectedCallback() {
+        this.loadBankAccounts();
+    }
 
-            // If no accounts exist and not in read-only mode, add one empty row
-            if (this.bankAccounts.length === 0 && !this.isReadOnly) {
-                this.addBankAccount();
-            }
-        }
+    loadBankAccounts() {
+        getBankAccounts()
+            .then(data => {
+                this.bankAccounts = (data || []).map(acc => ({
+                    id: acc.Id,
+                    name: acc.Name,
+                    bankName: acc.Bank_Name__c,
+                    ifsc: acc.IFSC_Code__c,
+                    accountNumber: acc.Account_Number__c,
+                    branch: acc.Branch__c || '',
+                    isPrimary: acc.Is_Primary__c || false
+                }));
+                if (this.bankAccounts.length === 0 && !this.isReadOnly) {
+                    this.addBankAccount();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading bank accounts', error);
+            });
     }
 
     @wire(getAcademicYears)
@@ -181,6 +186,9 @@ export default class SchoolSetup extends LightningElement {
 
     removeBankAccount(event) {
         const id = event.target.dataset.id;
+        if (id && !id.startsWith('temp-')) {
+            this.deletedBankIds.push(id);
+        }
         this.bankAccounts = this.bankAccounts.filter(acc => acc.id !== id);
     }
 
@@ -249,6 +257,20 @@ export default class SchoolSetup extends LightningElement {
             return;
         }
 
+        // Bank Detail Validation (Net Banking)
+        const hasMissingBankDetails = this.bankAccounts.some(acc => 
+            !acc.bankName || !acc.accountNumber || !acc.ifsc
+        );
+
+        if (hasMissingBankDetails) {
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Please set up your account details',
+                message: 'All bank accounts must have Bank Name, Account Number, and IFSC Code filled.',
+                variant: 'warning'
+            }));
+            return;
+        }
+
         this.isLoading = true;
 
         // Prepare bank accounts for Apex (mapping back to object fields)
@@ -264,9 +286,13 @@ export default class SchoolSetup extends LightningElement {
 
         Promise.all([
             saveSetup({ setupData: this.schoolData }),
-            saveBankAccounts({ accountsData: accountsToSave })
+            saveBankAccounts({ 
+                accountsData: accountsToSave, 
+                deleteIds: this.deletedBankIds 
+            })
         ])
             .then(() => {
+                this.deletedBankIds = []; // Clear after success
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
@@ -277,7 +303,7 @@ export default class SchoolSetup extends LightningElement {
                 this.isReadOnly = true;
                 this.isSetupInitiallyDone = true;
                 refreshApex(this.wiredSetupResult);
-                refreshApex(this.wiredBankAccountsResult);
+                this.loadBankAccounts();
             })
             .then(() => {
                 // Dispatch event to parent to refresh and navigate

@@ -76,13 +76,19 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         }
     }
 
-    @wire(getBankAccounts)
-    wiredBanks({ error, data }) {
-        if (data) {
-            this.schoolBankAccounts = data;
-        } else if (error) {
-            console.error('Error fetching school banks', error);
-        }
+    connectedCallback() {
+        this.loadBankAccounts();
+    }
+
+    loadBankAccounts() {
+        getBankAccounts()
+            .then(data => {
+                console.log('Bank accounts fetched:', JSON.stringify(data));
+                this.schoolBankAccounts = data || [];
+            })
+            .catch(error => {
+                console.error('Error fetching school banks', error);
+            });
     }
 
     get schoolName() {
@@ -252,11 +258,7 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
                 details: acc
             }));
         }
-        return this.bankOptions.map(bank => ({
-            ...bank,
-            initials: this.getInitials(bank.name),
-            className: `bank-card ${this.selectedBankId === bank.id ? 'active' : ''}`
-        }));
+        return [];
     }
 
     get selectedBankDetails() {
@@ -270,22 +272,31 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
 
     handleBankSelect(event) {
         const bankId = event.currentTarget.dataset.id;
+        console.log('Bank Selected ID:', bankId, 'Length:', bankId ? bankId.length : 0);
         this.selectedBankId = bankId;
-        const selected = this.bankOptionsDisplay.find(b => b.id === bankId);
-
-        if (selected) {
-            this.netBankingDetails.bankName = selected.name;
-            // Pre-fill if details exist (from custom bank accounts)
-            if (selected.details) {
-                this.netBankingDetails.bankIfsc = selected.details.IFSC_Code__c || '';
-                this.netBankingDetails.bankAccountNumber = selected.details.Account_Number__c || '';
-                this.netBankingDetails.bankBranch = selected.details.Branch__c || '';
-            } else if (this.schoolConfig.Bank_Name__c && this.netBankingDetails.bankName === this.schoolConfig.Bank_Name__c) {
-                // Fallback to primary school setup fields for default banks
-                this.netBankingDetails.bankIfsc = this.schoolConfig.Bank_IFSC__c || '';
-                this.netBankingDetails.bankAccountNumber = this.schoolConfig.Bank_Account_Number__c || '';
-                this.netBankingDetails.bankBranch = this.schoolConfig.Bank_Branch__c || '';
-            }
+        
+        // Robust ID matching (handles 15 vs 18 chars)
+        const selectedAcc = this.schoolBankAccounts.find(acc => 
+            acc.Id === bankId || 
+            (acc.Id && bankId && (acc.Id.startsWith(bankId) || bankId.startsWith(acc.Id)))
+        );
+        
+        console.log('Found account match:', !!selectedAcc);
+        if (selectedAcc) {
+            console.log('Account data:', JSON.stringify(selectedAcc));
+            // Map with fallbacks for casing/namespace stripping variations
+            this.netBankingDetails = {
+                bankName: selectedAcc.Bank_Name__c || selectedAcc.bankName || selectedAcc.Name || '',
+                bankIfsc: selectedAcc.IFSC_Code__c || selectedAcc.ifsc || selectedAcc.IFSC__c || '',
+                bankAccountNumber: selectedAcc.Account_Number__c || selectedAcc.accountNumber || '',
+                bankBranch: selectedAcc.Branch__c || selectedAcc.branch || ''
+            };
+            console.log('Final mapping to netBankingDetails:', JSON.stringify(this.netBankingDetails));
+        } else {
+            console.warn('No matching account found for ID - verifying all schoolBankAccounts IDs:');
+            this.schoolBankAccounts.forEach(acc => console.log('Existing ID:', acc.Id));
+            
+            this.netBankingDetails = { bankName: '', bankIfsc: '', bankAccountNumber: '', bankBranch: '' };
         }
     }
 
@@ -462,15 +473,20 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         if (val) {
             this.selectedPaymentMethod = val;
             this.selectedBankId = '';
+            if (val === 'Net Banking') {
+                this.loadBankAccounts();
+            }
             this.generateQRCode();
         }
     }
 
-    handleBankSelect(event) {
-        this.selectedBankId = event.currentTarget.dataset.id;
-    }
 
     async handleSubmitPayment() {
+        if (!this.billingTotal || parseFloat(this.billingTotal) <= 0) {
+            this.showToast('Invalid Amount', 'Please select at least one fee item to pay.', 'warning');
+            return;
+        }
+
         const result = await LightningConfirm.open({
             message: `Process payment of ₹${this.billingTotal} via ${this.selectedPaymentMethod}?`,
             variant: 'headerless',

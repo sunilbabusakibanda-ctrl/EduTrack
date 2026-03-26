@@ -622,17 +622,15 @@ tbody tr:hover .view-hint {
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(8px);
-    z-index: 10000;
+    background: rgba(0, 0, 0, .45);
+    backdrop-filter: blur(5px);
+    z-index: 10000; /* High z-index for Salesforce environment */
     display: flex;
-    align-items: flex-start; /* Start from top to prevent merging/ugly centering */
+    align-items: center;
     justify-content: center;
-    padding: 60px 20px; /* Consistent gap from top */
-    overflow-y: auto; /* Enable background scroll for long content */
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity .2s;
 }
 
 .overlay.open {
@@ -642,23 +640,21 @@ tbody tr:hover .view-hint {
 
 .modal {
     background: #ffffff;
-    width: 1000px;
-    max-width: 95vw;
-    margin: 0 auto;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.25);
+    width: 820px;
+    max-width: 96vw;
+    max-height: 90vh;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Header/Tabs stay sticky if we wanted, but here we'll let body expand */
-    transform: translateY(30px);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    transform: translateY(18px) scale(.97);
+    transition: transform .22s;
 }
 
 .overlay.open .modal {
-    transform: translateY(0);
-    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .mhdr {
@@ -668,6 +664,7 @@ tbody tr:hover .view-hint {
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .mstu {
@@ -769,8 +766,8 @@ tbody tr:hover .view-hint {
 /* Modal body */
 .mbody {
     padding: 0;
+    overflow-y: auto;
     flex: 1;
-    overflow-y: visible; /* Remove internal scroll */
 }
 
 /* Modal subject table */

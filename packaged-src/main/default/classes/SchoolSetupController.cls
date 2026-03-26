@@ -39,7 +39,7 @@ public with sharing class SchoolSetupController {
         }
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<Map<String, Object>> getBankAccounts() {
         try {
             List<School_Bank_Account__c> accounts = [SELECT Id, Name, Bank_Name__c, IFSC_Code__c, 
@@ -57,8 +57,12 @@ public with sharing class SchoolSetupController {
     }
 
     @AuraEnabled
-    public static void saveBankAccounts(List<Map<String, Object>> accountsData) {
+    public static void saveBankAccounts(List<Map<String, Object>> accountsData, List<Id> deleteIds) {
         try {
+            if (deleteIds != null && !deleteIds.isEmpty()) {
+                delete [SELECT Id FROM School_Bank_Account__c WHERE Id IN :deleteIds];
+            }
+            
             List<School_Bank_Account__c> toUpsert = new List<School_Bank_Account__c>();
             List<Id> existingIds = new List<Id>();
             

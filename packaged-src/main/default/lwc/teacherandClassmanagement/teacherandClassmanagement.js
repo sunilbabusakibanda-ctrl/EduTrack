@@ -1748,59 +1748,59 @@ export default class ClassManagement extends LightningElement {
         }
     }
 
-async handleSaveTimetable() {
-    if (!this.ttSelectedClassSectionId) { this.showToast('Error', 'No class section selected', 'error'); return; }
+    async handleSaveTimetable() {
+        if (!this.ttSelectedClassSectionId) { this.showToast('Error', 'No class section selected', 'error'); return; }
 
-    const periodTimes = this._periodTimings.length > 0
-        ? this._periodTimings
-        : DEFAULT_PERIOD_TIMES.map(t => ({ num: t.num, start: t.start, end: t.end }));
+        const periodTimes = this._periodTimings.length > 0
+            ? this._periodTimings
+            : DEFAULT_PERIOD_TIMES.map(t => ({ num: t.num, start: t.start, end: t.end }));
 
-    const periodsData = [];
-    this.timetableRows.forEach(row => {
-        row.periods.forEach(p => {
-            if (p.subjectId || p.teacherId) {
-                const pt = periodTimes.find(t => t.num === p.num) || periodTimes[p.num - 1];
-                periodsData.push({
-                    periodId:       p.periodId   || null,
-                    day:            row.day,
-                    periodNumber:   p.num,
-                    subjectId:      p.subjectId  || null,
-                    teacherId:      p.teacherId  || null,
-                    startTime:      pt ? pt.start : '',
-                    endTime:        pt ? pt.end   : '',
-                    classSectionId: this.ttSelectedClassSectionId,
-                    academicYearId: this.ttSelectedAcademicYear,
-                    startDate:      this.ttStartDate  || null,
-                    endDate:        this.ttEndDate    || null,
-                    frequency:      this.ttFrequency
-                });
-            }
+        const periodsData = [];
+        this.timetableRows.forEach(row => {
+            row.periods.forEach(p => {
+                if (p.subjectId || p.teacherId) {
+                    const pt = periodTimes.find(t => t.num === p.num) || periodTimes[p.num - 1];
+                    periodsData.push({
+                        periodId:       p.periodId   || null,
+                        day:            row.day,
+                        periodNumber:   p.num,
+                        subjectId:      p.subjectId  || null,
+                        teacherId:      p.teacherId  || null,
+                        startTime:      pt ? pt.start : '',
+                        endTime:        pt ? pt.end   : '',
+                        classSectionId: this.ttSelectedClassSectionId,
+                        academicYearId: this.ttSelectedAcademicYear,
+                        startDate:      this.ttStartDate  || null,
+                        endDate:        this.ttEndDate    || null,
+                        frequency:      this.ttFrequency
+                    });
+                }
+            });
         });
-    });
 
-    if (periodsData.length === 0) {
-        this.showToast('Warning', 'Please fill at least one period before saving', 'warning');
-        return;
-    }
+        if (periodsData.length === 0) {
+            this.showToast('Warning', 'Please fill at least one period before saving', 'warning');
+            return;
+        }
 
-    try {
-        this.isLoading = true;
-        await saveTimetablePeriods({
-            periodsData:    JSON.stringify(periodsData),
-            classSectionId: this.ttSelectedClassSectionId,
-            academicYearId: this.ttSelectedAcademicYear,
-            startDate:      this.ttStartDate,
-            endDate:        this.ttEndDate || this.ttStartDate,
-            frequency:      this.ttFrequency
-        });
-        // ✅ Just show toast — timetable stays open
-        this.showToast('Success', `${periodsData.length} period(s) saved for ${this.ttSelectedClassName}`, 'success');
-    } catch (e) {
-        this.showToast('Error', 'Failed to save timetable: ' + this.getErrorMessage(e), 'error');
-    } finally {
-        this.isLoading = false;
+        try {
+            this.isLoading = true;
+            await saveTimetablePeriods({
+                periodsData:    JSON.stringify(periodsData),
+                classSectionId: this.ttSelectedClassSectionId,
+                academicYearId: this.ttSelectedAcademicYear,
+                startDate:      this.ttStartDate,
+                endDate:        this.ttEndDate || this.ttStartDate,
+                frequency:      this.ttFrequency
+            });
+            this.timetableSuccessMessage = `${periodsData.length} period record(s) saved for ${this.ttSelectedClassName}`;
+            this.showTimetableSuccessModal = true;
+        } catch (e) {
+            this.showToast('Error', 'Failed to save timetable: ' + this.getErrorMessage(e), 'error');
+        } finally {
+            this.isLoading = false;
+        }
     }
-}
 
     handleClearTimetable() {
         this._subjectTeacherCache = {};

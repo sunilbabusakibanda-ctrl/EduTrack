@@ -159,8 +159,8 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         String subjectFieldName = subjectName.replace(' ', '_') + '__c';
         
         // Setup namespace aware check
-        String ns = EnterMarksController.class.getName().contains('.') ? EnterMarksController.class.getName().substringBefore('.') : '';
-        String prefix = String.isNotBlank(ns) ? ns + '__' : '';
+        String objName = Exam__c.SObjectType.getDescribe().getName();
+        String prefix = objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__') ? objName.substringBefore('__') + '__' : '';
         Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
         
         if (!examFields.containsKey(subjectFieldName.toLowerCase()) && examFields.containsKey((prefix + subjectFieldName).toLowerCase())) {
@@ -251,8 +251,8 @@ public static String saveMarks(
         String subjectField = subjectName.replace(' ', '_') + '__c';
 
         // Setup namespace aware check
-        String ns = EnterMarksController.class.getName().contains('.') ? EnterMarksController.class.getName().substringBefore('.') : '';
-        String prefix = String.isNotBlank(ns) ? ns + '__' : '';
+        String objName = Exam__c.SObjectType.getDescribe().getName();
+        String prefix = objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__') ? objName.substringBefore('__') + '__' : '';
 
         // ✅ Validate field exists on Exam__c
         Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
