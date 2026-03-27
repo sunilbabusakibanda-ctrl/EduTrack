@@ -17,6 +17,9 @@ public class EnterMarksControllerTest {
             Roll_No__c = 'ROLL001'
         );
         insert student;
+        
+        Subject__c sub = new Subject__c(Name='Maths', Is_Active__c=true);
+        insert sub;
     }
     
     @isTest

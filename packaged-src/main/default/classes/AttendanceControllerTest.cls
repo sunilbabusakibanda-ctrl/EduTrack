@@ -46,12 +46,12 @@ public class AttendanceControllerTest {
         Account student = [SELECT Id FROM Account LIMIT 1];
         
         // Successful update of existing session where absent student becomes present
-        String result = AttendanceController.saveAttendance(TestDataFactory.getValidClass(), 'A', String.valueOf(Date.today()), new List<String>(), 1, 0, 1, null);
-        Assert.areEqual('Success', result, 'Should save successfully');
+        AttendanceController.SessionData result = AttendanceController.saveAttendance(TestDataFactory.getValidClass(), 'A', String.valueOf(Date.today()), new List<String>(), 1, 0, 1, null);
+        Assert.isTrue(result.sessionExists, 'Should save successfully');
         
         // Successful insert of new class and session
-        String newResult = AttendanceController.saveAttendance('Class 2', 'B', String.valueOf(Date.today()), new List<String>{student.Id}, 1, 1, 0, null);
-        Assert.areEqual('Success', newResult, 'Should save successfully for new class');
+        AttendanceController.SessionData newResult = AttendanceController.saveAttendance('Class 2', 'B', String.valueOf(Date.today()), new List<String>{student.Id}, 1, 1, 0, null);
+        Assert.isTrue(newResult.sessionExists, 'Should save successfully for new class');
         
         // Duplicate session deletion branch
         Class__c existingClass = [SELECT Id FROM Class__c LIMIT 1];
