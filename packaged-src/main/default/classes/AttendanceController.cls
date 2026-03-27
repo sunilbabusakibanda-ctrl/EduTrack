@@ -4,19 +4,31 @@ public without sharing class AttendanceController {
     @AuraEnabled(cacheable=true)
     public static List<Map<String, String>> getRecentSubmissions() {
         List<Map<String, String>> results = new List<Map<String, String>>();
-        for (Attendance_Session__c s : [
-            SELECT Class__r.Name, Section__c, Attendance_Taken_By__r.Name 
+        Date today = Date.today();
+        
+        List<Attendance_Session__c> todaySessions = [
+            SELECT Id, Class__r.Name, Section__c, Attendance_Taken_By__r.Name 
             FROM Attendance_Session__c 
-            WHERE Attendance_Taken_By__c != null 
+            WHERE Date__c = :today 
+            AND Attendance_Taken_By__c != null 
             ORDER BY CreatedDate DESC 
             LIMIT 10
-        ]) {
+        ];
+
+        if (todaySessions.isEmpty()) {
             Map<String, String> item = new Map<String, String>();
-            item.put('id', s.Id);
-            String className = s.Class__r != null ? s.Class__r.Name : 'N/A';
-            String teacherName = s.Attendance_Taken_By__r != null ? s.Attendance_Taken_By__r.Name : 'N/A';
-            item.put('text', className + ' - ' + s.Section__c + ' submitted by ' + teacherName);
+            item.put('id', 'pending');
+            item.put('text', 'Today\'s attendance is currently pending');
             results.add(item);
+        } else {
+            for (Attendance_Session__c s : todaySessions) {
+                Map<String, String> item = new Map<String, String>();
+                item.put('id', s.Id);
+                String className = s.Class__r != null ? s.Class__r.Name : 'N/A';
+                String teacherName = s.Attendance_Taken_By__r != null ? s.Attendance_Taken_By__r.Name : 'N/A';
+                item.put('text', className + ' - ' + s.Section__c + ' submitted by ' + teacherName);
+                results.add(item);
+            }
         }
         return results;
     }
@@ -44,11 +56,12 @@ public without sharing class AttendanceController {
     @AuraEnabled(cacheable=true)
     public static List<Map<String, String>> getTeachers() {
         List<Map<String, String>> teacherList = new List<Map<String, String>>();
-        for (Contact c : [SELECT Id, Name, Subject__c FROM Contact WHERE Type__c = 'Teacher' ORDER BY Name]) {
+        // Query Person Accounts where Type is 'Teacher'
+        for (Account a : [SELECT PersonContactId, Name, Subject__c FROM Account WHERE IsPersonAccount = true AND Type = 'Teacher' ORDER BY Name]) {
             Map<String, String> teacher = new Map<String, String>();
-            teacher.put('id', c.Id);
-            teacher.put('name', c.Name);
-            teacher.put('subject', c.Subject__c != null ? c.Subject__c : 'N/A');
+            teacher.put('id', a.Id); // Using Account Id as the lookup now targets Account
+            teacher.put('name', a.Name);
+            teacher.put('subject', a.Subject__c != null ? a.Subject__c : 'N/A');
             teacherList.add(teacher);
         }
         return teacherList;
@@ -98,6 +111,8 @@ public without sharing class AttendanceController {
         @AuraEnabled public Integer present;
         @AuraEnabled public Integer absent;
         @AuraEnabled public String teacherName;
+        @AuraEnabled public String createdTime;
+        @AuraEnabled public String lastUpdatedTime;
 
         public SessionData() {
             this.sessionExists = false;
@@ -111,22 +126,25 @@ public without sharing class AttendanceController {
     @AuraEnabled
     public static SessionData getSessionData(String classVal, String sectionVal, Date dateVal) {
         SessionData data = new SessionData();
-        
+        if (String.isBlank(classVal) || String.isBlank(sectionVal) || dateVal == null) return data;
+
         // 1. Find Session
-        List<Attendance_Session__c> sessions = [SELECT Id, Total_Students__c, Present_Count__c, Absent_Count__c, Attendance_Taken_By__r.Name 
-                                                FROM Attendance_Session__c 
-                                                WHERE Class__r.Name = :classVal 
-                                                AND Section__c = :sectionVal 
-                                                AND Date__c = :dateVal 
-                                                LIMIT 1];
-        
+        List<Attendance_Session__c> sessions = [
+            SELECT Id, Attendance_Taken_By__r.Name, CreatedDate, LastModifiedDate 
+            FROM Attendance_Session__c 
+            WHERE (Class__r.Name = :classVal OR Class__c = :classVal) // Handle both Name and ID just in case
+            AND Section__c = :sectionVal 
+            AND Date__c = :dateVal 
+            ORDER BY LastModifiedDate DESC // Get newest if multiple
+            LIMIT 1
+        ];
+
         if (!sessions.isEmpty()) {
             Attendance_Session__c sess = sessions[0];
             data.sessionExists = true;
-            data.total = (Integer)sess.Total_Students__c;
-            data.present = (Integer)sess.Present_Count__c;
-            data.absent = (Integer)sess.Absent_Count__c;
             data.teacherName = sess.Attendance_Taken_By__r != null ? sess.Attendance_Taken_By__r.Name : '';
+            data.createdTime = sess.CreatedDate.format('hh:mm a');
+            data.lastUpdatedTime = sess.LastModifiedDate.format('hh:mm a');
             
             // 2. Get Absentees IF session exists
             for(Attendance__c att : [SELECT Student__c FROM Attendance__c 
@@ -145,7 +163,7 @@ public without sharing class AttendanceController {
     }
 
     @AuraEnabled
-    public static String saveAttendance(String classVal, String sectionVal, String dateStr, List<String> absentStudentIds, Integer totalStudents, Integer absentCount, Integer presentCount, String teacherId) {
+    public static SessionData saveAttendance(String classVal, String sectionVal, String dateStr, List<String> absentStudentIds, Integer totalStudents, Integer absentCount, Integer presentCount, String teacherId) {
         // Validations
         if(classVal != null) classVal = classVal.trim();
         if(sectionVal != null) sectionVal = sectionVal.trim();
@@ -280,7 +298,7 @@ public without sharing class AttendanceController {
                 insert toInsert;
             }
             
-            return 'Success';
+            return getSessionData(classVal, sectionVal, attendanceDate);
             
         } catch (Exception e) {
             Database.rollback(sp);

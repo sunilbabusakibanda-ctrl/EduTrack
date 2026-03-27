@@ -45,20 +45,22 @@ public static List<Map<String, Object>> getClasses() {
         List<SubjectWrapper> subjectWrappers = new List<SubjectWrapper>();
 
         try {
-            // Get subjects from Account picklist field (as per your data model)
-            Schema.DescribeFieldResult fieldResult = Account.Subject__c.getDescribe();
-            List<Schema.PicklistEntry> picklistValues = fieldResult.getPicklistValues();
+            System.debug('=== FETCHING SUBJECTS FROM OBJECT ===');
             
-            Integer counter = 1;
-            for (Schema.PicklistEntry entry : picklistValues) {
-                if (entry.isActive()) {
-                    subjectWrappers.add(new SubjectWrapper(
-                        'SUBJ' + String.valueOf(counter).leftPad(3, '0'),
-                        entry.getValue(),
-                        100 // Default max marks
-                    ));
-                    counter++;
-                }
+            // Query subjects from Subject__c object
+            List<Subject__c> subjects = [
+                SELECT Id, Name 
+                FROM Subject__c 
+                WHERE Is_Active__c = true 
+                ORDER BY Name
+            ];
+            
+            for (Subject__c s : subjects) {
+                subjectWrappers.add(new SubjectWrapper(
+                    s.Id,
+                    s.Name,
+                    100 // Default max marks
+                ));
             }
             
             System.debug('✅ Subjects returned: ' + subjectWrappers.size());
@@ -103,87 +105,48 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
 
     try {
         System.debug('=== GET STUDENTS FOR MARKS ENTRY ===');
-        System.debug('Class ID: ' + classId);
-        System.debug('Subject Name: ' + subjectName);
-        System.debug('Exam Type: ' + examType);
+        System.debug('Class ID: ' + classId + ' | Subject: ' + subjectName + ' | Exam: ' + examType);
         
-        // Get Class details
-        Class__c classRecord = [
-            SELECT Id, Name, Class__c, Section__c 
-            FROM Class__c 
-            WHERE Id = :classId 
-            LIMIT 1
-        ];
-        
-        System.debug('Class Record Name: ' + classRecord.Name);
-        System.debug('Class__c field value: [' + classRecord.Class__c + ']');
-        System.debug('Section__c field value: [' + classRecord.Section__c + ']');
+        // Resolve Field Name Dynamically
+        String subjectFieldName = findSubjectField(subjectName);
+        System.debug('Resolved field name: ' + subjectFieldName);
 
-        // ✅ FIX 1: Remove PersonAccount filter — students are Business Accounts with Type='Student'
-        // ✅ FIX 2: Match using Class__c = classRecord.Name (e.g. 'Class-7')
-        //           because Account.Class__c stores 'Class-7' not just '7'
+        Class__c classRecord = [SELECT Id, Name FROM Class__c WHERE Id = :classId LIMIT 1];
+        
         List<Account> students = [
             SELECT Id, Name, Roll_No__c, Class__c, Section__c, Type
             FROM Account
             WHERE Type = 'Student'
-              AND Class__c = :classRecord.Name   // ✅ Use .Name not .Class__c
+              AND Class__c = :classRecord.Name
             ORDER BY Name
             LIMIT 50000
         ];
 
-        System.debug('Students found: ' + students.size());
-        
-        if (students.isEmpty()) {
-            // ✅ Extra debug: show what Class__c values exist on accounts
-            List<Account> debugSample = [
-                SELECT Id, Name, Class__c, Section__c, Type 
-                FROM Account 
-                WHERE Type = 'Student' 
-                LIMIT 5
-            ];
-            for (Account a : debugSample) {
-                System.debug('Sample Account → Name:' + a.Name + 
-                    ' Class__c:[' + a.Class__c + ']' + 
-                    ' Section__c:[' + a.Section__c + ']');
-            }
-            return result;
-        }
+        if (students.isEmpty()) return result;
 
         Set<Id> studentIds = new Set<Id>();
-        for (Account s : students) {
-            studentIds.add(s.Id);
-        }
+        for (Account s : students) studentIds.add(s.Id);
 
         // Check for existing Exam records
         Map<Id, Exam__c> examMarksMap = new Map<Id, Exam__c>();
-        String subjectFieldName = subjectName.replace(' ', '_') + '__c';
-        
-        // Setup namespace aware check
-        String objName = Exam__c.SObjectType.getDescribe().getName();
-        String prefix = objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__') ? objName.substringBefore('__') + '__' : '';
-        Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
-        
-        if (!examFields.containsKey(subjectFieldName.toLowerCase()) && examFields.containsKey((prefix + subjectFieldName).toLowerCase())) {
-            subjectFieldName = prefix + subjectFieldName;
-        }
-
         try {
-            String query = 'SELECT Id, Student__c, Exam_Type__c, ' + subjectFieldName + 
-                          ' FROM Exam__c ' +
-                          'WHERE Student__c IN :studentIds ' +
-                          'AND Exam_Type__c = :examType';
+            // ✅ Always include Extra_Marks__c for dynamic subjects
+            String extraMarksField = findSubjectField('Extra Marks'); // Resolve Extra_Marks__c
+            String query = 'SELECT Id, Student__c, Exam_Type__c ';
+            if (subjectFieldName != null) query += ', ' + subjectFieldName;
+            if (extraMarksField != null) query += ', ' + extraMarksField;
             
-            List<Exam__c> existingExams = Database.query(query);
-            for (Exam__c exam : existingExams) {
+            query += ' FROM Exam__c ' +
+                     'WHERE Student__c IN :studentIds ' +
+                     'AND Exam_Type__c = :examType';
+            
+            for (Exam__c exam : Database.query(query)) {
                 examMarksMap.put(exam.Student__c, exam);
             }
-            System.debug('Existing exam records found: ' + examMarksMap.size());
-            
         } catch (Exception e) {
-            System.debug('Warning: Could not query subject field ' + subjectFieldName + ': ' + e.getMessage());
+            System.debug('Query failed: ' + e.getMessage());
         }
 
-        // Build Response
         for (Account student : students) {
             Map<String, Object> row = new Map<String, Object>();
             row.put('studentId', student.Id);
@@ -193,25 +156,85 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
             if (examMarksMap.containsKey(student.Id)) {
                 Exam__c exam = examMarksMap.get(student.Id);
                 row.put('hasMarks', true);
-                Object marksValue = exam.get(subjectFieldName);
+                row.put('examId', exam.Id);
+                
+                Object marksValue = null;
+                if (subjectFieldName != null) {
+                    marksValue = exam.get(subjectFieldName);
+                } else {
+                    // ✅ Dynamic Fallback: Check JSON for overflow subjects
+                    String extraMarksField = findSubjectField('Extra Marks');
+                    String jsonStr = (String) exam.get(extraMarksField);
+                    if (String.isNotBlank(jsonStr)) {
+                        try {
+                            Map<String, Object> extraMarks = (Map<String, Object>) JSON.deserializeUntyped(jsonStr);
+                            marksValue = extraMarks.get(subjectName);
+                        } catch (Exception e) {
+                            System.debug('JSON parse error: ' + e.getMessage());
+                        }
+                    }
+                }
+                
                 row.put('obtainedMarks', marksValue != null ? marksValue : 0);
                 row.put('maxMarks', 100);
-                row.put('examId', exam.Id);
             } else {
                 row.put('hasMarks', false);
                 row.put('obtainedMarks', null);
             }
             result.add(row);
         }
-
-        System.debug('✅ Result size: ' + result.size());
         return result;
 
     } catch (Exception e) {
         System.debug('❌ Error: ' + e.getMessage());
-        System.debug('Stack: ' + e.getStackTraceString());
-        throw new AuraHandledException('Error loading students: ' + e.getMessage());
+        throw new AuraHandledException(e.getMessage());
     }
+}
+
+/**
+ * Robustly finds the correct field API name for a subject, handling namespaces and variations.
+ */
+@AuraEnabled
+public static String findSubjectField(String subjectName) {
+    if (String.isBlank(subjectName)) return null;
+    
+    System.debug('[findSubjectField] Searching for: ' + subjectName);
+    String normalizedSearch = subjectName.toLowerCase().replace(' ', '').replace('_', '');
+    Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Exam__c.fields.getMap();
+    
+    // Get namespace prefix if any
+    String objName = Exam__c.SObjectType.getDescribe().getName();
+    String prefix = objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__') ? objName.substringBefore('__') + '__' : '';
+    System.debug('[findSubjectField] Namespace Prefix: ' + prefix);
+    
+    String bestMatch = null;
+    
+    // Prioritize Exact Name Match (without __c)
+    for (String apiName : fieldMap.keySet()) {
+        String baseName = apiName;
+        if (prefix != '' && baseName.startsWith(prefix.toLowerCase())) {
+            baseName = baseName.substring(prefix.length());
+        }
+        
+        String normalizedField = baseName.replace('__c', '').replace('_', '');
+        
+        // Exact match check
+        if (normalizedField == normalizedSearch) {
+            System.debug('[findSubjectField] Exact match found: ' + apiName);
+            return apiName;
+        }
+        
+        // Starts with match (fallback)
+        if (normalizedField.startsWith(normalizedSearch) || (normalizedSearch.length() > 3 && normalizedSearch.startsWith(normalizedField))) {
+            bestMatch = apiName;
+        }
+        
+        // Special case for Extra Marks
+        if (normalizedSearch == 'extramarks' && normalizedField == 'extramarks') return apiName;
+    }
+    
+    System.debug('[findSubjectField] Best match found: ' + bestMatch);
+    return bestMatch;
 }
 @AuraEnabled
 public static String saveMarks(
@@ -247,39 +270,23 @@ public static String saveMarks(
             throw new AuraHandledException('Could not resolve subject name for ID: ' + subjectId);
         }
 
-        // ✅ Build field API name
-        String subjectField = subjectName.replace(' ', '_') + '__c';
+        // ✅ Build field API name dynamically
+        String subjectField = findSubjectField(subjectName);
+        String extraMarksField = findSubjectField('Extra Marks'); // Resolve Extra_Marks__c
 
-        // Setup namespace aware check
-        String objName = Exam__c.SObjectType.getDescribe().getName();
-        String prefix = objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__') ? objName.substringBefore('__') + '__' : '';
+        Boolean isOverflow = (subjectField == null);
+        Boolean isTextField = false;
 
-        // ✅ Validate field exists on Exam__c
-        Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
-        Boolean hasField = examFields.containsKey(subjectField.toLowerCase());
-        Boolean hasNsField = examFields.containsKey((prefix + subjectField).toLowerCase());
-
-        if (!hasField && hasNsField) {
-            subjectField = prefix + subjectField;
-            hasField = true; 
+        if (!isOverflow) {
+            // ✅ Detect the actual field type
+            Map<String, Schema.SObjectField> examFields = Schema.SObjectType.Exam__c.fields.getMap();
+            Schema.DisplayType fieldType = examFields.get(subjectField.toLowerCase()).getDescribe().getType();
+            isTextField = (fieldType == Schema.DisplayType.STRING  ||
+                           fieldType == Schema.DisplayType.TEXTAREA ||
+                           fieldType == Schema.DisplayType.PICKLIST);
         }
 
-        if (!hasField) {
-            throw new AuraHandledException(
-                'Subject field "' + subjectField + '" does not exist on Exam__c. ' +
-                'Available fields: ' + String.join(new List<String>(examFields.keySet()), ', ')
-            );
-        }
-
-        // ✅ Detect the actual field type to avoid "Illegal assignment from Decimal to String"
-        Schema.DisplayType fieldType = examFields.get(subjectField.toLowerCase())
-                                                  .getDescribe()
-                                                  .getType();
-        Boolean isTextField = (fieldType == Schema.DisplayType.STRING  ||
-                               fieldType == Schema.DisplayType.TEXTAREA ||
-                               fieldType == Schema.DisplayType.PICKLIST);
-
-        System.debug('Subject field: ' + subjectField + ' | Type: ' + fieldType + ' | isTextField: ' + isTextField);
+        System.debug('Subject: ' + subjectName + ' | field: ' + subjectField + ' | isOverflow: ' + isOverflow);
 
         /* =========================
            3. Collect Student IDs
@@ -302,12 +309,14 @@ public static String saveMarks(
            5. Existing Exam records
            ========================= */
         Map<Id, Exam__c> examByStudent = new Map<Id, Exam__c>();
-        for (Exam__c ex : [
-            SELECT Id, Student__c, Exam_Type__c, Class__c, Section__c
-            FROM Exam__c
-            WHERE Student__c IN :studentIds
-              AND Exam_Type__c = :examType
-        ]) {
+        String query = 'SELECT Id, Student__c, Exam_Type__c, Class__c, Section__c ';
+        if (extraMarksField != null) query += ', ' + extraMarksField;
+        
+        query += ' FROM Exam__c ' +
+                 'WHERE Student__c IN :studentIds ' +
+                 'AND Exam_Type__c = :examType';
+
+        for (Exam__c ex : Database.query(query)) {
             examByStudent.put(ex.Student__c, ex);
         }
 
@@ -338,10 +347,23 @@ public static String saveMarks(
             }
 
             // ✅ THE FIX: assign correct type based on field definition
-            if (isTextField) {
-                exam.put(subjectField, String.valueOf(marks.intValue())); // store as String
+            if (isOverflow) {
+                // ✅ Overflow handling: Store in JSON
+                if (extraMarksField != null) {
+                    Map<String, Object> extraMarks = new Map<String, Object>();
+                    String existingJson = (String) exam.get(extraMarksField);
+                    if (String.isNotBlank(existingJson)) {
+                        extraMarks = (Map<String, Object>) JSON.deserializeUntyped(existingJson);
+                    }
+                    extraMarks.put(subjectName, marks);
+                    exam.put(extraMarksField, JSON.serialize(extraMarks));
+                }
             } else {
-                exam.put(subjectField, marks); // store as Decimal/Number
+                if (isTextField) {
+                    exam.put(subjectField, String.valueOf(marks.intValue())); // store as String
+                } else {
+                    exam.put(subjectField, marks); // store as Decimal/Number
+                }
             }
 
             examsToUpsert.add(exam);
@@ -350,6 +372,7 @@ public static String saveMarks(
         /* =========================
            7. Save
            ========================= */
+        System.debug('Upserting ' + examsToUpsert.size() + ' exam records.');
         upsert examsToUpsert;
 
         return 'Successfully saved marks for ' + examsToUpsert.size() + ' students';
@@ -364,13 +387,16 @@ public static String saveMarks(
         throw new AuraHandledException('Error saving marks: ' + e.getMessage());
     }
 }
-    // Helper method to get subject name from ID
+    // Helper method to get subject name from Salesforce ID
     private static String getSubjectNameById(String subjectId) {
-        List<SubjectWrapper> subjects = getSubjects();
-        for (SubjectWrapper subj : subjects) {
-            if (subj.id == subjectId) {
-                return subj.name;
-            }
+        if (String.isBlank(subjectId)) return null;
+        try {
+            List<Subject__c> subjects = [
+                SELECT Id, Name FROM Subject__c WHERE Id = :subjectId LIMIT 1
+            ];
+            if (!subjects.isEmpty()) return subjects[0].Name;
+        } catch (Exception e) {
+            System.debug('getSubjectNameById error: ' + e.getMessage());
         }
         return null;
     }
