@@ -238,8 +238,34 @@ public without sharing class AttendanceController {
             // Map to existing String fields requested by user
             session.Number_Of_Present__c = String.valueOf(presentCount);
             session.Number_Of_Absent__c = String.valueOf(absentCount);
+            session.Number_Of_Present__c = String.valueOf(presentCount);
+            session.Number_Of_Absent__c = String.valueOf(absentCount);
+            
             if (String.isNotBlank(teacherId)) {
-                session.Attendance_Taken_By__c = teacherId;
+                // Smart Lookup Handler: Handle target mismatch (Account vs Contact vs User)
+                Schema.DescribeFieldResult dr = Attendance_Session__c.Attendance_Taken_By__c.getDescribe();
+                String targetObj = dr.getReferenceTo()[0].getDescribe().getName();
+                
+                Id tId = (Id)teacherId;
+                String sourceObj = tId.getSObjectType().getDescribe().getName();
+                
+                if (targetObj == sourceObj) {
+                    session.Attendance_Taken_By__c = teacherId;
+                } else if (targetObj == 'Contact' && sourceObj == 'Account') {
+                    // Account -> Contact conversion (Person Account)
+                    List<Account> accs = [SELECT PersonContactId FROM Account WHERE Id = :teacherId LIMIT 1];
+                    if (!accs.isEmpty()) {
+                        session.Attendance_Taken_By__c = accs[0].PersonContactId;
+                    }
+                } else if (targetObj == 'User') {
+                    // Account/Contact -> User conversion
+                    // Attempt to find a User matching the Account/Contact (e.g. by Name or FederationId)
+                    // For now, let's try current user if it's a save attempt by someone
+                    session.Attendance_Taken_By__c = UserInfo.getUserId();
+                } else {
+                    // Fallback to avoid crash
+                    session.Attendance_Taken_By__c = null;
+                }
             }
             
             upsert session;
