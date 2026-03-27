@@ -869,6 +869,9 @@ try {
             WHERE Type = 'Teacher' AND IsPersonAccount = true
             ORDER BY Name
         ];
+        if (teachers.isEmpty()) {
+            teachers = [SELECT Id, Name FROM Account WHERE Type = 'Teacher' ORDER BY Name LIMIT 200];
+        }
         if (teachers.isEmpty()) return new List<Map<String, Object>>();
 
         Set<Id> teacherIds = new Map<Id, Account>(teachers).keySet();

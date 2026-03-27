@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>AttendanceController</members>
+        <members>AttendanceControllerTest</members>
+        <members>AttendanceReportController</members>
+        <members>AttendanceReportControllerTest</members>
+        <members>GradesController</members>
+        <members>GradesControllerTest</members>
+        <members>EnterMarksController</members>
+        <members>EnterMarksControllerTest</members>
+        <members>MarksheetController</members>
+        <members>MarksheetControllerTest</members>
+        <members>ClassManagementController</members>
+        <members>ClassManagementControllerTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>attendance</members>
+        <members>attendanceReport</members>
+        <members>gradesModule</members>
+        <members>enterMarks</members>
+        <members>teacherandClassmanagement</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <version>60.0</version>
+</Package>
