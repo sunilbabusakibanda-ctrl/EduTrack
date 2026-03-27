@@ -39,7 +39,12 @@
                     <div class="form-icon">
                         <span>📚</span>
                     </div>
-                    <label class="form-label">Select Subject</label>
+                    <div class="label-with-action">
+                        <label class="form-label">Select Subject</label>
+                        <button class="add-btn-small" onclick={handleOpenAddSubject} title="Add New Subject">
+                            <lightning-icon icon-name="utility:add" size="xx-small" variant="brand"></lightning-icon>
+                        </button>
+                    </div>
                 </div>
                 <lightning-combobox
                     name="subjectSelect"
@@ -208,6 +213,38 @@
                 <h3 class="no-data-title">No Data Available</h3>
                 <p class="no-data-msg">{noDataMessage}</p>
             </div>
+        </template>
+
+        <!-- Quick Add Subject Modal -->
+        <template if:true={isAddSubjectModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header custom-modal-header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleCloseAddSubject}>
+                            <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium">Add New Subject</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium custom-modal-content">
+                        <lightning-input 
+                            label="Subject Name" 
+                            placeholder="e.g. Robotics" 
+                            value={newSubjectName}
+                            onchange={handleNewSubjectNameChange}
+                            required
+                            class="custom-input">
+                        </lightning-input>
+                    </div>
+                    <footer class="slds-modal__footer custom-modal-footer">
+                        <button class="btn-cancel" onclick={handleCloseAddSubject}>Cancel</button>
+                        <button class="btn-save" onclick={handleSaveNewSubject} disabled={isNewSubjectSaveDisabled}>
+                            Save Subject
+                        </button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
         </template>
     </div>
 </template>

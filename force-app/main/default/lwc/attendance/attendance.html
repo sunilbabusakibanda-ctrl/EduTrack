@@ -31,40 +31,42 @@
 
                     <div class="field-label">👤 Select Teacher</div>
 
-                    <div class="search-wrap">
-                        <span class="si-left">🔍</span>
-                        <input type="text" 
-                               class={teacherSearchInputClass} 
-                               value={teacherSearchTerm}
-                               placeholder="Search your name…" 
-                               onfocus={openTeacherDropdown} 
-                               oninput={handleTeacherSearch}/>
-                        <template if:true={teacherSearchTerm}>
-                            <button class="si-clear show" onclick={handleClearTeacher}>✕</button>
-                        </template>
-                    </div>
+                    <div class="teacher-search-wrapper" data-id="teacher-search-container">
+                        <div class="search-wrap">
+                            <span class="si-left">🔍</span>
+                            <input type="text" 
+                                   class={teacherSearchInputClass} 
+                                   value={teacherSearchTerm}
+                                   placeholder="Search your name…" 
+                                   onfocus={openTeacherDropdown} 
+                                   oninput={handleTeacherSearch}/>
+                            <template if:true={teacherSearchTerm}>
+                                <button class="si-clear show" onclick={handleClearTeacher}>✕</button>
+                            </template>
+                        </div>
 
-                    <div class={teacherDropdownClass}>
-                        <div class="dropdown-inner">
-                            <template for:each={filteredTeachers} for:item="teacher">
-                                <div key={teacher.id} 
-                                     class="d-item" 
-                                     data-id={teacher.id} 
-                                     onclick={handleTeacherSelect}>
-                                    <div class={teacher.colorClass} title={teacher.initials}>{teacher.initials}</div>
-                                    <div class="d-info">
-                                        <div class="d-name">{teacher.name}</div>
-                                        <div class="d-sub">{teacher.subject}</div>
+                        <div class={teacherDropdownClass}>
+                            <div class="dropdown-inner">
+                                <template for:each={filteredTeachers} for:item="teacher">
+                                    <div key={teacher.id} 
+                                         class="d-item" 
+                                         data-id={teacher.id} 
+                                         onclick={handleTeacherSelect}>
+                                        <div class={teacher.colorClass} title={teacher.initials}>{teacher.initials}</div>
+                                        <div class="d-info">
+                                            <div class="d-name">{teacher.name}</div>
+                                            <div class="d-sub">{teacher.subject}</div>
+                                        </div>
+                                        <div class="d-check">✓</div>
                                     </div>
-                                    <div class="d-check">✓</div>
+                                </template>
+                            </div>
+                            <template if:true={showNoTeacherMatch}>
+                                <div class="no-match show">
+                                    <div class="nm-icon">🤷</div>No teacher found
                                 </div>
                             </template>
                         </div>
-                        <template if:true={showNoTeacherMatch}>
-                            <div class="no-match show">
-                                <div class="nm-icon">🤷</div>No teacher found
-                            </div>
-                        </template>
                     </div>
 
                     <template if:true={selectedTeacher}>
@@ -161,6 +163,13 @@
         <!-- Success Card (Summary View) -->
         <template lwc:if={isSuccess}>
             <div class="success-card">
+                <div class="success-timestamps">
+                    <span class="timestamp-item">Submitted: {submittedTime}</span>
+                    <template if:true={showUpdatedTime}>
+                        <span class="timestamp-separator"></span>
+                        <span class="timestamp-item">Updated: {lastUpdatedTime}</span>
+                    </template>
+                </div>
                 <span class="success-icon">🎉</span>
                 <h2 class="success-title">Attendance Submitted!</h2>
                 <div class="teacher-success-badge">

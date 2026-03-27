@@ -95,6 +95,14 @@ export default class ClassManagement extends LightningElement {
     @track teacherEmail         = '';
     @track teacherPhone         = '';
     @track teacherQualification = '';
+    @track teacherBirthDate     = '';
+    @track teacherJoiningDate   = '';
+    @track teacherBasicSalary    = 0;
+    @track teacherHra            = 0;
+    @track teacherDa             = 0;
+    @track teacherPf             = 0;
+    @track teacherAccountNumber  = '';
+    @track teacherIfsc           = '';
     @track teacherSkills        = [];
     @track skillLevelOptions    = [];
     @track showTeacherForm      = false;
@@ -1048,6 +1056,14 @@ export default class ClassManagement extends LightningElement {
     handleTeacherEmailChange(e)         { this.teacherEmail         = e.detail.value; }
     handleTeacherPhoneChange(e)         { this.teacherPhone         = e.detail.value; }
     handleTeacherQualificationChange(e) { this.teacherQualification = e.detail.value; }
+    handleTeacherBirthDateChange(e)     { this.teacherBirthDate     = e.detail.value; }
+    handleTeacherJoiningDateChange(e)   { this.teacherJoiningDate   = e.detail.value; }
+    handleTeacherBasicSalaryChange(e)    { this.teacherBasicSalary    = parseFloat(e.detail.value) || 0; }
+    handleTeacherHraChange(e)            { this.teacherHra            = parseFloat(e.detail.value) || 0; }
+    handleTeacherDaChange(e)             { this.teacherDa             = parseFloat(e.detail.value) || 0; }
+    handleTeacherPfChange(e)             { this.teacherPf             = parseFloat(e.detail.value) || 0; }
+    handleTeacherAccountNumberChange(e)  { this.teacherAccountNumber  = e.detail.value; }
+    handleTeacherIfscChange(e)           { this.teacherIfsc           = e.detail.value; }
 
     handleAddSkill() {
         this.teacherSkills = [
@@ -1087,13 +1103,28 @@ export default class ClassManagement extends LightningElement {
             const result = await createTeacherWithSkills({
                 firstName: this.teacherFirstName, lastName: this.teacherLastName,
                 email: this.teacherEmail, phone: this.teacherPhone,
-                qualification: this.teacherQualification, skills: this.teacherSkills
+                qualification: this.teacherQualification, 
+                birthDate: this.teacherBirthDate,
+                joiningDate: this.teacherJoiningDate,
+                basicSalary: this.teacherBasicSalary,
+                hra: this.teacherHra,
+                da: this.teacherDa,
+                pf: this.teacherPf,
+                accountNumber: this.teacherAccountNumber,
+                ifsc: this.teacherIfsc,
+                skills: this.teacherSkills
             });
-            this.showToast('Success', `Teacher "${result.teacherName}" created with ${result.skillsCount} skill(s)!`, 'success');
-            this.resetTeacherForm();
-            this.showTeacherForm = false;
-            await this.loadSubjects();
-            await this.loadWorkloadDashboard();
+
+            if (result.success) {
+                this.showToast('Success', `Teacher "${result.teacherName}" created with ${result.skillsCount} skill(s)!`, 'success');
+                this.resetTeacherForm();
+                this.showTeacherForm = false;
+                await this.loadSubjects();
+                await this.loadWorkloadDashboard();
+            } else {
+                this.showToast('Error', 'Failed to create teacher: ' + result.error, 'error');
+                console.error('--- TEACHER CREATION ERROR ---', result.error, result.stackTrace);
+            }
         } catch (e) {
             this.showToast('Error', 'Failed to create teacher: ' + this.getErrorMessage(e), 'error');
         } finally {
@@ -1105,7 +1136,10 @@ export default class ClassManagement extends LightningElement {
 
     resetTeacherForm() {
         this.teacherFirstName = this.teacherLastName = this.teacherEmail =
-        this.teacherPhone = this.teacherQualification = '';
+        this.teacherPhone = this.teacherQualification = this.teacherBirthDate = 
+        this.teacherJoiningDate = '';
+        this.teacherBasicSalary = this.teacherHra = this.teacherDa = this.teacherPf = 0;
+        this.teacherAccountNumber = this.teacherIfsc = '';
         this.teacherSkills = [];
     }
 
@@ -1886,7 +1920,12 @@ export default class ClassManagement extends LightningElement {
             const reader = new FileReader();
             reader.onload = () => {
                 const csvStr = reader.result;
-                this.teachersCsvPayload = this.parseCsvToJson(csvStr, ['firstName','lastName','email','phone','qualification','subject1','skillLevel1']);
+                this.teachersCsvPayload = this.parseCsvToJson(csvStr, [
+                    'firstName','lastName','email','phone','qualification',
+                    'birthDate','joiningDate',
+                    'basicSalary','hra','da','pf','accountNumber','ifsc',
+                    'subject1','skillLevel1'
+                ]);
             };
             reader.readAsText(file);
         }
@@ -1963,7 +2002,7 @@ export default class ClassManagement extends LightningElement {
     }
 
     handleDownloadTeacherTemplate() {
-        const csvContent = "data:text/csv;charset=utf-8,firstName,lastName,email,phone,qualification,subject1,skillLevel1\n";
+        const csvContent = "data:text/csv;charset=utf-8,firstName,lastName,email,phone,qualification,birthDate,joiningDate,basicSalary,hra,da,pf,accountNumber,ifsc,subject1,skillLevel1\n";
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
