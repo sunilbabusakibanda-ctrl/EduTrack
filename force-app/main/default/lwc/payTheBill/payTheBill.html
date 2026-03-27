@@ -168,7 +168,20 @@
                                             <div class="spinner-inline"></div>
                                         </template>
                                         <template lwc:else>
-                                            <img src={qrCodeUrl} alt="UPI QR">
+                                            <div class="slds-m-top_medium slds-text-align_center">
+                                                <template lwc:if={qrCodeUrl}>
+                                                    <img src={qrCodeUrl} alt="QR Code" class="qr-code-img" />
+                                                    <p class="slds-text-body_small slds-m-top_small">Scan with Any UPI App</p>
+                                                    <p class="slds-text-body_small text-muted">A/C: {upiIdUsed}</p>
+                                                    <p class="slds-text-body_small slds-m-top_x-small" style="font-size: 8px; color: #ccc;">{rawUpiUrl}</p>
+                                                </template>
+                                                <template lwc:else>
+                                                    <div class="qr-missing-msg animate-fade-in">
+                                                        <div class="msg-icon">⚠️</div>
+                                                        <div class="msg-text">Go to School Setup and upload a QR code.</div>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </template>
                                     </div>
                                     <div class="standee-merchant">{schoolName}</div>

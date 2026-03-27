@@ -81,7 +81,7 @@ public class SchoolSetupControllerTest {
         accountsData.add(acc1);
 
         Test.startTest();
-        SchoolSetupController.saveBankAccounts(accountsData);
+        SchoolSetupController.saveBankAccounts(accountsData, new List<Id>());
         List<Map<String, Object>> retrievedAccounts = SchoolSetupController.getBankAccounts();
         Test.stopTest();
 

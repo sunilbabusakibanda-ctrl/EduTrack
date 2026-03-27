@@ -4,7 +4,23 @@ public with sharing class SchoolSetupController {
     public static Map<String, Object> getSetup() {
         try {
             School_Setup__c setup = School_Setup__c.getOrgDefaults();
-            return NamespaceUtils.stripNamespace(setup);
+            // Explicitly map fields to avoid issues with JSON serialization stripping namespaced fields
+            Map<String, Object> result = new Map<String, Object>();
+            result.put('School_Name__c', setup.School_Name__c);
+            result.put('School_Address__c', setup.School_Address__c);
+            result.put('School_Email__c', setup.School_Email__c);
+            result.put('School_Phone__c', setup.School_Phone__c);
+            result.put('School_Logo__c', setup.School_Logo__c);
+            result.put('School_Subtitle__c', setup.School_Subtitle__c);
+            result.put('PhonePe_ID__c', setup.PhonePe_ID__c);
+            result.put('GooglePay_ID__c', setup.GooglePay_ID__c);
+            result.put('UPI_QR_ID__c', setup.UPI_QR_ID__c);
+            result.put('Bank_Name__c', setup.Bank_Name__c);
+            result.put('Bank_IFSC__c', setup.Bank_IFSC__c);
+            result.put('Bank_Account_Number__c', setup.Bank_Account_Number__c);
+            result.put('Bank_Branch__c', setup.Bank_Branch__c);
+            result.put('Setup_Completed__c', setup.Setup_Completed__c);
+            return result;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }

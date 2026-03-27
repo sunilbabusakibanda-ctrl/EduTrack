@@ -58,6 +58,8 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
     @track selectedPaymentMethod = 'Cash'; // Default to Cash
     @track selectedBankId = '';
     @track qrCodeBase64 = '';
+    @track dynamicQrUrl = '';
+    @track rawUpiUrl = '';      // For diagnostics
     @track isQRLoading = false;
     @track studentTotalPaid = 0;
     @track studentTotalPending = 0;
@@ -163,6 +165,14 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
     }
 
     // Computed Properties
+    get upiIdUsed() {
+        if (!this.schoolConfig) return 'Loading settings... [V5]';
+        const id = this.selectedPaymentMethod === 'PhonePe'
+            ? this.schoolConfig.PhonePe_ID__c
+            : this.schoolConfig.GooglePay_ID__c;
+        return (id || 'NOT SET IN SCHOOL SETUP') + ' [V5]';
+    }
+
     get isUPISelected() {
         return this.selectedPaymentMethod === 'PhonePe' || this.selectedPaymentMethod === 'Google Pay';
     }
@@ -175,6 +185,10 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         return this.isUPISelected && parseFloat(this.billingTotal) > 0;
     }
 
+    get isQrMissing() {
+        return this.isUPISelected && !this.schoolConfig.UPI_QR_ID__c;
+    }
+
     get uploadedQrUrl() {
         return this.schoolConfig.UPI_QR_ID__c ? `/sfc/servlet.shepherd/version/download/${this.schoolConfig.UPI_QR_ID__c}` : '';
     }
@@ -183,8 +197,9 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         if (this.uploadedQrUrl) {
             return this.uploadedQrUrl;
         }
-        if (this.qrCodeBase64) {
-            return `data:image/png;base64,${this.qrCodeBase64}`;
+        if (this.isUPISelected) {
+            if (this.qrCodeBase64) return `data:image/png;base64,${this.qrCodeBase64}`;
+            return this.dynamicQrUrl || '';
         }
         return '';
     }
@@ -222,26 +237,39 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
     async generateQRCode() {
         if (!this.isUPISelected || parseFloat(this.billingTotal) <= 0) {
             this.qrCodeBase64 = '';
+            this.dynamicQrUrl = '';
             return;
         }
 
-        // Use School Config or fallback to defaults
         const payeeAddress = this.selectedPaymentMethod === 'PhonePe'
-            ? (this.schoolConfig.PhonePe_ID__c || '8374331432@ybl')
-            : (this.schoolConfig.GooglePay_ID__c || '8374331432@okaxis');
+            ? this.schoolConfig.PhonePe_ID__c
+            : this.schoolConfig.GooglePay_ID__c;
+
+        if (!payeeAddress) {
+            console.warn('No UPI ID found for ' + this.selectedPaymentMethod);
+            this.qrCodeBase64 = '';
+            this.dynamicQrUrl = '';
+            this.isQRLoading = false;
+            return;
+        }
 
         const payeeName = this.schoolName.toUpperCase();
-
         this.isQRLoading = true;
+        
         const amount = this.billingTotal || 0;
-        const upiUrl = `upi://pay?pa=${payeeAddress}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR`;
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiUrl)}&margin=10&ecc=H`;
+        
+        // ULTA-ROBUST: Minimal parameters, no PN/TN (avoids encoding issues), with cache-busting
+        const upiUrl = `upi://pay?pa=${payeeAddress}&am=${amount}&cu=INR`;
+        this.rawUpiUrl = upiUrl;
+        const timestamp = Date.now();
+        this.dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiUrl)}&ts=${timestamp}`;
 
         try {
-            this.qrCodeBase64 = await getQRCodeBase64({ qrUrl: qrApiUrl });
+            // We fetch it via Apex to avoid CSP issues in some orgs, but we'll also have the URL ready as fallback
+            this.qrCodeBase64 = await getQRCodeBase64({ qrUrl: this.dynamicQrUrl });
         } catch (error) {
             console.error('QR Fetch Error:', error);
-            this.qrCodeBase64 = '';
+            // If Apex fails, the getter will fallback to the direct URL if CSP allows
         } finally {
             this.isQRLoading = false;
         }

@@ -667,6 +667,29 @@ tbody tr.selected td {
     object-fit: contain;
 }
 
+.qr-missing-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    background: #fffcf0;
+    border-radius: 8px;
+}
+
+.qr-missing-msg .msg-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.qr-missing-msg .msg-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #856404;
+    line-height: 1.5;
+}
+
 .standee-merchant {
     margin-top: 16px;
     font-size: 13px;

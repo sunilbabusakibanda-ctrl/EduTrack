@@ -208,6 +208,17 @@ export default class SchoolSetup extends LightningElement {
         });
     }
 
+    handleRemoveFile(event) {
+        if (this.isReadOnly) return;
+        const type = event.target.dataset.type;
+        if (type === 'qr') {
+            this.schoolData.upiQrId = '';
+            this.schoolData.upiQrUrl = '';
+        } else {
+            this.schoolData.schoolLogo = '';
+        }
+    }
+
     handleFileSelect(event) {
         if (this.isReadOnly) return;
         const file = event.target.files[0];
