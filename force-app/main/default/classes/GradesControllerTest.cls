@@ -29,7 +29,7 @@ public class GradesControllerTest {
             Social__c='88', 
             Computer__c='95', 
             Telugu__c='75', 
-            Hindi__c=82
+            Hindi__c='82'
         );
     }
     
