@@ -36,6 +36,11 @@
                 <default>false</default>
                 <label>E</label>
             </value>
+            <value>
+                <fullName>All</fullName>
+                <default>false</default>
+                <label>All</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

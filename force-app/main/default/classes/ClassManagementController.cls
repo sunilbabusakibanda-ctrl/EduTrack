@@ -703,19 +703,31 @@ try {
     ) {
         Savepoint sp = Database.setSavepoint();
         try {
-            if (String.isBlank(firstName) || String.isBlank(lastName))
-                throw new AuraHandledException('First Name and Last Name are required.');
-            if (String.isBlank(email))
-                throw new AuraHandledException('Email is required.');
-            if (skills == null || skills.isEmpty())
-                throw new AuraHandledException('At least one subject skill is required.');
+            if (String.isBlank(firstName) || String.isBlank(lastName)) {
+                AuraHandledException e = new AuraHandledException('First Name and Last Name are required.');
+                e.setMessage('First Name and Last Name are required.');
+                throw e;
+            }
+            if (String.isBlank(email)) {
+                AuraHandledException e = new AuraHandledException('Email is required.');
+                e.setMessage('Email is required.');
+                throw e;
+            }
+            if (skills == null || skills.isEmpty()) {
+                AuraHandledException e = new AuraHandledException('At least one subject skill is required.');
+                e.setMessage('At least one subject skill is required.');
+                throw e;
+            }
 
             List<Account> existing = [
                 SELECT Id FROM Account
                 WHERE PersonEmail = :email AND IsPersonAccount = true LIMIT 1
             ];
-            if (!existing.isEmpty())
-                throw new AuraHandledException('A teacher with this email already exists.');
+            if (!existing.isEmpty()) {
+                AuraHandledException e = new AuraHandledException('A teacher with this email already exists: ' + email);
+                e.setMessage('A teacher with this email already exists: ' + email);
+                throw e;
+            }
 
             Id personRtId;
 try {

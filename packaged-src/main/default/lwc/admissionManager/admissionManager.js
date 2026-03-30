@@ -325,7 +325,27 @@ export default class AdmissionManager extends NavigationMixin(LightningElement) 
     handleNewAdmissionAction() {
         this.currentStep = '1';
         this.selectedProductIds = [];
-        this.tempStudent = { ...this.tempStudent, firstName: '', lastName: '', fatherName: '', motherName: '', dob: '', phone: '', emergencyContact: '', email: '', village: '', city: '', pincode: '' };
+        this.concessionAmount = 0;
+        this.concessionPercent = 0;
+        this.tempStudent = {
+            firstName: '',
+            lastName: '',
+            fatherName: '',
+            motherName: '',
+            dob: '',
+            phone: '',
+            emergencyContact: '',
+            email: '',
+            aadharNo: '',
+            village: '',
+            city: '',
+            pincode: '',
+            state: '',
+            country: '',
+            selectedClass: '',
+            selectedSection: '',
+            academicYear: ''
+        };
     }
 
     showToast(title, message, variant) {
