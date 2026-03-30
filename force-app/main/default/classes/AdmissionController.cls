@@ -63,32 +63,31 @@ public with sharing class AdmissionController {
             String phoneValue = studentData.get('phone');
             student.PersonMobilePhone = phoneValue;
             student.Phone = phoneValue;
-            
-            student.put('Father_Name__c', studentData.get('fatherName'));
-            student.put('Mother_Name__c', studentData.get('motherName'));
+            student.Father_Name__c = studentData.get('fatherName');
+            student.Mother_Name__c = studentData.get('motherName');
             if (String.isNotBlank(studentData.get('dob'))) {
                 try {
                     student.PersonBirthdate = Date.valueOf(studentData.get('dob'));
                 } catch (Exception e) {}
             }
-            student.put('Emergency_Contact__c', studentData.get('emergencyContact'));
+            student.Emergency_Contact__c = studentData.get('emergencyContact');
             if (String.isNotBlank(studentData.get('aadharNo'))) {
-                student.put('Aadhar_Card_No__c', studentData.get('aadharNo'));
+                student.Aadhar_Card_No__c = studentData.get('aadharNo');
             }
 
             student.PersonMailingCity = studentData.get('city');
             student.PersonMailingPostalCode = studentData.get('pincode');
-            student.put('State__c', studentData.get('state'));
-            student.put('Country__c', studentData.get('country'));
-            student.put('Village__c', studentData.get('village'));
+            student.State__c = studentData.get('state');
+            student.Country__c = studentData.get('country');
+            student.Village__c = studentData.get('village');
             
             student.PersonMailingStreet = studentData.get('village');
             student.BillingStreet = studentData.get('village');
 
             student.Type = 'Student';
-            student.put('Active__c', 'Yes');
-            student.put('Class__c', studentData.get('selectedClass'));
-            student.put('Section__c', studentData.get('selectedSection'));
+            student.Active__c = 'Yes';
+            student.Class__c = studentData.get('selectedClass');
+            student.Section__c = studentData.get('selectedSection');
             
             insert student;
             
@@ -103,9 +102,9 @@ public with sharing class AdmissionController {
             opp.AccountId = student.Id;
             opp.StageName = 'Prospecting';
             opp.CloseDate = Date.today().addDays(30);
-            opp.put('Class__c', studentData.get('selectedClass'));
-            opp.put('Section__c', studentData.get('selectedSection'));
-            opp.put('Academic_Year__c', studentData.get('academicYear'));
+            opp.Class__c = studentData.get('selectedClass');
+            opp.Section__c = studentData.get('selectedSection');
+            opp.Academic_Year__c = studentData.get('academicYear');
             insert opp;
             
             if(!selectedPricebookEntryIds.isEmpty()) {
@@ -394,16 +393,16 @@ public with sharing class AdmissionController {
                 Map<String, String> data = studentDataList[i];
                 try {
                     Account acc = new Account(RecordTypeId = personAccountRecordTypeId, FirstName = data.get('First Name'), LastName = data.get('Last Name'), PersonEmail = data.get('Email'), Phone = data.get('Phone'), PersonMobilePhone = data.get('Phone'));
-                    acc.put('Father_Name__c', data.get('Father Name')); acc.put('Mother_Name__c', data.get('Mother Name'));
+                    acc.Father_Name__c = data.get('Father Name'); acc.Mother_Name__c = data.get('Mother Name');
                     
                     String dobStr = data.containsKey('DOB') ? data.get('DOB') : data.get('DOB (YYYY-MM-DD)');
                     if(String.isNotBlank(dobStr)) acc.PersonBirthdate = parseFlexibleDate(dobStr);
 
-                    acc.put('Aadhar_Card_No__c', data.get('Aadhar No')); acc.put('Village__c', data.get('Village'));
+                    acc.Aadhar_Card_No__c = data.get('Aadhar No'); acc.Village__c = data.get('Village');
                     acc.PersonMailingCity = data.get('City'); acc.PersonMailingPostalCode = data.get('Pincode');
-                    acc.put('State__c', data.get('State')); acc.put('Country__c', data.get('Country'));
-                    acc.put('Class__c', data.get('Class')); acc.put('Section__c', data.get('Section'));
-                    acc.Type = 'Student'; acc.put('Active__c', 'Yes');
+                    acc.State__c = data.get('State'); acc.Country__c = data.get('Country');
+                    acc.Class__c = data.get('Class'); acc.Section__c = data.get('Section');
+                    acc.Type = 'Student'; acc.Active__c = 'Yes';
 
                     accountsToInsert.add(acc);
                     validStudentRowData.add(data);
@@ -425,7 +424,7 @@ public with sharing class AdmissionController {
 
                         Opportunity opp = new Opportunity(AccountId = srList[i].getId(), StageName = 'Prospecting', CloseDate = Date.today().addDays(30));
                         opp.Name = acc.FirstName + ' ' + acc.LastName + ' - Admission ' + (data.get('Academic Year') != null ? data.get('Academic Year') : '');
-                        opp.put('Class__c', data.get('Class')); opp.put('Section__c', data.get('Section')); opp.put('Academic_Year__c', ayId);
+                        opp.Class__c = data.get('Class'); opp.Section__c = data.get('Section'); opp.Academic_Year__c = ayId;
 
                         oppsToInsert.add(opp);
                         successRowData.add(data);
