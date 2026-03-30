@@ -116,8 +116,8 @@
                 <div class="stat-value purple">{topScoreDisplay}</div>
                 <div class="stat-sub">
                     <template for:each={topScorersList} for:item="ts">
-                        <span key={ts.Id}>
-                            <span class="clickable-name" onclick={openModal} data-id={ts.Id} data-test={ts.examType}>{ts.Name}</span><template lwc:if={ts.isLast}></template><template lwc:else>, </template>
+                        <span key={ts.Id} class="top-scorer-badge" onclick={openModal} data-id={ts.Id} data-test={ts.examType}>
+                            {ts.Name}
                         </span>
                     </template>
                     • {topScorerClassLabel}
@@ -204,7 +204,7 @@
                                 <div class="mname">{modalStudent.Name}</div>
                                 <div class="mmeta">
                                     <span>📋 {modalStudent.Roll_No__c}</span>
-                                    <span>🏫 Class {modalStudent.Class__c}</span>
+                                    <span>🏫 {modalStudent.Class__c}</span>
                                     <span>🔤 Section {modalStudent.Section__c}</span>
                                 </div>
                             </div>

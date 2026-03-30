@@ -327,6 +327,31 @@ select option {
     font-size: 13px;
     color: rgba(0, 0, 0, 0.55);
     margin-top: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.top-scorer-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    background: linear-gradient(135deg, #a855f7, #8b5cf6);
+    color: white !important;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 6px rgba(168, 85, 247, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.top-scorer-badge:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    filter: brightness(1.1);
 }
 
 .stat-sub.up {

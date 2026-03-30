@@ -186,34 +186,24 @@ export default class GradesModule extends LightningElement {
         let passCount = 0;
         let failCount = 0;
         let sum = 0;
-        let top = -1;
-        let topScorers = [];
-        
-        const isSubjectMode = !!this.selectedSubject;
 
         this.students.forEach(s => {
             sum += s.displayScore;
             if (s.displayScore >= 35) passCount++;
             else failCount++;
-            
-            const rankScore = isSubjectMode ? s.subjectScore : s.totalSum;
-
-            // In subject mode, skip students with zero/no marks
-            if (isSubjectMode && rankScore <= 0) return;
-
-            if (rankScore > top) {
-                top = rankScore;
-                topScorers = [s];
-            } else if (rankScore === top && top > 0) {
-                topScorers.push(s);
-            }
         });
-        
+
+        // TOP SCORERS: Top 5 students between 95% and 100%
+        let eligibleTopScorers = this.students
+            .filter(s => s.displayScore >= 95)
+            .sort((a, b) => b.displayScore - a.displayScore)
+            .slice(0, 5);
+
         this.totalPassed = passCount;
         this.totalFailed = failCount;
         this.classAverage = total > 0 ? (sum / total).toFixed(1) : 0;
-        this.topScore = topScorers.length > 0 ? topScorers[0].displayScore : 0;
-        this._topScorers = topScorers;
+        this.topScore = eligibleTopScorers.length > 0 ? eligibleTopScorers[0].displayScore : 0;
+        this._topScorers = eligibleTopScorers;
         this.passRate = total > 0 ? Math.round((passCount / total) * 100) : 0;
         this.averageDiff = 0; 
     }
@@ -371,14 +361,12 @@ export default class GradesModule extends LightningElement {
     get selectedTestLabel() { return this.selectedTest || 'No Test Selected'; }
     get topScorersList() {
         if (!this._topScorers || this._topScorers.length === 0) {
-            return [{ Id: null, Name: 'N/A', classLabel: '', examType: '', isLast: true }];
+            return [{ Id: null, Name: 'None' }];
         }
-        return this._topScorers.map((s, i) => ({
+        return this._topScorers.map(s => ({
             Id: s.Id,
             Name: s.Name,
-            classLabel: `${s.Class__c || ''}${s.Section__c || ''}`,
-            examType: s.Exam_Type__c || '',
-            isLast: i === this._topScorers.length - 1
+            examType: s.Exam_Type__c || ''
         }));
     }
     get topScorerClassLabel() {
