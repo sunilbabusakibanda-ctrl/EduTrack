@@ -62,6 +62,7 @@ public with sharing class GradesController {
     public static List<Map<String, Object>> getGradesData(String className, String sectionName, String examType, String searchTerm) {
         // 1. Identify Subject Fields dynamically
         List<String> subjectFields = new List<String>();
+        Map<String, String> fieldToLocalMap = new Map<String, String>();
         Map<String, Schema.SObjectField> fields = Schema.SObjectType.Exam__c.fields.getMap();
         Set<String> excluded = new Set<String>{'Exam_Type__c', 'Roll_No__c', 'Roll_Number__c', 'Section__c', 'Class__c', 'Student__c', 'Name', 'Id', 'CreatedDate', 'LastModifiedDate', 'SystemModstamp'};
         
@@ -71,6 +72,7 @@ public with sharing class GradesController {
                 Schema.DisplayType dt = dfr.getType();
                 if (dt == Schema.DisplayType.Double || dt == Schema.DisplayType.Integer || dt == Schema.DisplayType.Percent || dt == Schema.DisplayType.String) {
                     subjectFields.add(dfr.getName());
+                    fieldToLocalMap.put(dfr.getName(), dfr.getLocalName());
                 }
             }
         }
@@ -81,7 +83,7 @@ public with sharing class GradesController {
         if (String.isNotBlank(examType)) {
             subQuery += ' WHERE Exam_Type__c = \'' + String.escapeSingleQuotes(examType) + '\'';
         }
-        subQuery += ')';
+        subQuery += ' ORDER BY CreatedDate DESC)';
         
         String query = 'SELECT Id, Name, Roll_No__c, Class__c, Section__c, ' + subQuery + 
                        ' FROM Account WHERE Type = \'Student\'';
@@ -117,18 +119,25 @@ public with sharing class GradesController {
                 // Find matching exam for the selected type
                 Exam__c matchingExam = null;
                 if (s.Exams__r != null && !s.Exams__r.isEmpty()) {
+                    // If examType is specified, take the first matching one. 
+                    // If examType is null (All Tests), take the most recent one.
                     matchingExam = s.Exams__r[0];
                 }
                 
-                row.put('Exam_Type__c', matchingExam != null ? matchingExam.Exam_Type__c : examType);
+                row.put('Exam_Type__c', matchingExam != null ? matchingExam.Exam_Type__c : (String.isNotBlank(examType) ? examType : 'All Tests'));
                 
                 for (String f : subjectFields) {
                     Object val = (matchingExam != null) ? matchingExam.get(f) : null;
-                    String localFieldName = fields.get(f).getDescribe().getLocalName();
+                    String localFieldName = fieldToLocalMap.get(f);
+                    
                     if (val == null) {
                         row.put(localFieldName, 0); 
                     } else if (val instanceof String) {
-                        try { row.put(localFieldName, Decimal.valueOf((String)val)); } catch (Exception ex) { row.put(localFieldName, 0); }
+                        try { 
+                            row.put(localFieldName, Decimal.valueOf((String)val)); 
+                        } catch (Exception ex) { 
+                            row.put(localFieldName, 0); 
+                        }
                     } else {
                         row.put(localFieldName, val);
                     }

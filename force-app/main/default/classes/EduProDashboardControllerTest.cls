@@ -30,7 +30,7 @@ public class EduProDashboardControllerTest {
         
         insert new Attendance__c(Student__c=student.Id, Attendance_Session__c=sess.Id, Attendance_Status__c='Absent', Date__c=Date.today());
         
-        insert new Exam__c(Student__c=student.Id, English__c='80', Maths__c='90', Science__c='85', Social__c='88', Computer__c='95', Telugu__c='75', Hindi__c=82);
+        insert new Exam__c(Student__c=student.Id, English__c='80', Maths__c='90', Science__c='85', Social__c='88', Computer__c='95', Telugu__c='75', Hindi__c='82');
     }
     
     @isTest

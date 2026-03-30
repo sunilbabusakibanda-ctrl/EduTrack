@@ -1,0 +1,39 @@
+───── Deploying Metadata ─────
+Stages:
+1. Preparing
+2. Waiting for the org to respond
+3. Deploying Metadata
+4. Running Tests
+5. Updating Source Tracking
+6. Done
+
+▶ Preparing…
+   Deploying v60.0 metadata to sunil@devorg.com using the v66.0 SOAP API.
+   Deploy ID: 0Aff6000004BlaoCAC
+   Target Org: sunil@devorg.com
+✔ Preparing (281ms)
+◯ Waiting for the org to respond - Skipped
+▶ Deploying Metadata…
+   Components: 0/476 (0%)
+   Components: 46/476 (10%)
+   Components: 379/476 (80%)
+   Components: 473/476 (99%)
+   Components: 473/477 (99%)
+✘ Deploying Metadata (32.09s)
+
+Deploying v60.0 metadata to sunil@devorg.com using the v66.0 SOAP API.
+Status: Failed
+Deploy ID: 0Aff6000004BlaoCAC
+Target Org: sunil@devorg.com
+
+Elapsed time: 32.37s
+
+[1m[31mComponent Failures [4][39m[22m
+ Type       Name                      Problem                                                                                                                                                                                 Line:Column 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (49:46)  49:46       
+ ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (53:49)  53:49       
+ ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (60:30)  60:30       
+ ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(NULL, NULL, String, NULL, Integer, Integer, Integer) from the type EduTrack.AttendanceController (63:34)              63:34       
+
+

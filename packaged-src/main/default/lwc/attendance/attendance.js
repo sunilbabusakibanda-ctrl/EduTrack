@@ -4,6 +4,8 @@ import getSessionData from '@salesforce/apex/AttendanceController.getSessionData
 import saveAttendance from '@salesforce/apex/AttendanceController.saveAttendance';
 import getClasses from '@salesforce/apex/AttendanceController.getClasses';
 import getSections from '@salesforce/apex/AttendanceController.getSections';
+import getTeachers from '@salesforce/apex/AttendanceController.getTeachers';
+import getRecentSubmissions from '@salesforce/apex/AttendanceController.getRecentSubmissions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AttendanceScreen extends LightningElement {
@@ -19,9 +21,68 @@ export default class AttendanceScreen extends LightningElement {
     @track pinnedIds = []; // IDs of students whose status changed in the current filter view
     @track showReport = false; // Toggles between Tracker and Report view
 
+    // Teacher Selection State
+    @track showTeacherSelection = true;
+    @track teachers = [];
+    @track filteredTeachers = [];
+    @track selectedTeacher = null;
+    @track teacherSearchTerm = '';
+    @track isTeacherDropdownOpen = false;
+    @track recentSubmissions = [];
+    @track submittedTeacherName = '';
+    @track submittedTime = '';
+    @track lastUpdatedTime = '';
+    _outsideClickListener; // To manage lifecycle of click-outside listener
+    _justOpened = false; // To prevent immediate close on the same click that opens the dropdown
+
     // Wired Options
     @track classOptions = [];
     @track sectionOptions = [];
+
+
+    fetchRecentSubmissions() {
+        // Method kept for manual refresh after submission
+        getRecentSubmissions()
+            .then(result => {
+                if (result) {
+                    const copy1 = result.map(item => ({...item, id: item.id + '-1'}));
+                    const copy2 = result.map(item => ({...item, id: item.id + '-2'}));
+                    this.recentSubmissions = [...copy1, ...copy2];
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching recent submissions:', error);
+            });
+    }
+
+    @wire(getRecentSubmissions)
+    wiredRecentSubmissions({ error, data }) {
+        if (data) {
+            // Duplicate once for a seamless infinite loop with unique keys
+            const copy1 = data.map(item => ({...item, id: item.id + '-1'}));
+            const copy2 = data.map(item => ({...item, id: item.id + '-2'}));
+            this.recentSubmissions = [...copy1, ...copy2];
+        } else if (error) {
+            console.error('Error loading recent submissions', error);
+        }
+    }
+
+    @wire(getTeachers)
+    wiredTeachers({ error, data }) {
+        if (data) {
+            this.teachers = data.map(t => {
+                const colorClass = this.getRandomColorClass();
+                return {
+                    ...t,
+                    initials: this.getInitials(t.name),
+                    colorClass: colorClass
+                };
+            });
+            this.filteredTeachers = [...this.teachers];
+        } else if (error) {
+            console.error('Error loading teachers', error);
+        }
+    }
 
     @wire(getClasses)
     wiredClasses({ error, data }) {
@@ -51,6 +112,34 @@ export default class AttendanceScreen extends LightningElement {
         
         // Auto-load defaults on initialization
         this.loadStudentsIfReady();
+
+        // Listen for clicks outside to close teacher dropdown
+        this._outsideClickListener = this.handleClickOutside.bind(this);
+        window.addEventListener('click', this._outsideClickListener);
+    }
+
+    disconnectedCallback() {
+        if (this._outsideClickListener) {
+            window.removeEventListener('click', this._outsideClickListener);
+        }
+    }
+
+    handleClickOutside(event) {
+        // If the dropdown was just opened by a focus event, ignore the subsequent click event
+        if (this._justOpened) {
+            this._justOpened = false;
+            return;
+        }
+
+        if (!this.isTeacherDropdownOpen) return;
+
+        // Use composedPath to handle clicks within Shadow DOM
+        const path = event.composedPath();
+        const isInside = path.some(el => el.dataset && el.dataset.id === 'teacher-search-container');
+        
+        if (!isInside) {
+            this.isTeacherDropdownOpen = false;
+        }
     }
 
     get isSectionDisabled() {
@@ -78,6 +167,9 @@ export default class AttendanceScreen extends LightningElement {
             this.loading = true;
             this.isSuccess = false; // Reset view
             this.students = []; // Clear list
+            this.submittedTeacherName = '';
+            this.submittedTime = '';
+            this.lastUpdatedTime = '';
             
             // Date restrictions: Attendance for past dates is Read Only
             const selectedDateObj = new Date(this.selectedDate);
@@ -94,6 +186,12 @@ export default class AttendanceScreen extends LightningElement {
                 ]);
                 
                 this.sessionExists = sessionData.sessionExists;
+                if (this.sessionExists) {
+                    this.submittedTeacherName = sessionData.teacherName || '';
+                    this.submittedTime = sessionData.createdTime || '';
+                    this.lastUpdatedTime = sessionData.lastUpdatedTime || '';
+                }
+                
                 this.students = studentsData.map(student => {
                     // Auto-mark absent if session exists
                     const absentIds = sessionData.absentIds || [];
@@ -184,23 +282,28 @@ export default class AttendanceScreen extends LightningElement {
         const present = total - absent;
 
         try {
-            await saveAttendance({ 
+            const sessionData = await saveAttendance({ 
                 classVal: this.selectedClass.trim(), 
                 sectionVal: this.selectedSection.trim(), 
                 dateStr: this.selectedDate,
                 absentStudentIds: absentStudentIds,
-                totalCount: total,
+                totalStudents: total,
                 presentCount: present,
-                absentCount: absent
+                absentCount: absent,
+                teacherId: this.selectedTeacher ? this.selectedTeacher.id : ''
             });
 
-            this.showToast('Success', 'Attendance saved successfully', 'success');
-            
-            // Force Refresh to get new Session ID/Data
-            await this.loadStudentsIfReady();
-            this.forceRefresh = true; // Flag to ensure UI updates if needed
-            this.isSuccess = true; // Show Summary
+            if (sessionData) {
+                this.submittedTeacherName = sessionData.teacherName || (this.selectedTeacher ? this.selectedTeacher.name : '');
+                this.submittedTime = sessionData.createdTime || '';
+                this.lastUpdatedTime = sessionData.lastUpdatedTime || '';
+                this.sessionExists = sessionData.sessionExists;
+                this.isSuccess = true; // Show Summary
+            }
 
+            this.showToast('Success', 'Attendance saved successfully', 'success');
+            this.fetchRecentSubmissions();
+            this.loading = false;
         } catch (error) {
             console.error('Save Error:', error);
             this.showToast('Error', 'Failed to save: ' + (error.body ? error.body.message : error.message), 'error');
@@ -281,6 +384,10 @@ export default class AttendanceScreen extends LightningElement {
         return this.sessionExists ? 'Update Attendance' : 'Submit Attendance';
     }
 
+    get showUpdatedTime() {
+        return this.submittedTime && this.lastUpdatedTime && this.submittedTime !== this.lastUpdatedTime;
+    }
+
     get stats() {
         const total = this.students.length;
         const absent = this.students.filter(s => s.isAbsent).length;
@@ -340,6 +447,84 @@ export default class AttendanceScreen extends LightningElement {
 
     getInitials(name) {
         return name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+    }
+
+    handleTeacherSearch(event) {
+        this.teacherSearchTerm = event.target.value.toLowerCase();
+        if (this.teacherSearchTerm) {
+            this.isTeacherDropdownOpen = true;
+            this.filteredTeachers = this.teachers.filter(t => 
+                t.name.toLowerCase().includes(this.teacherSearchTerm) || 
+                t.subject.toLowerCase().includes(this.teacherSearchTerm)
+            );
+        } else {
+            this.filteredTeachers = [...this.teachers];
+            this.isTeacherDropdownOpen = false;
+        }
+    }
+
+    handleTeacherInputChange(event) {
+        this.teacherSearchTerm = event.target.value;
+        if (!this.teacherSearchTerm) {
+            this.isTeacherDropdownOpen = false;
+        }
+    }
+
+    openTeacherDropdown() {
+        if (!this.selectedTeacher) {
+            this.isTeacherDropdownOpen = true;
+            this._justOpened = true; // Mark as just opened to ignore the following click event
+        }
+    }
+
+    handleTeacherSelect(event) {
+        const teacherId = event.currentTarget.dataset.id;
+        this.selectedTeacher = this.teachers.find(t => t.id === teacherId);
+        this.isTeacherDropdownOpen = false;
+        this.teacherSearchTerm = this.selectedTeacher.name;
+    }
+
+    handleClearTeacher() {
+        this.selectedTeacher = null;
+        this.teacherSearchTerm = '';
+        this.isTeacherDropdownOpen = false;
+    }
+
+    handleProceed() {
+        if (this.selectedTeacher) {
+            this.showTeacherSelection = false;
+        }
+    }
+
+    handleTeacherChange() {
+        this.handleClearTeacher();
+        this.isTeacherDropdownOpen = true;
+    }
+
+    get isProceedDisabled() {
+        return !this.selectedTeacher;
+    }
+
+    get teacherSearchInputClass() {
+        return `search-input ${this.teacherSearchTerm ? 'has-value' : ''}`;
+    }
+
+    get teacherDropdownClass() {
+        return `dropdown ${this.isTeacherDropdownOpen ? 'open' : ''}`;
+    }
+
+    get showNoTeacherMatch() {
+        return this.isTeacherDropdownOpen && this.filteredTeachers.length === 0;
+    }
+
+    get contactDate() {
+        const d = new Date();
+        return d.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }
+
+    getRandomColorClass() {
+        const classes = ['bg-indigo', 'bg-purple', 'bg-sky', 'bg-rose', 'bg-amber', 'bg-emerald', 'bg-pink', 'bg-teal', 'bg-orange', 'bg-violet'];
+        return classes[Math.floor(Math.random() * classes.length)];
     }
 
     showToast(title, message, variant) {

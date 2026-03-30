@@ -95,6 +95,14 @@ export default class ClassManagement extends LightningElement {
     @track teacherEmail         = '';
     @track teacherPhone         = '';
     @track teacherQualification = '';
+    @track teacherBirthDate     = '';
+    @track teacherJoiningDate   = '';
+    @track teacherBasicSalary    = 0;
+    @track teacherHra            = 0;
+    @track teacherDa             = 0;
+    @track teacherPf             = 0;
+    @track teacherAccountNumber  = '';
+    @track teacherIfsc           = '';
     @track teacherSkills        = [];
     @track skillLevelOptions    = [];
     @track showTeacherForm      = false;
@@ -182,7 +190,6 @@ export default class ClassManagement extends LightningElement {
     @track newClassNameInline      = '';
     @track modalSubjects           = [{ id: 1, name: '', label: 'Subject Name', showAdd: true, showDelete: false }];
     @track modalClasses            = [{ id: 1, name: '', label: 'Class Name', showAdd: true, showDelete: false }];
-    @track modalSections           = [{ id: 1, name: '', label: 'Section Name', showAdd: true, showDelete: false }];
 
     @track newClassName = '';
     @track newSectionName = '';
@@ -1049,6 +1056,14 @@ export default class ClassManagement extends LightningElement {
     handleTeacherEmailChange(e)         { this.teacherEmail         = e.detail.value; }
     handleTeacherPhoneChange(e)         { this.teacherPhone         = e.detail.value; }
     handleTeacherQualificationChange(e) { this.teacherQualification = e.detail.value; }
+    handleTeacherBirthDateChange(e)     { this.teacherBirthDate     = e.detail.value; }
+    handleTeacherJoiningDateChange(e)   { this.teacherJoiningDate   = e.detail.value; }
+    handleTeacherBasicSalaryChange(e)    { this.teacherBasicSalary    = parseFloat(e.detail.value) || 0; }
+    handleTeacherHraChange(e)            { this.teacherHra            = parseFloat(e.detail.value) || 0; }
+    handleTeacherDaChange(e)             { this.teacherDa             = parseFloat(e.detail.value) || 0; }
+    handleTeacherPfChange(e)             { this.teacherPf             = parseFloat(e.detail.value) || 0; }
+    handleTeacherAccountNumberChange(e)  { this.teacherAccountNumber  = e.detail.value; }
+    handleTeacherIfscChange(e)           { this.teacherIfsc           = e.detail.value; }
 
     handleAddSkill() {
         this.teacherSkills = [
@@ -1088,13 +1103,28 @@ export default class ClassManagement extends LightningElement {
             const result = await createTeacherWithSkills({
                 firstName: this.teacherFirstName, lastName: this.teacherLastName,
                 email: this.teacherEmail, phone: this.teacherPhone,
-                qualification: this.teacherQualification, skills: this.teacherSkills
+                qualification: this.teacherQualification, 
+                birthDate: this.teacherBirthDate,
+                joiningDate: this.teacherJoiningDate,
+                basicSalary: this.teacherBasicSalary,
+                hra: this.teacherHra,
+                da: this.teacherDa,
+                pf: this.teacherPf,
+                accountNumber: this.teacherAccountNumber,
+                ifsc: this.teacherIfsc,
+                skills: this.teacherSkills
             });
-            this.showToast('Success', `Teacher "${result.teacherName}" created with ${result.skillsCount} skill(s)!`, 'success');
-            this.resetTeacherForm();
-            this.showTeacherForm = false;
-            await this.loadSubjects();
-            await this.loadWorkloadDashboard();
+
+            if (result.success) {
+                this.showToast('Success', `Teacher "${result.teacherName}" created with ${result.skillsCount} skill(s)!`, 'success');
+                this.resetTeacherForm();
+                this.showTeacherForm = false;
+                await this.loadSubjects();
+                await this.loadWorkloadDashboard();
+            } else {
+                this.showToast('Error', 'Failed to create teacher: ' + result.error, 'error');
+                console.error('--- TEACHER CREATION ERROR ---', result.error, result.stackTrace);
+            }
         } catch (e) {
             this.showToast('Error', 'Failed to create teacher: ' + this.getErrorMessage(e), 'error');
         } finally {
@@ -1106,7 +1136,10 @@ export default class ClassManagement extends LightningElement {
 
     resetTeacherForm() {
         this.teacherFirstName = this.teacherLastName = this.teacherEmail =
-        this.teacherPhone = this.teacherQualification = '';
+        this.teacherPhone = this.teacherQualification = this.teacherBirthDate = 
+        this.teacherJoiningDate = '';
+        this.teacherBasicSalary = this.teacherHra = this.teacherDa = this.teacherPf = 0;
+        this.teacherAccountNumber = this.teacherIfsc = '';
         this.teacherSkills = [];
     }
 
@@ -1850,35 +1883,11 @@ export default class ClassManagement extends LightningElement {
     }
     handleCloseCreateClass() { this.showCreateClassModal = false; this.newClassName = ''; }
 
-    handleOpenCreateSection() { 
-        this.showCreateSectionModal = true; 
-        this.modalSections = [{ id: 1, name: '', label: 'Section Name', showAdd: true, showDelete: false }];
-    }
-    handleCloseCreateSection() { this.showCreateSectionModal = false; }
+    handleOpenCreateSection() { this.showCreateSectionModal = true; }
+    handleCloseCreateSection() { this.showCreateSectionModal = false; this.newSectionName = ''; }
 
     handleNewClassNameChange(event) { this.newClassName = event.target.value; }
-
-    handleModalSectionNameChange(event) {
-        const id = parseInt(event.target.dataset.id, 10);
-        const val = event.target.value;
-        this.modalSections = this.modalSections.map(s => s.id === id ? { ...s, name: val } : s);
-    }
-
-    handleAddSectionModalRow() {
-        const newId = this.modalSections.length + 1;
-        this.modalSections = [...this.modalSections, { id: newId, name: '', label: `Section Name ${newId}`, showAdd: false, showDelete: true }];
-    }
-
-    handleRemoveSectionModalRow(event) {
-        const id = parseInt(event.target.dataset.id, 10);
-        this.modalSections = this.modalSections.filter(s => s.id !== id);
-        this.modalSections = this.modalSections.map((s, index) => ({ 
-            ...s, 
-            label: index === 0 ? 'Section Name' : `Section Name ${index + 1}`, 
-            showAdd: index === 0,
-            showDelete: index > 0 
-        }));
-    }
+    handleNewSectionNameChange(event) { this.newSectionName = event.target.value; }
 
     /* --- Create Class Submit --- */
     handleCreateClassSubmit() {
@@ -1894,27 +1903,14 @@ export default class ClassManagement extends LightningElement {
 
     /* --- Create Section Submit --- */
     handleCreateSectionSubmit() {
-        const payload = this.modalSections
-            .filter(s => s.name && s.name.trim())
-            .map(s => s.name.trim());
-
-        if (payload.length === 0) {
-            this.showToast('Error', 'Please enter at least one Section Name', 'error');
-            return;
-        }
-
-        this.isLoading = true;
-        const promises = payload.map(sectionName => createSection({ sectionName }));
-
-        Promise.all(promises)
+        if (!this.newSectionName) { this.showToast('Error', 'Section Name is required', 'error'); return; }
+        createSection({ sectionName: this.newSectionName })
             .then(() => {
-                this.showToast('Success', 'Sections created successfully', 'success');
-                this.modalSections = [{ id: 1, name: '', label: 'Section Name', showAdd: true, showDelete: false }];
-                this.showCreateSectionModal = false;
-                this.loadSections(); 
+                this.showToast('Success', 'Section created successfully', 'success');
+                this.handleCloseCreateSection();
+                this.loadSections(); // Refresh picks
             })
-            .catch(error => { this.showToast('Error', 'Error creating sections: ' + this.getErrorMessage(error), 'error'); })
-            .finally(() => { this.isLoading = false; });
+            .catch(error => { this.showToast('Error', this.getErrorMessage(error), 'error'); });
     }
 
     /* --- CSV File Handlers --- */
@@ -1924,7 +1920,12 @@ export default class ClassManagement extends LightningElement {
             const reader = new FileReader();
             reader.onload = () => {
                 const csvStr = reader.result;
-                this.teachersCsvPayload = this.parseCsvToJson(csvStr, ['firstName','lastName','email','phone','qualification','subject1','skillLevel1']);
+                this.teachersCsvPayload = this.parseCsvToJson(csvStr, [
+                    'firstName','lastName','email','phone','qualification',
+                    'birthDate','joiningDate',
+                    'basicSalary','hra','da','pf','accountNumber','ifsc',
+                    'subject1','skillLevel1'
+                ]);
             };
             reader.readAsText(file);
         }
@@ -2001,7 +2002,7 @@ export default class ClassManagement extends LightningElement {
     }
 
     handleDownloadTeacherTemplate() {
-        const csvContent = "data:text/csv;charset=utf-8,firstName,lastName,email,phone,qualification,subject1,skillLevel1\n";
+        const csvContent = "data:text/csv;charset=utf-8,firstName,lastName,email,phone,qualification,birthDate,joiningDate,basicSalary,hra,da,pf,accountNumber,ifsc,subject1,skillLevel1\n";
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
@@ -2239,4 +2240,130 @@ export default class ClassManagement extends LightningElement {
         if (error?.body?.pageErrors?.[0]?.message) return error.body.pageErrors[0].message;
         return error?.message || 'Unknown error';
     }
+    // ─────────────────────────────────────────────────────────────
+// TRACKED PROPERTY — replace existing modalSections declaration
+// ─────────────────────────────────────────────────────────────
+@track modalSections = [
+    { id: '1', name: '', rowNum: 1, showAdd: true, showDelete: false }
+];
+
+
+// ─────────────────────────────────────────────────────────────
+// GETTERS
+// ─────────────────────────────────────────────────────────────
+get modalSectionsCount() {
+    return this.modalSections.length;
+}
+
+get modalSectionsCountGt1() {
+    return this.modalSections.length > 1;
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// OPEN — reset to single row
+// ─────────────────────────────────────────────────────────────
+handleOpenCreateSection() {
+    this.showCreateSectionModal = true;
+    this.modalSections = [
+        { id: '1', name: '', rowNum: 1, showAdd: true, showDelete: false }
+    ];
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// CLOSE — reset state
+// ─────────────────────────────────────────────────────────────
+handleCloseCreateSection() {
+    this.showCreateSectionModal = false;
+    this.modalSections = [
+        { id: '1', name: '', rowNum: 1, showAdd: true, showDelete: false }
+    ];
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// ADD ROW — append new row, move + to new last
+// ─────────────────────────────────────────────────────────────
+handleAddSectionModalRow() {
+    const newId = String(Date.now()); // STRING id — consistent with data-id attribute
+    const newRowNum = this.modalSections.length + 1;
+
+    // Remove showAdd from all existing rows
+    const updated = this.modalSections.map(s => ({ ...s, showAdd: false }));
+
+    this.modalSections = [
+        ...updated,
+        { id: newId, name: '', rowNum: newRowNum, showAdd: true, showDelete: true }
+    ];
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// CHANGE — update name as user types
+// ─────────────────────────────────────────────────────────────
+handleModalSectionNameChange(event) {
+    const id = event.target.dataset.id; // keep as STRING — no parseInt
+    const val = event.target.value;
+    this.modalSections = this.modalSections.map(s =>
+        s.id === id ? { ...s, name: val } : s
+    );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// DELETE ROW — KEY FIX: compare as strings, not numbers
+// ─────────────────────────────────────────────────────────────
+handleRemoveSectionModalRow(event) {
+    event.stopPropagation();
+    const id = event.currentTarget.dataset.id; // STRING — matches what we stored
+
+    // Filter out the deleted row
+    let updated = this.modalSections.filter(s => s.id !== id);
+
+    // Re-number rows and fix flags
+    updated = updated.map((s, idx) => ({
+        ...s,
+        rowNum:     idx + 1,
+        showAdd:    idx === updated.length - 1, // + only on last row
+        showDelete: idx > 0                      // delete on all except first
+    }));
+
+    this.modalSections = [...updated]; // new array reference forces re-render
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// SUBMIT — create all non-empty sections
+// ─────────────────────────────────────────────────────────────
+handleCreateSectionSubmit() {
+    const names = this.modalSections
+        .map(s => (s.name || '').trim())
+        .filter(n => n.length > 0);
+
+    if (names.length === 0) {
+        this.showToast('Error', 'Please enter at least one Section Name', 'error');
+        return;
+    }
+
+    this.isLoading = true;
+
+    const promises = names.map(sectionName => createSection({ sectionName }));
+
+    Promise.all(promises)
+        .then(() => {
+            const msg = names.length === 1
+                ? `Section "${names[0]}" created successfully`
+                : `${names.length} sections created successfully`;
+            this.showToast('Success', msg, 'success');
+            this.handleCloseCreateSection();
+            this.loadSections();
+        })
+        .catch(error => {
+            this.showToast('Error', this.getErrorMessage(error), 'error');
+        })
+        .finally(() => {
+            this.isLoading = false;
+        });
+}
 }

@@ -1,5 +1,14 @@
 public without sharing class ClassManagementController {
 
+    public class TeacherResponse {
+        @AuraEnabled public Boolean success;
+        @AuraEnabled public String teacherId;
+        @AuraEnabled public String teacherName;
+        @AuraEnabled public Integer skillsCount;
+        @AuraEnabled public String error;
+        @AuraEnabled public String stackTrace;
+    }
+
     /* ═══════════════════════════════════════════════════════════════
        GET ACADEMIC YEARS
        ═══════════════════════════════════════════════════════════════ */
@@ -304,15 +313,16 @@ public static Map<String, Object> bulkCreateTeachers(
         if (String.isNotBlank(a.PersonEmail)) existingEmails.add(a.PersonEmail.toLowerCase());
     }
 
-    Id personRtId;
-    try {
-        personRtId = [
-            SELECT Id FROM RecordType
-            WHERE SObjectType = 'Account' AND IsPersonType = true LIMIT 1
-        ].Id;
-    } catch (Exception ex) {
-        throw new AuraHandledException('Person Account record type not found.');
-    }
+    // CURRENT
+Id personRtId;
+try {
+    personRtId = [
+        SELECT Id FROM RecordType
+        WHERE SObjectType = 'Account' AND IsPersonType = true LIMIT 1
+    ].Id;
+} catch (Exception ex) {
+    throw new AuraHandledException('Person Account record type not found.');
+}
 
     // Build subject name → Id map (lowercase, trimmed)
     Map<String, Id> subjectNameToId = new Map<String, Id>();
@@ -333,6 +343,27 @@ public static Map<String, Object> bulkCreateTeachers(
         String email     = row.get('email')         != null ? ((String)row.get('email')).trim()         : '';
         String phone     = row.get('phone')         != null ? ((String)row.get('phone')).trim()         : '';
         String qual      = row.get('qualification') != null ? ((String)row.get('qualification')).trim() : '';
+        
+        Date birthDate   = null;
+        Date joinDate    = null;
+        try {
+            if (row.get('birthDate')   != null) birthDate = Date.valueOf((String)row.get('birthDate'));
+            if (row.get('joiningDate') != null) joinDate  = Date.valueOf((String)row.get('joiningDate'));
+        } catch (Exception ex) {}
+
+        Decimal basic    = 0;
+        Decimal hra      = 0;
+        Decimal da       = 0;
+        Decimal pf       = 0;
+        try {
+            if (row.get('basicSalary') != null) basic = Decimal.valueOf(String.valueOf(row.get('basicSalary')));
+            if (row.get('hra')         != null) hra   = Decimal.valueOf(String.valueOf(row.get('hra')));
+            if (row.get('da')          != null) da    = Decimal.valueOf(String.valueOf(row.get('da')));
+            if (row.get('pf')          != null) pf    = Decimal.valueOf(String.valueOf(row.get('pf')));
+        } catch (Exception ex) {}
+
+        String accNo     = row.get('accountNumber') != null ? ((String)row.get('accountNumber')).trim() : '';
+        String ifsc      = row.get('ifsc')          != null ? ((String)row.get('ifsc')).trim()          : '';
 
         if (String.isBlank(firstName) || String.isBlank(lastName)) {
             errorRows.add('Row ' + rowNum + ': First Name and Last Name are required.');
@@ -361,14 +392,24 @@ public static Map<String, Object> bulkCreateTeachers(
         }
 
         Account a = new Account(
-            FirstName    = firstName,
-            LastName     = lastName,
-            PersonEmail  = email,
-            Type         = 'Teacher',
-            RecordTypeId = personRtId
+            FirstName              = firstName,
+            LastName               = lastName,
+            PersonEmail            = email,
+            Type                   = 'Teacher',
+            RecordTypeId           = personRtId,
+            Qualification__c       = qual,
+            PersonBirthdate        = birthDate,
+            Joining_Date__c        = joinDate,
+            PersonMobilePhone      = phone,
+            Phone                  = phone,
+            Description            = qual,
+            Basic_Salary__c        = basic,
+            HRA__c                 = hra,
+            DA__c                  = da,
+            PF_Deduction__c        = pf,
+            Bank_Account_Number__c = accNo,
+            IFSC_Code__c           = ifsc
         );
-        if (String.isNotBlank(phone)) a.Phone       = phone;
-        if (String.isNotBlank(qual))  a.Description = qual;
 
         toInsert.add(a);
         skillMatrix.add(rowSkills);
@@ -409,6 +450,7 @@ public static Map<String, Object> bulkCreateTeachers(
                             Teacher__c     = accountId,
                             Subject__c     = subjectId,
                             Skill_Level__c = sk.get('level')
+                            // Note: Years of Experience is not currently passed in bulk import row map
                         ));
                     }
                 }
@@ -649,41 +691,76 @@ public static Map<String, Object> bulkCreateTeachers(
        CREATE TEACHER WITH SKILLS
        ═══════════════════════════════════════════════════════════════ */
     @AuraEnabled
-    public static Map<String, Object> createTeacherWithSkills(
+    public static TeacherResponse createTeacherWithSkills(
         String firstName,    String lastName,
         String email,        String phone,
         String qualification,
+        Date birthDate,      Date joiningDate,
+        Decimal basicSalary, Decimal hra,
+        Decimal da,          Decimal pf,
+        String accountNumber, String ifsc,
         List<Map<String, Object>> skills
     ) {
         Savepoint sp = Database.setSavepoint();
         try {
-            if (String.isBlank(firstName) || String.isBlank(lastName))
-                throw new AuraHandledException('First Name and Last Name are required.');
-            if (String.isBlank(email))
-                throw new AuraHandledException('Email is required.');
-            if (skills == null || skills.isEmpty())
-                throw new AuraHandledException('At least one subject skill is required.');
+            if (String.isBlank(firstName) || String.isBlank(lastName)) {
+                AuraHandledException e = new AuraHandledException('First Name and Last Name are required.');
+                e.setMessage('First Name and Last Name are required.');
+                throw e;
+            }
+            if (String.isBlank(email)) {
+                AuraHandledException e = new AuraHandledException('Email is required.');
+                e.setMessage('Email is required.');
+                throw e;
+            }
+            if (skills == null || skills.isEmpty()) {
+                AuraHandledException e = new AuraHandledException('At least one subject skill is required.');
+                e.setMessage('At least one subject skill is required.');
+                throw e;
+            }
 
             List<Account> existing = [
                 SELECT Id FROM Account
                 WHERE PersonEmail = :email AND IsPersonAccount = true LIMIT 1
             ];
-            if (!existing.isEmpty())
-                throw new AuraHandledException('A teacher with this email already exists.');
+            if (!existing.isEmpty()) {
+                AuraHandledException e = new AuraHandledException('A teacher with this email already exists: ' + email);
+                e.setMessage('A teacher with this email already exists: ' + email);
+                throw e;
+            }
 
-            Id personRtId = [
-                SELECT Id FROM RecordType
-                WHERE SObjectType = 'Account' AND IsPersonType = true LIMIT 1
-            ].Id;
-
+            Id personRtId;
+try {
+    personRtId = [
+        SELECT Id FROM RecordType
+        WHERE SObjectType = 'Account' 
+        AND IsPersonType = true 
+        AND IsActive = true
+        LIMIT 1
+    ].Id;
+} catch (Exception ex) {
+    throw new AuraHandledException(
+        'Person Account record type not found. Please ensure Person Accounts are enabled.'
+    );
+}
             Account teacher = new Account(
-                FirstName    = firstName,
-                LastName     = lastName,
-                PersonEmail  = email,
-                Phone        = phone,
-                Type         = 'Teacher',
-                Description  = qualification,
-                RecordTypeId = personRtId
+                FirstName              = firstName,
+                LastName               = lastName,
+                PersonEmail            = email,
+                PersonMobilePhone      = phone,
+                Phone                  = phone,
+                Type                   = 'Teacher',
+                Qualification__c       = qualification,
+                Description            = qualification,
+                PersonBirthdate        = birthDate,
+                Joining_Date__c        = joiningDate,
+                Basic_Salary__c        = basicSalary,
+                HRA__c                 = hra,
+                DA__c                  = da,
+                PF_Deduction__c        = pf,
+                Bank_Account_Number__c = accountNumber,
+                IFSC_Code__c           = ifsc,
+                RecordTypeId           = personRtId
             );
             insert teacher;
 
@@ -706,27 +783,28 @@ public static Map<String, Object> bulkCreateTeachers(
                     String subjectName = subjectNameMap.containsKey((Id) subjectId)
                         ? subjectNameMap.get((Id) subjectId) : subjectId;
                     teacherSkills.add(new Teacher_Skill__c(
-                        Name           = fullName + ' - ' + subjectName,
-                        Teacher__c     = teacher.Id,
-                        Subject__c     = subjectId,
-                        Skill_Level__c = skillLevel
+                        Name                   = fullName + ' - ' + subjectName,
+                        Teacher__c             = teacher.Id,
+                        Subject__c             = subjectId,
+                        Skill_Level__c         = skillLevel,
+                        Years_of_Experience__c = (Decimal) s.get('yearsOfExperience')
                     ));
                 }
             }
             if (!teacherSkills.isEmpty()) insert teacherSkills;
 
-            return new Map<String, Object>{
-                'teacherId'   => teacher.Id,
-                'teacherName' => fullName,
-                'skillsCount' => teacherSkills.size()
-            };
+            TeacherResponse response = new TeacherResponse();
+            response.success = true;
+            response.teacherId = teacher.Id;
+            return response;
 
-        } catch (DmlException e) {
-            Database.rollback(sp);
-            throw new AuraHandledException('Database error: ' + e.getDmlMessage(0));
         } catch (Exception e) {
             Database.rollback(sp);
-            throw new AuraHandledException(e.getMessage());
+            TeacherResponse response = new TeacherResponse();
+            response.success = false;
+            response.error = e.getMessage();
+            response.stackTrace = e.getStackTraceString();
+            return response;
         }
     }
 
@@ -803,6 +881,9 @@ public static Map<String, Object> bulkCreateTeachers(
             WHERE Type = 'Teacher' AND IsPersonAccount = true
             ORDER BY Name
         ];
+        if (teachers.isEmpty()) {
+            teachers = [SELECT Id, Name FROM Account WHERE Type = 'Teacher' ORDER BY Name LIMIT 200];
+        }
         if (teachers.isEmpty()) return new List<Map<String, Object>>();
 
         Set<Id> teacherIds = new Map<Id, Account>(teachers).keySet();

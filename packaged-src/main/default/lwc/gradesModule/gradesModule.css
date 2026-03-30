@@ -327,6 +327,31 @@ select option {
     font-size: 13px;
     color: rgba(0, 0, 0, 0.55);
     margin-top: 2px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+.top-scorer-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    background: linear-gradient(135deg, #a855f7, #8b5cf6);
+    color: white !important;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 6px rgba(168, 85, 247, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.top-scorer-badge:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    filter: brightness(1.1);
 }
 
 .stat-sub.up {
@@ -618,52 +643,61 @@ tbody tr:hover .view-hint {
     cursor: not-allowed;
 }
 
-/* MODAL */
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .45);
-    backdrop-filter: blur(5px);
-    z-index: 10000; /* High z-index for Salesforce environment */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.main-container .gm-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    min-height: 1200px !important; /* Restoring the height the user liked for coverage */
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(8px) !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 60px 20px !important;
     opacity: 0;
     pointer-events: none;
-    transition: opacity .2s;
+    transition: all 0.3s ease;
 }
 
-.overlay.open {
+.main-container .gm-overlay.open {
     opacity: 1;
     pointer-events: all;
 }
 
-.modal {
-    background: #ffffff;
-    width: 820px;
-    max-width: 96vw;
-    max-height: 90vh;
-    border-radius: 24px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.18);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: translateY(18px) scale(.97);
-    transition: transform .22s;
+.main-container .gm-overlay .gm-modal {
+    background: #ffffff !important;
+    width: 880px !important;
+    max-width: 95% !important;
+    max-height: 85vh !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.4) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 1001 !important;
+    opacity: 0;
+    transform: translateY(20px) !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.overlay.open .modal {
-    transform: translateY(0) scale(1);
+.main-container .gm-overlay.open .gm-modal {
+    opacity: 1;
+    transform: translateY(0) !important;
 }
 
 .mhdr {
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
+    padding: 16px 20px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
 }
 
 .mstu {
@@ -729,11 +763,13 @@ tbody tr:hover .view-hint {
 
 /* Test tabs */
 .mtabs {
-    padding: 14px 24px 0;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid var(--border);
+    padding: 10px 20px 0 !important;
+    background: #ffffff !important;
+    display: flex !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    flex-shrink: 0 !important;
 }
 
 .mtab {
@@ -764,9 +800,10 @@ tbody tr:hover .view-hint {
 
 /* Modal body */
 .mbody {
-    padding: 0;
-    overflow-y: auto;
-    flex: 1;
+    padding: 0 !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    background: #ffffff !important;
 }
 
 /* Modal subject table */

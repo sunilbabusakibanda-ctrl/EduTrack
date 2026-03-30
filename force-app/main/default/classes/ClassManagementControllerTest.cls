@@ -202,13 +202,64 @@ private class ClassManagementControllerTest {
     }
 
     /* ═══════════════════════════════════════════════════════════
-       TESTS: getAllSections
+       TESTS: getAllSections and getSections
        ═══════════════════════════════════════════════════════════ */
     @isTest
     static void testGetAllSections() {
         createSection();
         Test.startTest();
         List<Map<String, Object>> result = ClassManagementController.getAllSections();
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testGetClasses() {
+        createClass();
+        Test.startTest();
+        List<Map<String, Object>> result = ClassManagementController.getClasses();
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testGetSections() {
+        createSection();
+        Test.startTest();
+        List<Map<String, Object>> result = ClassManagementController.getSections();
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testBulkCreateSubjects() {
+        List<Map<String, Object>> data = new List<Map<String, Object>>{
+            new Map<String, Object>{ 'name' => 'BulkSubj1' },
+            new Map<String, Object>{ 'name' => '' },
+            new Map<String, Object>{ 'name' => 'BulkSubj1' } // Duplicate
+        };
+        Test.startTest();
+        Map<String, Object> res = ClassManagementController.bulkCreateSubjects(data);
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testBulkCreateTeachers() {
+        Subject__c sub = createSubject('BulkSubj');
+        List<Map<String, Object>> data = new List<Map<String, Object>>{
+            new Map<String, Object>{
+                'firstName' => 'Bulk',
+                'lastName' => 'Teacher',
+                'email' => 'bulk@test.com',
+                'phone' => '1234',
+                'qualification' => 'BS',
+                'subject1' => 'BulkSubj',
+                'skillLevel1' => 'Expert'
+            },
+            new Map<String, Object>{ // Error row missing email
+                'firstName' => 'Bulk2',
+                'lastName' => 'Teacher2'
+            }
+        };
+        Test.startTest();
+        Map<String, Object> res = ClassManagementController.bulkCreateTeachers(data);
         Test.stopTest();
     }
 
@@ -437,8 +488,11 @@ private class ClassManagementControllerTest {
         };
 
         Test.startTest();
-        Map<String, Object> result = ClassManagementController.createTeacherWithSkills(
-            'Mike', 'Taylor', 'mike.taylor@test.com', '9000000001', 'M.Sc Chemistry', skills
+        ClassManagementController.TeacherResponse result = ClassManagementController.createTeacherWithSkills(
+            'Mike', 'Taylor', 'mike.taylor@test.com', '9000000001', 'M.Sc Chemistry',
+            Date.today().addYears(-30), Date.today(),
+            50000, 5000, 2000, 1500, '123456789', 'IFSC001',
+            skills
         );
         Test.stopTest();
     }
@@ -457,10 +511,14 @@ private class ClassManagementControllerTest {
 
         Test.startTest();
         try {
-            ClassManagementController.createTeacherWithSkills(
-                'Dup', 'Teacher', 'dup.teacher@test.com', '9000000002', 'B.Sc', skills
+            ClassManagementController.TeacherResponse result = ClassManagementController.createTeacherWithSkills(
+                'Dup', 'Teacher', 'dup.teacher@test.com', '9000000002', 'B.Sc',
+                Date.today().addYears(-25), Date.today(),
+                40000, 4000, 1500, 1000, '987654321', 'IFSC002',
+                skills
             );
-        } catch (AuraHandledException e) {
+            System.debug('RESULT_ERROR: ' + result.error);
+        } catch (Exception e) {
             // Expected
         }
         Test.stopTest();
@@ -470,8 +528,10 @@ private class ClassManagementControllerTest {
     static void testCreateTeacherBlankName() {
         Test.startTest();
         try {
-            ClassManagementController.createTeacherWithSkills(
-                '', '', 'noemail@test.com', '', '', new List<Map<String, Object>>()
+            ClassManagementController.TeacherResponse result = ClassManagementController.createTeacherWithSkills(
+                '', '', 'noemail@test.com', '', '',
+                null, null, 0, 0, 0, 0, '', '',
+                new List<Map<String, Object>>()
             );
         } catch (AuraHandledException e) {
             // Expected
@@ -483,8 +543,10 @@ private class ClassManagementControllerTest {
     static void testCreateTeacherBlankEmail() {
         Test.startTest();
         try {
-            ClassManagementController.createTeacherWithSkills(
-                'First', 'Last', '', '', '', new List<Map<String, Object>>()
+            ClassManagementController.TeacherResponse result = ClassManagementController.createTeacherWithSkills(
+                'First', 'Last', '', '', '',
+                null, null, 0, 0, 0, 0, '', '',
+                new List<Map<String, Object>>()
             );
         } catch (AuraHandledException e) {
             // Expected
@@ -496,8 +558,10 @@ private class ClassManagementControllerTest {
     static void testCreateTeacherNoSkills() {
         Test.startTest();
         try {
-            ClassManagementController.createTeacherWithSkills(
-                'First', 'Last', 'test@skills.com', '', '', new List<Map<String, Object>>()
+            ClassManagementController.TeacherResponse result = ClassManagementController.createTeacherWithSkills(
+                'First', 'Last', 'test@skills.com', '', '',
+                null, null, 0, 0, 0, 0, '', '',
+                new List<Map<String, Object>>()
             );
         } catch (AuraHandledException e) {
             // Expected
@@ -517,8 +581,11 @@ private class ClassManagementControllerTest {
         };
 
         Test.startTest();
-        Map<String, Object> result = ClassManagementController.createTeacherWithSkills(
-            'Anna', 'Bell', 'anna.bell@test.com', '9000000003', 'BFA', skills
+        ClassManagementController.TeacherResponse result = ClassManagementController.createTeacherWithSkills(
+            'Anna', 'Bell', 'anna.bell@test.com', '9000000003', 'BFA',
+            Date.today().addYears(-22), Date.today(),
+            30000, 3000, 1000, 500, '555555555', 'IFSC003',
+            skills
         );
         Test.stopTest();
     }

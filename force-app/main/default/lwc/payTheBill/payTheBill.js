@@ -58,6 +58,8 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
     @track selectedPaymentMethod = 'Cash'; // Default to Cash
     @track selectedBankId = '';
     @track qrCodeBase64 = '';
+    @track dynamicQrUrl = '';
+    @track rawUpiUrl = '';      // For diagnostics
     @track isQRLoading = false;
     @track studentTotalPaid = 0;
     @track studentTotalPending = 0;
@@ -76,13 +78,19 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         }
     }
 
-    @wire(getBankAccounts)
-    wiredBanks({ error, data }) {
-        if (data) {
-            this.schoolBankAccounts = data;
-        } else if (error) {
-            console.error('Error fetching school banks', error);
-        }
+    connectedCallback() {
+        this.loadBankAccounts();
+    }
+
+    loadBankAccounts() {
+        getBankAccounts()
+            .then(data => {
+                console.log('Bank accounts fetched:', JSON.stringify(data));
+                this.schoolBankAccounts = data || [];
+            })
+            .catch(error => {
+                console.error('Error fetching school banks', error);
+            });
     }
 
     get schoolName() {
@@ -157,6 +165,14 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
     }
 
     // Computed Properties
+    get upiIdUsed() {
+        if (!this.schoolConfig) return 'Loading settings... [V5]';
+        const id = this.selectedPaymentMethod === 'PhonePe'
+            ? this.schoolConfig.PhonePe_ID__c
+            : this.schoolConfig.GooglePay_ID__c;
+        return (id || 'NOT SET IN SCHOOL SETUP') + ' [V5]';
+    }
+
     get isUPISelected() {
         return this.selectedPaymentMethod === 'PhonePe' || this.selectedPaymentMethod === 'Google Pay';
     }
@@ -169,6 +185,10 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         return this.isUPISelected && parseFloat(this.billingTotal) > 0;
     }
 
+    get isQrMissing() {
+        return this.isUPISelected && !this.schoolConfig.UPI_QR_ID__c;
+    }
+
     get uploadedQrUrl() {
         return this.schoolConfig.UPI_QR_ID__c ? `/sfc/servlet.shepherd/version/download/${this.schoolConfig.UPI_QR_ID__c}` : '';
     }
@@ -177,8 +197,9 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         if (this.uploadedQrUrl) {
             return this.uploadedQrUrl;
         }
-        if (this.qrCodeBase64) {
-            return `data:image/png;base64,${this.qrCodeBase64}`;
+        if (this.isUPISelected) {
+            if (this.qrCodeBase64) return `data:image/png;base64,${this.qrCodeBase64}`;
+            return this.dynamicQrUrl || '';
         }
         return '';
     }
@@ -216,26 +237,39 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
     async generateQRCode() {
         if (!this.isUPISelected || parseFloat(this.billingTotal) <= 0) {
             this.qrCodeBase64 = '';
+            this.dynamicQrUrl = '';
             return;
         }
 
-        // Use School Config or fallback to defaults
         const payeeAddress = this.selectedPaymentMethod === 'PhonePe'
-            ? (this.schoolConfig.PhonePe_ID__c || '8374331432@ybl')
-            : (this.schoolConfig.GooglePay_ID__c || '8374331432@okaxis');
+            ? this.schoolConfig.PhonePe_ID__c
+            : this.schoolConfig.GooglePay_ID__c;
+
+        if (!payeeAddress) {
+            console.warn('No UPI ID found for ' + this.selectedPaymentMethod);
+            this.qrCodeBase64 = '';
+            this.dynamicQrUrl = '';
+            this.isQRLoading = false;
+            return;
+        }
 
         const payeeName = this.schoolName.toUpperCase();
-
         this.isQRLoading = true;
+        
         const amount = this.billingTotal || 0;
-        const upiUrl = `upi://pay?pa=${payeeAddress}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR`;
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiUrl)}&margin=10&ecc=H`;
+        
+        // ULTA-ROBUST: Minimal parameters, no PN/TN (avoids encoding issues), with cache-busting
+        const upiUrl = `upi://pay?pa=${payeeAddress}&am=${amount}&cu=INR`;
+        this.rawUpiUrl = upiUrl;
+        const timestamp = Date.now();
+        this.dynamicQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(upiUrl)}&ts=${timestamp}`;
 
         try {
-            this.qrCodeBase64 = await getQRCodeBase64({ qrUrl: qrApiUrl });
+            // We fetch it via Apex to avoid CSP issues in some orgs, but we'll also have the URL ready as fallback
+            this.qrCodeBase64 = await getQRCodeBase64({ qrUrl: this.dynamicQrUrl });
         } catch (error) {
             console.error('QR Fetch Error:', error);
-            this.qrCodeBase64 = '';
+            // If Apex fails, the getter will fallback to the direct URL if CSP allows
         } finally {
             this.isQRLoading = false;
         }
@@ -252,11 +286,7 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
                 details: acc
             }));
         }
-        return this.bankOptions.map(bank => ({
-            ...bank,
-            initials: this.getInitials(bank.name),
-            className: `bank-card ${this.selectedBankId === bank.id ? 'active' : ''}`
-        }));
+        return [];
     }
 
     get selectedBankDetails() {
@@ -270,22 +300,31 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
 
     handleBankSelect(event) {
         const bankId = event.currentTarget.dataset.id;
+        console.log('Bank Selected ID:', bankId, 'Length:', bankId ? bankId.length : 0);
         this.selectedBankId = bankId;
-        const selected = this.bankOptionsDisplay.find(b => b.id === bankId);
-
-        if (selected) {
-            this.netBankingDetails.bankName = selected.name;
-            // Pre-fill if details exist (from custom bank accounts)
-            if (selected.details) {
-                this.netBankingDetails.bankIfsc = selected.details.IFSC_Code__c || '';
-                this.netBankingDetails.bankAccountNumber = selected.details.Account_Number__c || '';
-                this.netBankingDetails.bankBranch = selected.details.Branch__c || '';
-            } else if (this.schoolConfig.Bank_Name__c && this.netBankingDetails.bankName === this.schoolConfig.Bank_Name__c) {
-                // Fallback to primary school setup fields for default banks
-                this.netBankingDetails.bankIfsc = this.schoolConfig.Bank_IFSC__c || '';
-                this.netBankingDetails.bankAccountNumber = this.schoolConfig.Bank_Account_Number__c || '';
-                this.netBankingDetails.bankBranch = this.schoolConfig.Bank_Branch__c || '';
-            }
+        
+        // Robust ID matching (handles 15 vs 18 chars)
+        const selectedAcc = this.schoolBankAccounts.find(acc => 
+            acc.Id === bankId || 
+            (acc.Id && bankId && (acc.Id.startsWith(bankId) || bankId.startsWith(acc.Id)))
+        );
+        
+        console.log('Found account match:', !!selectedAcc);
+        if (selectedAcc) {
+            console.log('Account data:', JSON.stringify(selectedAcc));
+            // Map with fallbacks for casing/namespace stripping variations
+            this.netBankingDetails = {
+                bankName: selectedAcc.Bank_Name__c || selectedAcc.bankName || selectedAcc.Name || '',
+                bankIfsc: selectedAcc.IFSC_Code__c || selectedAcc.ifsc || selectedAcc.IFSC__c || '',
+                bankAccountNumber: selectedAcc.Account_Number__c || selectedAcc.accountNumber || '',
+                bankBranch: selectedAcc.Branch__c || selectedAcc.branch || ''
+            };
+            console.log('Final mapping to netBankingDetails:', JSON.stringify(this.netBankingDetails));
+        } else {
+            console.warn('No matching account found for ID - verifying all schoolBankAccounts IDs:');
+            this.schoolBankAccounts.forEach(acc => console.log('Existing ID:', acc.Id));
+            
+            this.netBankingDetails = { bankName: '', bankIfsc: '', bankAccountNumber: '', bankBranch: '' };
         }
     }
 
@@ -462,15 +501,20 @@ export default class PayTheBill extends NavigationMixin(LightningElement) {
         if (val) {
             this.selectedPaymentMethod = val;
             this.selectedBankId = '';
+            if (val === 'Net Banking') {
+                this.loadBankAccounts();
+            }
             this.generateQRCode();
         }
     }
 
-    handleBankSelect(event) {
-        this.selectedBankId = event.currentTarget.dataset.id;
-    }
 
     async handleSubmitPayment() {
+        if (!this.billingTotal || parseFloat(this.billingTotal) <= 0) {
+            this.showToast('Invalid Amount', 'Please select at least one fee item to pay.', 'warning');
+            return;
+        }
+
         const result = await LightningConfirm.open({
             message: `Process payment of ₹${this.billingTotal} via ${this.selectedPaymentMethod}?`,
             variant: 'headerless',

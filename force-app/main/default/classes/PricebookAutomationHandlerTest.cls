@@ -21,6 +21,10 @@ public class PricebookAutomationHandlerTest {
         Academic_Year__c ayOld = [SELECT Id, Is_Active__c FROM Academic_Year__c WHERE Name='2023-2024' LIMIT 1];
         
         Test.startTest();
+        // Update old academic year to inactive in DB so the handler's SOQL finds it
+        ayOld.Is_Active__c = false;
+        update ayOld;
+        
         // Invoke handler manually isolating logic completely
         Map<Id, Academic_Year__c> oldMap = new Map<Id, Academic_Year__c>();
         Academic_Year__c decoupledAy = new Academic_Year__c(Id = ayNew.Id, Is_Active__c = false);

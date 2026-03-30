@@ -6,6 +6,7 @@ import getSubjects              from '@salesforce/apex/EnterMarksController.getS
 import getExamTypes             from '@salesforce/apex/EnterMarksController.getExamTypes';
 import getStudentsForMarksEntry from '@salesforce/apex/EnterMarksController.getStudentsForMarksEntry';
 import saveMarks                from '@salesforce/apex/EnterMarksController.saveMarks';
+import bulkCreateSubjects       from '@salesforce/apex/ClassManagementController.bulkCreateSubjects';
 
 export default class EnterMarks extends LightningElement {
     @api teacherId;
@@ -22,6 +23,10 @@ export default class EnterMarks extends LightningElement {
     @track showStudentsList  = false;
     @track showNoDataMessage = false;
     @track noDataMessage     = '';
+
+    // Quick Add Subject
+    @track isAddSubjectModalOpen = false;
+    @track newSubjectName = '';
 
     allSubjects = [];
 
@@ -47,6 +52,7 @@ export default class EnterMarks extends LightningElement {
     get isSubjectDisabled() { return !this.selectedClass; }
     get isExamDisabled()    { return !this.selectedSubject; }
     get isSaveDisabled()    { return this.loading || !this.hasValidMarks(); }
+    get isNewSubjectSaveDisabled() { return !this.newSubjectName || this.newSubjectName.trim().length === 0 || this.loading; }
 
     get selectedClassLabel() {
         const o = this.classOptions.find(opt => opt.value === this.selectedClass);
@@ -176,6 +182,55 @@ export default class EnterMarks extends LightningElement {
         this.showNoDataMessage = false;
         if (this.selectedExam && this.selectedClass && this.selectedSubject) {
             this.loadStudents();
+        }
+    }
+
+    // ─── Quick Add Subject ──────────────────────────────────────
+    handleOpenAddSubject() {
+        this.isAddSubjectModalOpen = true;
+        this.newSubjectName = '';
+    }
+
+    handleCloseAddSubject() {
+        this.isAddSubjectModalOpen = false;
+    }
+
+    handleNewSubjectNameChange(event) {
+        this.newSubjectName = event.target.value;
+    }
+
+    async handleSaveNewSubject() {
+        if (!this.newSubjectName || this.newSubjectName.trim() === '') return;
+
+        this.loading = true;
+        try {
+            const result = await bulkCreateSubjects({
+                subjectsData: [{ name: this.newSubjectName.trim() }]
+            });
+
+            if (result.created > 0) {
+                this.showToast('Success', `Subject "${this.newSubjectName}" created!`, 'success');
+                this.handleCloseAddSubject();
+                
+                // Refresh subjects list
+                await this.loadSubjects();
+                this.updateSubjectOptions();
+                
+                // Auto-select the newly created subject if possible
+                const newSub = this.allSubjects.find(s => (s.name || s.Name).toLowerCase() === this.newSubjectName.toLowerCase().trim());
+                if (newSub) {
+                    this.selectedSubject = (newSub.id || newSub.Id);
+                }
+            } else if (result.skipped > 0) {
+                this.showToast('Note', 'This subject already exists.', 'info');
+                this.handleCloseAddSubject();
+            } else {
+                this.showToast('Error', 'Failed to create subject', 'error');
+            }
+        } catch (error) {
+            this.handleError('Error creating subject', error);
+        } finally {
+            this.loading = false;
         }
     }
 

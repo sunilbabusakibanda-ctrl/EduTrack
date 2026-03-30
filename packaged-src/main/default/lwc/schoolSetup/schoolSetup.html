@@ -39,7 +39,13 @@
                         <label class="form-label">School Logo</label>
                         <div class="logo-upload-container">
                             <template if:true={schoolData.schoolLogo}>
-                                <img src={schoolData.schoolLogo} class="logo-preview" alt="Logo preview">
+                                <div class="preview-wrapper">
+                                    <img src={schoolData.schoolLogo} class="logo-preview" alt="Logo preview">
+                                    <template if:false={isReadOnly}>
+                                        <lightning-button label="Remove Logo" variant="destructive-text" 
+                                            onclick={handleRemoveFile} data-type="logo" class="slds-m-top_x-small"></lightning-button>
+                                    </template>
+                                </div>
                             </template>
                             <template if:false={isReadOnly}>
                                 <div class="file-input-wrapper">
@@ -146,7 +152,13 @@
                         <label class="form-label">Default UPI QR Code</label>
                         <div class="logo-upload-container">
                             <template if:true={schoolData.upiQrUrl}>
-                                <img src={schoolData.upiQrUrl} class="qr-preview" alt="QR preview">
+                                <div class="preview-wrapper">
+                                    <img src={schoolData.upiQrUrl} class="qr-preview" alt="QR preview">
+                                    <template if:false={isReadOnly}>
+                                        <lightning-button label="Remove QR" variant="destructive-text" 
+                                            onclick={handleRemoveFile} data-type="qr" class="slds-m-top_x-small"></lightning-button>
+                                    </template>
+                                </div>
                             </template>
                             <template if:false={isReadOnly}>
                                 <div class="file-input-wrapper">

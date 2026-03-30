@@ -1,5 +1,97 @@
 <template>
     <div class="attendance-container">
+        <!-- Teacher Selection Landing Page -->
+        <template if:true={showTeacherSelection}>
+            <div class="card teacher-selection-card">
+                <div class="card-fill"></div>
+                <div class="card-content">
+                    <div class="header">
+                        <div class="teacher-header-icon">📋</div>
+                        <h1>Take Attendance</h1>
+                        <p>Select your name to get started</p>
+                    </div>
+
+                    <div style="text-align:center">
+                        <div class="date-badge">📅 <span>{contactDate}</span></div>
+                    </div>
+
+                    <!-- Submission Carousel -->
+                    <template if:true={recentSubmissions.length}>
+                        <div class="carousel-container">
+                            <div class="carousel-track">
+                                <template for:each={recentSubmissions} for:item="sub">
+                                    <div key={sub.id} class="carousel-item">
+                                        <span class="carousel-bullet">●</span>
+                                        {sub.text}
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="field-label">👤 Select Teacher</div>
+
+                    <div class="teacher-search-wrapper" data-id="teacher-search-container">
+                        <div class="search-wrap">
+                            <span class="si-left">🔍</span>
+                            <input type="text" 
+                                   class={teacherSearchInputClass} 
+                                   value={teacherSearchTerm}
+                                   placeholder="Search your name…" 
+                                   onfocus={openTeacherDropdown} 
+                                   oninput={handleTeacherSearch}/>
+                            <template if:true={teacherSearchTerm}>
+                                <button class="si-clear show" onclick={handleClearTeacher}>✕</button>
+                            </template>
+                        </div>
+
+                        <div class={teacherDropdownClass}>
+                            <div class="dropdown-inner">
+                                <template for:each={filteredTeachers} for:item="teacher">
+                                    <div key={teacher.id} 
+                                         class="d-item" 
+                                         data-id={teacher.id} 
+                                         onclick={handleTeacherSelect}>
+                                        <div class={teacher.colorClass} title={teacher.initials}>{teacher.initials}</div>
+                                        <div class="d-info">
+                                            <div class="d-name">{teacher.name}</div>
+                                            <div class="d-sub">{teacher.subject}</div>
+                                        </div>
+                                        <div class="d-check">✓</div>
+                                    </div>
+                                </template>
+                            </div>
+                            <template if:true={showNoTeacherMatch}>
+                                <div class="no-match show">
+                                    <div class="nm-icon">🤷</div>No teacher found
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <template if:true={selectedTeacher}>
+                        <div class="selected-preview show">
+                            <div class={selectedTeacher.colorClass} title={selectedTeacher.initials}>{selectedTeacher.initials}</div>
+                            <div class="sel-info">
+                                <div class="sel-name">{selectedTeacher.name}</div>
+                                <div class="sel-sub">{selectedTeacher.subject}</div>
+                            </div>
+                            <button class="sel-change" onclick={handleTeacherChange}>Change</button>
+                        </div>
+                    </template>
+
+                    <button class="btn-proceed" disabled={isProceedDisabled} onclick={handleProceed}>
+                        Proceed to Take Attendance
+                        <span class="btn-arrow">→</span>
+                    </button>
+
+                    <div class="helper">Only you can mark attendance for your class</div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Main Tracker View (Hidden during teacher selection) -->
+        <template if:false={showTeacherSelection}>
         
         <!-- Header Section -->
         <div class="header-section">
@@ -71,8 +163,19 @@
         <!-- Success Card (Summary View) -->
         <template lwc:if={isSuccess}>
             <div class="success-card">
+                <div class="success-timestamps">
+                    <span class="timestamp-item">Submitted: {submittedTime}</span>
+                    <template if:true={showUpdatedTime}>
+                        <span class="timestamp-separator"></span>
+                        <span class="timestamp-item">Updated: {lastUpdatedTime}</span>
+                    </template>
+                </div>
                 <span class="success-icon">🎉</span>
                 <h2 class="success-title">Attendance Submitted!</h2>
+                <div class="teacher-success-badge">
+                    <span class="teacher-label">Teacher:</span>
+                    <span class="teacher-name">{submittedTeacherName}</span>
+                </div>
                 <p class="success-subtitle">{formattedSelectedClass} • {formattedSelectedSection} • {selectedDate}</p>
                 
                 <div class="summary-stats">
@@ -189,7 +292,8 @@
             </template>
         </template> <!-- End of Else (List Mode) -->
 
-        </template>
+        </template> <!-- End of showReport == false -->
+        </template> <!-- End of main tracker view (showTeacherSelection == false) -->
 
         <!-- Report View -->
         <template if:true={showReport}>

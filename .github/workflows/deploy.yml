@@ -1,5 +1,8 @@
 name: Deploy to SunilDev
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -9,6 +12,8 @@ on:
       - 'packaged-src/**'
       - 'manifest/**'
       - 'sfdx-project.json'
+      - '.github/workflows/**'
+      - 'create_packaged_src.ps1'
 
 jobs:
   deploy:
@@ -30,14 +35,23 @@ jobs:
           echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
           sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias SunilDev --set-default
           rm ./SFDX_AUTH_URL.txt
-
       - name: Prepare Packaged Source
         shell: pwsh
         run: ./create_packaged_src.ps1
-
       - name: Deploy Source to Target Org
         run: |
           sf project deploy start \
             --source-dir packaged-src \
             --target-org SunilDev \
-            --wait 30
+            --wait 30 > deploy-log.txt 2>&1
+      - name: Print and Push Deployment Logs on Failure
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-Content deploy-log.txt
+          git config --global user.name "Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add -f deploy-log.txt
+          git commit -m "Add failing deployment logs [skip ci]"
+          git checkout -b diagnostic-logs 2>/dev/null || git checkout diagnostic-logs
+          git push origin diagnostic-logs --force

@@ -651,6 +651,8 @@
                                     <div class="form-group"><lightning-input name="lastName" label="Last Name" value={teacherLastName} placeholder="e.g., Smith" onchange={handleTeacherLastNameChange} required class="premium-input"></lightning-input></div>
                                     <div class="form-group"><lightning-input name="email" label="Email" type="email" value={teacherEmail} placeholder="e.g., john.smith@school.com" onchange={handleTeacherEmailChange} required class="premium-input"></lightning-input></div>
                                     <div class="form-group"><lightning-input name="phone" label="Phone" type="tel" value={teacherPhone} placeholder="e.g., +91 98765 43210" onchange={handleTeacherPhoneChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="birthDate" label="Birth Date" type="date" value={teacherBirthDate} onchange={handleTeacherBirthDateChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="joiningDate" label="Joining Date" type="date" value={teacherJoiningDate} onchange={handleTeacherJoiningDateChange} class="premium-input"></lightning-input></div>
                                 </div>
                                 <div class="form-group full-width"><lightning-textarea name="qualification" label="Qualification" value={teacherQualification} placeholder="e.g., M.Ed, B.Ed in English Literature" onchange={handleTeacherQualificationChange} class="premium-input"></lightning-textarea></div>
                             </div>
@@ -690,6 +692,19 @@
                                     <div class="empty-skills-state"><lightning-icon icon-name="utility:info" size="small" variant="warning"></lightning-icon><p>No skills added yet. Click "Add Subject Skill" to begin.</p></div>
                                 </template>
                             </div>
+                            <!-- Salary Information -->
+                            <div class="form-section">
+                                <h3 class="form-section-title">Salary Information</h3>
+                                <div class="form-grid">
+                                    <div class="form-group"><lightning-input name="basicSalary" type="number" step="0.01" label="Basic Salary" value={teacherBasicSalary} onchange={handleTeacherBasicSalaryChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="hra" type="number" step="0.01" label="HRA" value={teacherHra} onchange={handleTeacherHraChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="da" type="number" step="0.01" label="DA" value={teacherDa} onchange={handleTeacherDaChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="pf" type="number" step="0.01" label="PF Deduction" value={teacherPf} onchange={handleTeacherPfChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="accountNumber" label="Account Number" value={teacherAccountNumber} onchange={handleTeacherAccountNumberChange} class="premium-input"></lightning-input></div>
+                                    <div class="form-group"><lightning-input name="ifsc" label="IFSC Code" value={teacherIfsc} onchange={handleTeacherIfscChange} class="premium-input"></lightning-input></div>
+                                </div>
+                            </div>
+
                             <div class="teacher-form-actions">
                                 <lightning-button label="Cancel" onclick={handleToggleTeacherForm} icon-name="utility:close" class="secondary-button"></lightning-button>
                                 <lightning-button label="Create Teacher &amp; Continue" variant="brand" onclick={handleCreateTeacher} icon-name="utility:save" icon-position="right" class="submit-button"></lightning-button>

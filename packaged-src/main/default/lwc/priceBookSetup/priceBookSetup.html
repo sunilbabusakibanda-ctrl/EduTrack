@@ -17,10 +17,6 @@
                         </defs>
                     </svg>
                 </div>
-                <!--<div class="school-info">
-                    <h1 class="school-name">Vikash High School</h1>
-                    <p class="school-tagline">Excellence in Education, Excellence in Life</p>
-                </div>-->
             </div>
 
             <!-- Loading Spinner -->
@@ -53,9 +49,48 @@
                             <div key={field.id} class="input-group">
                                 <div class="input-wrapper">
                                     <label>Product Name</label>
-                                    <input type="text" class="product-input"
-                                        placeholder="e.g., Tuition Fee, Library Fee, Sports Fee" data-id={field.id}
-                                        value={field.value} onchange={handleInputChange} disabled={isLoading}>
+                                    <!-- Autocomplete wrapper -->
+                                    <div class="autocomplete-wrapper">
+                                        <input
+                                            type="text"
+                                            class="product-input"
+                                            placeholder="e.g., Tuition Fee, Library Fee, Sports Fee"
+                                            data-id={field.id}
+                                            value={field.value}
+                                            onchange={handleInputChange}
+                                            oninput={handleInputChange}
+                                            onfocus={handleInputFocus}
+                                            onblur={handleInputBlur}
+                                            onkeydown={handleKeyDown}
+                                            disabled={isLoading}
+                                            autocomplete="off"
+                                        />
+                                        <!-- Dropdown suggestions -->
+                                        <template if:true={field.showSuggestions}>
+                                            <div class="suggestions-dropdown">
+                                                <template if:true={field.hasSuggestions}>
+                                                    <template for:each={field.suggestions} for:item="suggestion">
+                                                        <div
+                                                            key={suggestion.label}
+                                                            class={suggestion.itemClass}
+                                                            data-field-id={field.id}
+                                                            data-value={suggestion.label}
+                                                            onmousedown={handleSuggestionClick}
+                                                        >
+                                                            <span class="suggestion-icon">{suggestion.icon}</span>
+                                                            <span class="suggestion-text">{suggestion.label}</span>
+                                                            <span class="suggestion-badge">{suggestion.badge}</span>
+                                                        </div>
+                                                    </template>
+                                                </template>
+                                                <template if:false={field.hasSuggestions}>
+                                                    <div class="suggestion-empty">
+                                                        <span>No matching products found</span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                                 <template if:true={field.isFirst}>
                                     <button class="add-btn" onclick={addInputField} title="Add another product"
@@ -126,7 +161,6 @@
                                 disabled={isLoading}>
                             </lightning-combobox>
                         </div>
-
                     </div>
 
                     <div class="price-list-container">

@@ -205,16 +205,27 @@ public with sharing class EduProDashboardController {
             Double obtainedSize = 0;
             Integer subjects = 0;
             
-            if (String.isNotBlank(e.English__c)) { obtainedSize += Double.valueOf(e.English__c); subjects++; }
-            if (String.isNotBlank(e.Maths__c)) { obtainedSize += Double.valueOf(e.Maths__c); subjects++; }
-            if (String.isNotBlank(e.Science__c)) { obtainedSize += Double.valueOf(e.Science__c); subjects++; }
-            if (String.isNotBlank(e.Social__c)) { obtainedSize += Double.valueOf(e.Social__c); subjects++; }
-            if (String.isNotBlank(e.Computer__c)) { obtainedSize += Double.valueOf(e.Computer__c); subjects++; }
-            if (String.isNotBlank(e.Telugu__c)) { obtainedSize += Double.valueOf(e.Telugu__c); subjects++; }
-            if (e.Hindi__c != null) { obtainedSize += e.Hindi__c; subjects++; }
+            if (String.isNotBlank((String)e.get('English__c'))) { obtainedSize += Double.valueOf(e.get('English__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Maths__c'))) { obtainedSize += Double.valueOf(e.get('Maths__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Science__c'))) { obtainedSize += Double.valueOf(e.get('Science__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Social__c'))) { obtainedSize += Double.valueOf(e.get('Social__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Computer__c'))) { obtainedSize += Double.valueOf(e.get('Computer__c')); subjects++; }
+            
+            // Handle Telugu and Hindi safely whether they are Strings or Numbers in local org
+            Object teluguObj = e.get('Telugu__c');
+            if (teluguObj != null && String.isNotBlank(String.valueOf(teluguObj))) { 
+                obtainedSize += Double.valueOf(teluguObj); 
+                subjects++; 
+            }
+            
+            Object hindiObj = e.get('Hindi__c');
+            if (hindiObj != null && String.isNotBlank(String.valueOf(hindiObj))) { 
+                obtainedSize += Double.valueOf(hindiObj); 
+                subjects++; 
+            }
 
             if (subjects > 0) {
-                totalPercent += (obtainedSize / (subjects * 100)) * 100;
+                totalPercent += (obtainedSize / (subjects * 100.0)) * 100.0;
                 count++;
             }
         }
@@ -230,16 +241,26 @@ public with sharing class EduProDashboardController {
             Double obtainedSize = 0;
             Integer subjects = 0;
             
-            if (String.isNotBlank(e.English__c)) { obtainedSize += Double.valueOf(e.English__c); subjects++; }
-            if (String.isNotBlank(e.Maths__c)) { obtainedSize += Double.valueOf(e.Maths__c); subjects++; }
-            if (String.isNotBlank(e.Science__c)) { obtainedSize += Double.valueOf(e.Science__c); subjects++; }
-            if (String.isNotBlank(e.Social__c)) { obtainedSize += Double.valueOf(e.Social__c); subjects++; }
-            if (String.isNotBlank(e.Computer__c)) { obtainedSize += Double.valueOf(e.Computer__c); subjects++; }
-            if (String.isNotBlank(e.Telugu__c)) { obtainedSize += Double.valueOf(e.Telugu__c); subjects++; }
-            if (e.Hindi__c != null) { obtainedSize += e.Hindi__c; subjects++; }
+            if (String.isNotBlank((String)e.get('English__c'))) { obtainedSize += Double.valueOf(e.get('English__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Maths__c'))) { obtainedSize += Double.valueOf(e.get('Maths__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Science__c'))) { obtainedSize += Double.valueOf(e.get('Science__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Social__c'))) { obtainedSize += Double.valueOf(e.get('Social__c')); subjects++; }
+            if (String.isNotBlank((String)e.get('Computer__c'))) { obtainedSize += Double.valueOf(e.get('Computer__c')); subjects++; }
+            
+            Object teluguObj = e.get('Telugu__c');
+            if (teluguObj != null && String.isNotBlank(String.valueOf(teluguObj))) { 
+                obtainedSize += Double.valueOf(teluguObj); 
+                subjects++; 
+            }
+            
+            Object hindiObj = e.get('Hindi__c');
+            if (hindiObj != null && String.isNotBlank(String.valueOf(hindiObj))) { 
+                obtainedSize += Double.valueOf(hindiObj); 
+                subjects++; 
+            }
 
             if (subjects > 0) {
-                totalPercent += (obtainedSize / (subjects * 100)) * 100;
+                totalPercent += (obtainedSize / (subjects * 100.0)) * 100.0;
                 count++;
             }
         }

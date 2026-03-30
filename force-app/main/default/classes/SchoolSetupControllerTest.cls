@@ -66,4 +66,41 @@ public class SchoolSetupControllerTest {
             Assert.fail('Should not have thrown exception: ' + e.getMessage());
         }
     }
+
+    @IsTest
+    static void testBankAccounts() {
+        List<Map<String, Object>> accountsData = new List<Map<String, Object>>();
+        Map<String, Object> acc1 = new Map<String, Object>{
+            'Name' => 'Primary Bank',
+            'Bank_Name__c' => 'Test Bank',
+            'IFSC_Code__c' => 'TEST0123',
+            'Account_Number__c' => '123456789',
+            'Branch__c' => 'Main Branch',
+            'Is_Primary__c' => true
+        };
+        accountsData.add(acc1);
+
+        Test.startTest();
+        SchoolSetupController.saveBankAccounts(accountsData, new List<Id>());
+        List<Map<String, Object>> retrievedAccounts = SchoolSetupController.getBankAccounts();
+        Test.stopTest();
+
+        Assert.areEqual(1, retrievedAccounts.size(), 'Should have 1 bank account');
+        Assert.areEqual('Primary Bank', retrievedAccounts[0].get('Name'), 'Name should match');
+    }
+
+    @IsTest
+    static void testAcademicYears() {
+        Test.startTest();
+        SchoolSetupController.saveAcademicYear('2025-2026', true);
+        
+        // Add another to trigger the 2-active limit logic if needed
+        SchoolSetupController.saveAcademicYear('2026-2027', true);
+        SchoolSetupController.saveAcademicYear('2027-2028', true);
+        
+        List<Map<String, Object>> retrievedYears = SchoolSetupController.getAcademicYears();
+        Test.stopTest();
+
+        Assert.areNotEqual(0, retrievedYears.size(), 'Should have academic years');
+    }
 }
