@@ -363,125 +363,164 @@ public with sharing class AdmissionController {
 
     @AuraEnabled 
     public static Map<String, Object> importStudentsBulk(List<Map<String, String>> studentDataList) {
-        Integer successCount = 0; List<String> errors = new List<String>();
+        Integer successCount = 0; 
+        List<String> errors = new List<String>();
+        
         try {
             Id personAccountRecordTypeId = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1].Id;
+            
+            // 1. Setup Data
             Map<String, Id> ayMap = new Map<String, Id>();
             for(Academic_Year__c ay : [SELECT Id, Name FROM Academic_Year__c]) {
-                if (ay.Name != null) {
-                    ayMap.put(ay.Name.replaceAll('–', '-'), ay.Id);
-                }
+                if (ay.Name != null) ayMap.put(ay.Name.replaceAll('–', '-'), ay.Id);
             }
 
-            // 1. Build Pricebook Cache for Bulk Lookups Node Frictionless Node frictionless
             Set<String> classNames = new Set<String>();
             for(Map<String, String> data : studentDataList) {
                 if(data.get('Class') != null) classNames.add(data.get('Class').replace('-', ' '));
             }
             
-            Map<String, List<PricebookEntry>> pbeCache = new Map<String, List<PricebookEntry>>();
-            for(PricebookEntry pbe : [SELECT Id, Product2Id, Product2.Name, UnitPrice, Pricebook2Id, Pricebook2.Name, Pricebook2.Academic_Year__c FROM PricebookEntry WHERE IsActive = true AND Pricebook2.IsActive = true AND Product2.ProductCode != 'PREV_DUES' AND (NOT Product2.Name LIKE '%Previous%') AND Pricebook2.Name LIKE 'Class %']) {
-                for (String cls : classNames) {
-                    if (pbe.Pricebook2.Name != null) {
-                        String pbNameClean = pbe.Pricebook2.Name.replaceAll('–', '-');
-                        if (pbNameClean == cls || pbNameClean.startsWith(cls + ' -')) {
-                            String key = cls + '-' + (pbe.Pricebook2.Academic_Year__c != null ? String.valueOf(pbe.Pricebook2.Academic_Year__c) : 'null');
-                            if(!pbeCache.containsKey(key)) pbeCache.put(key, new List<PricebookEntry>());
-                            pbeCache.get(key).add(pbe);
-
-                            if (pbe.Pricebook2.Academic_Year__c != null) {
-                                String fallbackCacheKey = cls + '-null';
-                                if (!pbeCache.containsKey(fallbackCacheKey)) pbeCache.put(fallbackCacheKey, new List<PricebookEntry>());
-                                pbeCache.get(fallbackCacheKey).add(pbe);
-                            }
+            // 2. Identify Target Pricebooks
+            Map<String, Id> classAYToPBId = new Map<String, Id>();
+            List<Pricebook2> pbs = [SELECT Id, Name, Academic_Year__c FROM Pricebook2 WHERE IsActive = true AND (Name IN :classNames OR Name LIKE 'Class %') ORDER BY Academic_Year__c DESC NULLS LAST];
+            
+            for (String cls : classNames) {
+                for (Pricebook2 pb : pbs) {
+                    String pbNameClean = pb.Name.replaceAll('–', '-');
+                    if (pbNameClean == cls || pbNameClean.startsWith(cls + ' -')) {
+                        if (pb.Academic_Year__c != null && !classAYToPBId.containsKey(cls + '-' + pb.Academic_Year__c)) {
+                            classAYToPBId.put(cls + '-' + pb.Academic_Year__c, pb.Id);
+                        }
+                        if (!classAYToPBId.containsKey(cls + '-null')) {
+                            classAYToPBId.put(cls + '-null', pb.Id);
                         }
                     }
                 }
             }
 
-            // 1. Build Caches and Bulk Lists
-            List<Account> accountsToInsert = new List<Account>();
-            List<Map<String, String>> validStudentRowData = new List<Map<String, String>>();
+            // Fetch all PBEs in advance
+            Map<Id, List<PricebookEntry>> pbeCache = new Map<Id, List<PricebookEntry>>();
+            for(PricebookEntry pbe : [SELECT Id, Pricebook2Id, UnitPrice, Product2.Name FROM PricebookEntry WHERE IsActive = true AND Pricebook2Id IN :classAYToPBId.values() AND Product2.ProductCode != 'PREV_DUES' AND (NOT Product2.Name LIKE '%Previous%')]) {
+                if(!pbeCache.containsKey(pbe.Pricebook2Id)) pbeCache.put(pbe.Pricebook2Id, new List<PricebookEntry>());
+                pbeCache.get(pbe.Pricebook2Id).add(pbe);
+            }
 
+            // 3. Insert Accounts (Students)
+            List<Account> accountsToInsert = new List<Account>();
+            Map<Integer, Integer> accountToRowIdx = new Map<Integer, Integer>();
+            
             for(Integer i = 0; i < studentDataList.size(); i++) {
                 Map<String, String> data = studentDataList[i];
                 try {
-                    Account acc = new Account(RecordTypeId = personAccountRecordTypeId, FirstName = data.get('First Name'), LastName = data.get('Last Name'), PersonEmail = data.get('Email'), Phone = data.get('Phone'), PersonMobilePhone = data.get('Phone'));
+                    Account acc = new Account(RecordTypeId = personAccountRecordTypeId, FirstName = data.get('First Name'), LastName = data.get('Last Name'), PersonEmail = data.get('Email'), Phone = data.get('Phone'), PersonMobilePhone = data.get('Phone'), Type = 'Student');
+                    if(String.isNotBlank(data.get('DOB'))) acc.PersonBirthdate = parseFlexibleDate(data.get('DOB'));
                     acc.put('Father_Name__c', data.get('Father Name')); acc.put('Mother_Name__c', data.get('Mother Name'));
-                    
-                    String dobStr = data.containsKey('DOB') ? data.get('DOB') : data.get('DOB (YYYY-MM-DD)');
-                    if(String.isNotBlank(dobStr)) acc.PersonBirthdate = parseFlexibleDate(dobStr);
-
                     acc.put('Aadhar_Card_No__c', data.get('Aadhar No')); acc.put('Village__c', data.get('Village'));
                     acc.PersonMailingCity = data.get('City'); acc.PersonMailingPostalCode = data.get('Pincode');
                     acc.put('State__c', data.get('State')); acc.put('Country__c', data.get('Country'));
                     acc.put('Class__c', data.get('Class')); acc.put('Section__c', data.get('Section'));
-                    acc.Type = 'Student'; acc.put('Active__c', 'Yes');
-
+                    acc.put('Active__c', 'Yes'); // Required Field
+                    
+                    accountToRowIdx.put(accountsToInsert.size(), i);
                     accountsToInsert.add(acc);
-                    validStudentRowData.add(data);
-                } catch (Exception e) { errors.add('Row ' + (i + 1) + ': ' + e.getMessage()); }
+                } catch (Exception e) { 
+                    errors.add('Row ' + (i+1) + ' verification failed: ' + e.getMessage()); 
+                }
+            }
+            
+            if(accountsToInsert.isEmpty()) return new Map<String, Object>{ 'successCount' => 0, 'errors' => errors, 'totalRows' => studentDataList.size() };
+            
+            Database.SaveResult[] accSrList = Database.insert(accountsToInsert, false);
+            
+            // 4. Create Opportunities (Admissions)
+            List<Opportunity> oppsToInsert = new List<Opportunity>();
+            Map<Integer, Integer> oppToRowIdx = new Map<Integer, Integer>();
+
+            for(Integer i = 0; i < accSrList.size(); i++) {
+                Integer rowIdx = accountToRowIdx.get(i);
+                if (accSrList[i].isSuccess()) {
+                    Map<String, String> data = studentDataList[rowIdx];
+                    Id ayId = ayMap.get(data.get('Academic Year'));
+                    
+                    Opportunity opp = new Opportunity(
+                        AccountId = accSrList[i].getId(), 
+                        StageName = 'Prospecting', 
+                        CloseDate = Date.today().addDays(30), 
+                        Name = (String.isNotBlank(accountsToInsert[i].FirstName) ? accountsToInsert[i].FirstName + ' ' : '') + accountsToInsert[i].LastName + ' - Admission'
+                    );
+                    opp.put('Class__c', data.get('Class')); 
+                    opp.put('Section__c', data.get('Section')); 
+                    opp.put('Academic_Year__c', ayId);
+                    
+                    // Deliberately NOT setting Pricebook2Id here to exactly mimic 'createAdmission' logic!
+                    
+                    oppToRowIdx.put(oppsToInsert.size(), rowIdx);
+                    oppsToInsert.add(opp);
+                } else {
+                    errors.add('Row ' + (rowIdx+1) + ' Student failed: ' + accSrList[i].getErrors()[0].getMessage());
+                }
             }
 
-            // 2. Insert Accounts Bulk Node Frictionless
-            if (!accountsToInsert.isEmpty()) {
-                Database.SaveResult[] srList = Database.insert(accountsToInsert, false);
-                List<Opportunity> oppsToInsert = new List<Opportunity>();
-                List<Map<String, String>> successRowData = new List<Map<String, String>>();
-                List<Account> successAccounts = new List<Account>();
-
-                for(Integer i = 0; i < srList.size(); i++) {
-                    if (srList[i].isSuccess()) {
-                        Account acc = accountsToInsert[i];
-                        Map<String, String> data = validStudentRowData[i];
+            if(!oppsToInsert.isEmpty()) {
+                Database.SaveResult[] oppSrList = Database.insert(oppsToInsert, false);
+                
+                // 5. Create Opportunity Line Items (Fees)
+                List<OpportunityLineItem> olisToInsert = new List<OpportunityLineItem>();
+                Map<Integer, Integer> oliToRowIdx = new Map<Integer, Integer>();
+                
+                for(Integer i = 0; i < oppSrList.size(); i++) {
+                    Integer rowIdx = oppToRowIdx.get(i);
+                    if(oppSrList[i].isSuccess()) {
+                        Id oppId = oppSrList[i].getId();
+                        
+                        Map<String, String> data = studentDataList[rowIdx];
                         Id ayId = ayMap.get(data.get('Academic Year'));
-
-                        Opportunity opp = new Opportunity(AccountId = srList[i].getId(), StageName = 'Prospecting', CloseDate = Date.today().addDays(30));
-                        opp.Name = acc.FirstName + ' ' + acc.LastName + ' - Admission ' + (data.get('Academic Year') != null ? data.get('Academic Year') : '');
-                        opp.put('Class__c', data.get('Class')); opp.put('Section__c', data.get('Section')); opp.put('Academic_Year__c', ayId);
-
-                        oppsToInsert.add(opp);
-                        successRowData.add(data);
-                        successAccounts.add(acc);
+                        String cls = data.get('Class') != null ? data.get('Class').replace('-', ' ') : '';
+                        String key = cls + '-' + (ayId != null ? (String)ayId : 'null');
+                        Id targetPbId = classAYToPBId.containsKey(key) ? classAYToPBId.get(key) : classAYToPBId.get(cls + '-null');
+                        
+                        if(targetPbId != null && pbeCache.containsKey(targetPbId)) {
+                            for(PricebookEntry pbe : pbeCache.get(targetPbId)) {
+                                oliToRowIdx.put(olisToInsert.size(), rowIdx);
+                                olisToInsert.add(new OpportunityLineItem(OpportunityId = oppId, PricebookEntryId = pbe.Id, Quantity = 1, UnitPrice = pbe.UnitPrice));
+                            }
+                        } else {
+                            errors.add('Row ' + (rowIdx+1) + ' warning: No active Pricebook/Fees found for Class (' + cls + '). Admission created without fees.');
+                        }
                     } else {
-                        errors.add('Row account error: ' + srList[i].getErrors()[0].getMessage());
+                        errors.add('Row ' + (rowIdx+1) + ' Admission failed: ' + oppSrList[i].getErrors()[0].getMessage());
                     }
                 }
 
-                // 3. Insert Opportunities Bulk Node Frictionless
-                if (!oppsToInsert.isEmpty()) {
-                    Database.SaveResult[] srOppList = Database.insert(oppsToInsert, false);
-                    List<OpportunityLineItem> olisToInsert = new List<OpportunityLineItem>();
-
-                    for(Integer i = 0; i < srOppList.size(); i++) {
-                        if (srOppList[i].isSuccess()) {
-                            Id oppId = srOppList[i].getId();
-                            Map<String, String> data = successRowData[i];
-                            Id ayId = ayMap.get(data.get('Academic Year'));
-                            String pbName = data.get('Class') != null ? data.get('Class').replace('-', ' ') : '';
-                            
-                            // Load From Cache Node flawless Node stream absolute flawlessly Node frictionless
-                            String cacheKey = pbName + '-' + (ayId != null ? String.valueOf(ayId) : 'null');
-                            String fallbackKey = pbName + '-null';
-                            List<PricebookEntry> pbes = pbeCache.containsKey(cacheKey) ? pbeCache.get(cacheKey) : pbeCache.containsKey(fallbackKey) ? pbeCache.get(fallbackKey) : new List<PricebookEntry>();
-
-                            if(!pbes.isEmpty()) {
-                                for(PricebookEntry pbe : pbes) {
-                                    olisToInsert.add(new OpportunityLineItem(OpportunityId = oppId, PricebookEntryId = pbe.Id, Quantity = 1, UnitPrice = pbe.UnitPrice));
-                                }
+                if(!olisToInsert.isEmpty()) {
+                    Database.SaveResult[] oliSrList = Database.insert(olisToInsert, false);
+                    Set<Integer> failedFeeRows = new Set<Integer>();
+                    for(Integer i = 0; i < oliSrList.size(); i++) {
+                        Integer rowIdx = oliToRowIdx.get(i);
+                        if(!oliSrList[i].isSuccess()) {
+                            if(!failedFeeRows.contains(rowIdx)) {
+                                errors.add('Row ' + (rowIdx+1) + ' Fee mismatch: ' + oliSrList[i].getErrors()[0].getMessage());
+                                failedFeeRows.add(rowIdx);
                             }
-                            successCount++;
-                        } else {
-                            errors.add('Row opp error: ' + srOppList[i].getErrors()[0].getMessage());
                         }
                     }
-
-                    if (!olisToInsert.isEmpty()) {
-                        insert olisToInsert;
+                    
+                    // Final Success count: Only count if Opportunity succeeded AND had no Fee errors
+                    for(Integer i = 0; i < oppSrList.size(); i++) {
+                        Integer rowIdx = oppToRowIdx.get(i);
+                        if(oppSrList[i].isSuccess() && !failedFeeRows.contains(rowIdx)) {
+                            successCount++;
+                        }
+                    }
+                } else {
+                    for(Database.SaveResult sr : oppSrList) {
+                        if(sr.isSuccess()) successCount++;
                     }
                 }
             }
-        } catch (Exception e) { throw new AuraHandledException('Bulk Import Failed: ' + e.getMessage()); }
+        } catch (Exception e) { 
+            errors.add('System Error: ' + e.getMessage() + ' [Line ' + e.getLineNumber() + ']'); 
+        }
         return new Map<String, Object>{ 'successCount' => successCount, 'errors' => errors, 'totalRows' => studentDataList.size() };
     }
 

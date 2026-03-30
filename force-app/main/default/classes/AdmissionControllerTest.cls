@@ -152,20 +152,53 @@ public class AdmissionControllerTest {
             'Class' => 'Class-1',
             'Academic Year' => ay.Name
         });
+
+        Test.startTest();
+        Map<String, Object> result = AdmissionController.importStudentsBulk(importData);
+        Test.stopTest();
+
+        Assert.areEqual(1, (Integer)result.get('successCount'), 'Student should be imported');
+    }
+
+    @isTest
+    static void testImportStudentsBulkMultiplePricebooks() {
+        // Setup multiple matching pricebooks
+        Academic_Year__c ayActive = [SELECT Id, Name FROM Academic_Year__c WHERE Is_Active__c = true LIMIT 1];
+        Academic_Year__c ayOther = new Academic_Year__c(Name = '2024-2025', Is_Active__c = false, Start_Date__c = Date.today().addDays(-400), End_Date__c = Date.today().addDays(-35));
+        insert ayOther;
+
+        Product2 prod = [SELECT Id FROM Product2 LIMIT 1];
+        
+        // Pricebook 1: "Class 1" (Generic or linked to another year)
+        Pricebook2 pb1 = new Pricebook2(Name = 'Class 1', IsActive = true, Academic_Year__c = ayOther.Id);
+        insert pb1;
+        insert new PricebookEntry(Pricebook2Id = pb1.Id, Product2Id = prod.Id, UnitPrice = 100, IsActive = true);
+
+        // Pricebook 2: "Class 1 - 2025-2026" (Specific to active year)
+        Pricebook2 pb2 = new Pricebook2(Name = 'Class 1 - ' + ayActive.Name, IsActive = true, Academic_Year__c = ayActive.Id);
+        insert pb2;
+        insert new PricebookEntry(Pricebook2Id = pb2.Id, Product2Id = prod.Id, UnitPrice = 150, IsActive = true);
+
+        List<Map<String, String>> importData = new List<Map<String, String>>();
         importData.add(new Map<String, String>{
-            'First Name' => 'Jane',
-            'Last Name' => 'Smith',
-            'Email' => 'jane@smith.com',
-            'Phone' => '8888888888',
-            'DOB' => '2016/07/20',
+            'First Name' => 'Multi',
+            'Last Name' => 'PB',
             'Class' => 'Class-1',
-            'Academic Year' => ay.Name
+            'Academic Year' => ayActive.Name
         });
 
         Test.startTest();
         Map<String, Object> result = AdmissionController.importStudentsBulk(importData);
         Test.stopTest();
 
-        Assert.areEqual(2, result.get('successCount'), 'Both students should be imported');
+        Assert.areEqual(1, (Integer)result.get('successCount'), 'Student should be imported successfully despite multiple matching pricebooks');
+        
+        // Verify only one set of line items added (from the correct pricebook)
+        Opportunity opp = [SELECT Id, Pricebook2Id, (SELECT PricebookEntry.Pricebook2Id FROM OpportunityLineItems) FROM Opportunity WHERE Account.FirstName = 'Multi' LIMIT 1];
+        Assert.areEqual(pb2.Id, opp.Pricebook2Id, 'Should have assigned the active year pricebook');
+        Assert.isFalse(opp.OpportunityLineItems.isEmpty(), 'Should have line items');
+        for(OpportunityLineItem oli : opp.OpportunityLineItems) {
+            Assert.areEqual(pb2.Id, oli.PricebookEntry.Pricebook2Id, 'Line items should belong to the assigned pricebook');
+        }
     }
 }
