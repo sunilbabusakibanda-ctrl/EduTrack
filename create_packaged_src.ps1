@@ -1,8 +1,7 @@
 $TargetDir = "packaged-src/main/default"
 
-mkdir "$TargetDir/lwc" -ErrorAction SilentlyContinue
-mkdir "$TargetDir/classes" -ErrorAction SilentlyContinue
-
+New-Item -ItemType Directory -Force -Path "$TargetDir/lwc" | Out-Null
+New-Item -ItemType Directory -Force -Path "$TargetDir/classes" | Out-Null
 
 # 1. List of LWC to move
 $LwcList = @(
