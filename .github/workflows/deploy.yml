@@ -36,40 +36,8 @@ jobs:
           sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias SunilDev --set-default
           rm ./SFDX_AUTH_URL.txt
       - name: Prepare Packaged Source
-        run: |
-          mkdir -p packaged-src/main/default/lwc
-          mkdir -p packaged-src/main/default/classes
-          # Copy LWCs
-          for lwc in admissionManager attendance attendanceReport bulkStudentImport complaintbox eduProDashboard enterMarks expenseManagement gradesModule payTheBill priceBookSetup schoolSetup student studentPromotion teacherandClassmanagement schoolstaff assignedClasses; do
-            if [ -d "force-app/main/default/lwc/$lwc" ]; then
-              cp -r "force-app/main/default/lwc/$lwc" packaged-src/main/default/lwc/
-            fi
-          done
-          # Copy Apex Classes
-          for cls in AdmissionController StudentController MarksheetController ClassManagementController AddFeesController ComplaintBox ExpenseController SchoolStaffController AttendanceReportController AttendanceController EduProDashboardController GradesController EnterMarksController SchoolSetupController NamespaceUtils TestDataFactory PromotionController AcademicYearTriggerTest PricebookAutomationHandler AdmissionInvoiceController InvoicePDFController; do
-            if [ -f "force-app/main/default/classes/$cls.cls" ]; then
-              cp "force-app/main/default/classes/$cls.cls" packaged-src/main/default/classes/
-              cp "force-app/main/default/classes/$cls.cls-meta.xml" packaged-src/main/default/classes/
-            fi
-            if [ -f "force-app/main/default/classes/${cls}Test.cls" ]; then
-              cp "force-app/main/default/classes/${cls}Test.cls" packaged-src/main/default/classes/
-              cp "force-app/main/default/classes/${cls}Test.cls-meta.xml" packaged-src/main/default/classes/
-            fi
-          done
-          # Copy other folders
-          for f in applications tabs permissionsets staticresources objects flexipages layouts triggers pages standardValueSets; do
-            if [ -d "force-app/main/default/$f" ]; then
-              cp -r "force-app/main/default/$f" packaged-src/main/default/
-            fi
-          done
-          # Cleanups
-          rm -f packaged-src/main/default/objects/Product2/fields/UnitOfMeasureId.field-meta.xml
-          rm -f packaged-src/main/default/objects/Pricebook2/fields/CostBookId.field-meta.xml
-          # Cleanup standard__ / sfdcInternalInt__ files
-          find packaged-src/main/default/applications -name "standard__*" -delete 2>/dev/null || true
-          find packaged-src/main/default/applications -name "sfdcInternalInt__*" -delete 2>/dev/null || true
-          find packaged-src/main/default/permissionsets -name "standard__*" -delete 2>/dev/null || true
-          find packaged-src/main/default/permissionsets -name "sfdcInternalInt__*" -delete 2>/dev/null || true
+        shell: pwsh
+        run: ./create_packaged_src.ps1
       - name: Deploy Source to Target Org
         run: |
           sf project deploy start \
