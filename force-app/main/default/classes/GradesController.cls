@@ -141,7 +141,12 @@ public with sharing class GradesController {
                 
                 for (String f : subjectFields) {
                     Object val = (matchingExam != null) ? matchingExam.get(f) : null;
-                    String localFieldName = fieldToLocalMap.get(f);
+                    String localFieldName = f;
+                    
+                    // Forcefully strip namespace if present (e.g. EduTrack__English__c -> English__c)
+                    if (f.countMatches('__') == 2) {
+                        localFieldName = f.substring(f.indexOf('__') + 2);
+                    }
                     
                     if (val == null) {
                         row.put(localFieldName, 0); 
@@ -198,7 +203,13 @@ public with sharing class GradesController {
                 row.put('Section__c', (String)e.get(examSectionField));
                 for (String f : subjectFields) {
                     Object val = e.get(f);
-                    String localName = fieldToLocalMap.get(f);
+                    String localName = f;
+
+                    // Forcefully strip namespace (e.g. EduTrack__Hindi__c -> Hindi__c)
+                    if (f.countMatches('__') == 2) {
+                        localName = f.substring(f.indexOf('__') + 2);
+                    }
+
                     if (val instanceof String) {
                         try { row.put(localName, Decimal.valueOf((String)val)); } catch (Exception ex) { row.put(localName, 0); }
                     } else {
