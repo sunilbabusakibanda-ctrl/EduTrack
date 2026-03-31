@@ -171,7 +171,11 @@ public with sharing class GradesController {
     @AuraEnabled(cacheable=true)
     public static List<Map<String, Object>> getStudentExams(String studentId) {
         try {
+            List<String> subjectFields = new List<String>();
             Map<String, String> fieldToLocalMap = new Map<String, String>();
+            Map<String, Schema.SObjectField> fields = Schema.SObjectType.Exam__c.fields.getMap();
+            Set<String> excluded = new Set<String>{'Exam_Type__c', 'Roll_Number__c', 'Section__c', 'Class__c', 'Student__c', 'Name', 'Id', 'CreatedDate', 'LastModifiedDate', 'SystemModstamp'};
+
             for (String fieldName : fields.keySet()) {
                 Schema.DescribeFieldResult dfr = fields.get(fieldName).getDescribe();
                 if (dfr.isCustom() && !excluded.contains(dfr.getName()) && !excluded.contains(dfr.getLocalName())) {
@@ -223,4 +227,4 @@ public with sharing class GradesController {
             throw new AuraHandledException('Error fetching student exams: ' + e.getMessage());
         }
     }
-}
+}
