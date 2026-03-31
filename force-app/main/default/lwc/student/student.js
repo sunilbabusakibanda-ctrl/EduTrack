@@ -163,14 +163,23 @@ export default class Student extends NavigationMixin(LightningElement) {
             this.isLoading = true;
             const data = await getStudentDetails({ studentId });
 
-            // Extract academic years from products
+            // Extract academic years and names from products
             const products = data.products || [];
-            const yearIds = [...new Set(products.map(p => p.Opportunity?.Academic_Year__c).filter(y => !!y))];
+            const yearMap = data.academicYearNames || {};
 
-            // Map IDs to Names using academicYearOptions
+            // Add any missing IDs that didn't resolve (failsafe)
+            products.forEach(p => {
+                const opp = p.Opportunity;
+                if (opp && opp.Academic_Year__c && !yearMap[opp.Academic_Year__c]) {
+                    yearMap[opp.Academic_Year__c] = opp.Academic_Year__c;
+                }
+            });
+
+            const yearIds = Object.keys(yearMap);
+
+            // Map IDs to Names using yearMap directly (supports inactive/archived years)
             this.detailAcademicYearOptions = yearIds.map(yId => {
-                const match = this.academicYearOptions.find(opt => opt.value === yId);
-                return { label: match ? match.label : (yId || 'Unnamed Year'), value: yId };
+                return { label: yearMap[yId] || 'Unnamed Year', value: yId };
             });
 
             // Default to the most recent year
@@ -238,7 +247,7 @@ export default class Student extends NavigationMixin(LightningElement) {
     }
 
     get selectedDetailAcademicYearName() {
-        const match = this.academicYearOptions.find(opt => opt.value === this.selectedDetailAcademicYear);
+        const match = this.detailAcademicYearOptions.find(opt => opt.value === this.selectedDetailAcademicYear);
         return match ? match.label : (this.selectedDetailAcademicYear || 'N/A');
     }
 
