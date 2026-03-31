@@ -125,15 +125,18 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         // Fetch the Class and Section values from the Class__c record
         String clsQuery = 'SELECT Id, Name, ' + clsValField + ', ' + clsSecField + ' FROM Class__c WHERE Id = :classId LIMIT 1';
         SObject classRecord = Database.query(clsQuery);
-        String className   = (String)classRecord.get(clsValField);
-        String sectionName = (String)classRecord.get(clsSecField);
+        String classLabel   = (String)classRecord.get(clsValField);
+        String sectionLabel = (String)classRecord.get(clsSecField);
 
-        // ✅ FINAL FIX: Match Students by Class AND Section separately
+        // ✅ FINAL FIX: Resolve Picklist API Names from Labels
+        String classApiValue   = getPicklistApiValue(accClassField, classLabel);
+        String sectionApiValue = getPicklistApiValue(accSectionField, sectionLabel);
+
         String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', Type ' +
                              'FROM Account ' +
                              'WHERE Type = \'Student\' ' +
-                             'AND ' + accClassField + ' = :className ' +
-                             'AND ' + accSectionField + ' = :sectionName ' +
+                             'AND ' + accClassField + ' = :classApiValue ' +
+                             'AND ' + accSectionField + ' = :sectionApiValue ' +
                              'ORDER BY Name ' +
                              'LIMIT 50000';
                              
@@ -431,6 +434,30 @@ public static String saveMarks(
             System.debug('getSubjectNameById error: ' + e.getMessage());
         }
         return null;
+    }
+
+    /**
+     * Resolves the API Name of a picklist value from its Label.
+     */
+    private static String getPicklistApiValue(String fieldName, String label) {
+        if (String.isBlank(label)) return label;
+        
+        try {
+            Map<String, Schema.SObjectField> fields = Schema.SObjectType.Account.fields.getMap();
+            if (!fields.containsKey(fieldName.toLowerCase())) return label;
+            
+            Schema.DescribeFieldResult dfr = fields.get(fieldName.toLowerCase()).getDescribe();
+            if (dfr.getType() != Schema.DisplayType.PICKLIST) return label;
+            
+            for (Schema.PicklistEntry ple : dfr.getPicklistValues()) {
+                if (ple.getLabel().equalsIgnoreCase(label) || ple.getValue().equalsIgnoreCase(label)) {
+                    return ple.getValue();
+                }
+            }
+        } catch (Exception e) {
+            System.debug('Picklist resolve error: ' + e.getMessage());
+        }
+        return label;
     }
 
     // Wrapper class for subjects
