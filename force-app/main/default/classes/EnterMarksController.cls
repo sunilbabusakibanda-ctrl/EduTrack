@@ -85,8 +85,11 @@ public static List<Map<String, Object>> getClasses() {
     @AuraEnabled(cacheable=true)
     public static List<String> getExamTypes() {
         try {
-            // Get Exam Type from Exam object's Exam_Type__c field (picklist)
-            Schema.DescribeFieldResult fieldResult = Exam__c.Exam_Type__c.getDescribe();
+            // ✅ Dynamic resolver for namespaced Exam Type field
+            Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Exam__c.fields.getMap();
+            String examTypeField = fieldMap.containsKey('edutrack__exam_type__c') ? 'EduTrack__Exam_Type__c' : 'Exam_Type__c';
+            
+            Schema.DescribeFieldResult fieldResult = fieldMap.get(examTypeField.toLowerCase()).getDescribe();
             List<Schema.PicklistEntry> picklistValues = fieldResult.getPicklistValues();
             List<String> examTypes = new List<String>();
             
@@ -469,6 +472,13 @@ public static String saveMarks(
         }
         return label;
     }
+
+    /* - `[x]` Refactor EnterMarksController.cls for Dynamic Metadata
+    - `[x]` Update getSubjects with Exam field fallback
+    - `[x]` Update getExamTypes for namespace-safety
+    - `[/]` Deploy Updated Controller to SunilDev
+    - `[ ]` Run Live Diagnostic in SunilDev
+    - `[ ]` Sync Final Verified Code to GitHub main branch */
 
     // Wrapper class for subjects
     public class SubjectWrapper {
