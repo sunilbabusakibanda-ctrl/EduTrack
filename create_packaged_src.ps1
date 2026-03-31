@@ -1,5 +1,11 @@
 $TargetDir = "packaged-src/main/default"
 
+# 0. Clean the Target Directory
+if (Test-Path "packaged-src") {
+    Write-Host "--- Cleaning up existing packaged-src ---"
+    Remove-Item -Path "packaged-src" -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 New-Item -ItemType Directory -Force -Path "$TargetDir/lwc" | Out-Null
 New-Item -ItemType Directory -Force -Path "$TargetDir/classes" | Out-Null
 
