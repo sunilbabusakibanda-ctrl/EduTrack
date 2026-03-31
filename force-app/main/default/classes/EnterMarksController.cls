@@ -1,44 +1,47 @@
 public class EnterMarksController {
 
-   @AuraEnabled(cacheable=true)
+@AuraEnabled(cacheable=true)
 public static List<Map<String, Object>> getClasses() {
     List<Map<String, Object>> classList = new List<Map<String, Object>>();
-    
+    Set<String> processedKeys = new Set<String>();
+
     try {
-        System.debug('=== GETTING CLASSES ===');
+        System.debug('=== SMART GETTING CLASSES ===');
         
-        // Query all classes
-        List<Class__c> classes = [
-            SELECT Id, Name, Class__c, Section__c
-            FROM Class__c 
-            ORDER BY Name
-        ];
-        
-        System.debug('Classes found: ' + classes.size());
-        
-        // Add each class to the list
-        for (Class__c cls : classes) {
-            Map<String, Object> classMap = new Map<String, Object>();
-            classMap.put('value', cls.Id);  // This must be the Salesforce ID
-            classMap.put('label', cls.Name);
-            classMap.put('displayName', cls.Name);
-            classMap.put('Name', cls.Name);
-            classMap.put('Id', cls.Id);
-            classMap.put('Class__c', cls.Class__c);      // Actual class value
-            classMap.put('Section__c', cls.Section__c);  // Actual section value
-            
-            classList.add(classMap);
-            System.debug('Added class: ' + cls.Name + ' (ID: ' + cls.Id + ')');
+        // 1. Query Official Class Records
+        List<Class__c> officialClasses = [SELECT Id, Name, Class__c, Section__c FROM Class__c ORDER BY Name];
+        for (Class__c cls : officialClasses) {
+            String label = String.isNotBlank(cls.Name) ? cls.Name : (cls.Class__c + ' - ' + cls.Section__c);
+            classList.add(createClassMap(cls.Id, label, (String)cls.Class__c, (String)cls.Section__c));
+            processedKeys.add((cls.Class__c + '-' + cls.Section__c).toLowerCase());
+        }
+
+        // 2. Discover Missing Classes from Students (The Fix for SunilDev)
+        List<AggregateResult> studentClasses = [SELECT EduTrack__Class__c cls, EduTrack__Section__c sec FROM Account WHERE Type = 'Student' GROUP BY EduTrack__Class__c, EduTrack__Section__c];
+        for (AggregateResult ar : studentClasses) {
+            String val = (String)ar.get('cls');
+            String sec = (String)ar.get('sec');
+            if (String.isNotBlank(val) && !processedKeys.contains((val + '-' + sec).toLowerCase())) {
+                classList.add(createClassMap(null, val + ' - Section ' + sec + ' (Auto)', val, sec));
+                processedKeys.add((val + '-' + sec).toLowerCase());
+            }
         }
         
-        System.debug('✅ Total classes returned: ' + classList.size());
+        System.debug('✅ Total classes discovered: ' + classList.size());
         return classList;
-        
     } catch (Exception e) {
-        System.debug('❌ Error in getClasses: ' + e.getMessage());
-        System.debug('Stack trace: ' + e.getStackTraceString());
         throw new AuraHandledException('Failed to load classes: ' + e.getMessage());
     }
+}
+
+private static Map<String, Object> createClassMap(Id id, String label, String classVal, String secVal) {
+    Map<String, Object> m = new Map<String, Object>();
+    m.put('value', id != null ? (String)id : (classVal + '|' + secVal)); // Fallback value for auto-discovered
+    m.put('label', label);
+    m.put('Class__c', classVal);
+    m.put('Section__c', secVal);
+    m.put('Id', id);
+    return m;
 }
     @AuraEnabled(cacheable=true)
     public static List<SubjectWrapper> getSubjects() {
@@ -135,15 +138,24 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         String clsValField = clsFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
         String clsSecField = clsFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
         
-        // Fetch the Class and Section values from the Class__c record
-        String clsQuery = 'SELECT Id, Name, ' + clsValField + ', ' + clsSecField + ' FROM Class__c WHERE Id = :classId LIMIT 1';
-        SObject classRecord = Database.query(clsQuery);
-        String classLabel   = (String)classRecord.get(clsValField);
-        String sectionLabel = (String)classRecord.get(clsSecField);
+        // ✅ FINAL SMART-MATCH: Normalize both Class and Section defensively
+        String classLabel   = '';
+        String sectionLabel = '';
+        
+        if (classId instanceof Id) {
+            SObject classRecord = Database.query('SELECT Id, Name, ' + clsValField + ', ' + clsSecField + ' FROM Class__c WHERE Id = :classId LIMIT 1');
+            classLabel   = (String)classRecord.get(clsValField);
+            sectionLabel = (String)classRecord.get(clsSecField);
+        } else {
+            // Fallback for Auto-Discovered classes
+            String valStr = String.valueOf(classId);
+            classLabel   = valStr.substringBefore('|');
+            sectionLabel = valStr.substringAfter('|');
+        }
 
-        // ✅ FINAL FIX: Match by both API Name and Label defensively
-        List<String> classValues   = getPicklistValues(accClassField, classLabel);
-        List<String> sectionValues = getPicklistValues(accSectionField, sectionLabel);
+        // Generate fuzzy variations (Class-1, Class_1, Class 1)
+        List<String> classValues   = getFuzzyValues(accClassField, classLabel);
+        List<String> sectionValues = getFuzzyValues(accSectionField, sectionLabel);
 
         String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', Type ' +
                              'FROM Account ' +
@@ -450,34 +462,19 @@ public static String saveMarks(
     }
 
     /**
-     * Returns both API values and labels to handle inconsistently stored picklist data.
+     * Generates extremely fuzzy variations to ensure data consistency in imported orgs.
      */
-    private static List<String> getPicklistValues(String fieldName, String label) {
-        List<String> values = new List<String>{label};
-        if (String.isBlank(label)) return values;
+    private static List<String> getFuzzyValues(String fieldName, String label) {
+        if (String.isBlank(label)) return new List<String>{label};
+            
+        Set<String> variations = new Set<String>{label};
+        variations.add(label.replace('-', ' ')); // Hyphen to Space
+        variations.add(label.replace(' ', '-')); // Space to Hyphen
+        variations.add(label.replace('-', '_')); // Hyphen to Underscore
+        variations.add(label.replace(' ', '_')); // Space to Underscore
         
         try {
             Map<String, Schema.SObjectField> fields = Schema.SObjectType.Account.fields.getMap();
-            if (!fields.containsKey(fieldName.toLowerCase())) return values;
-            
-            Schema.DescribeFieldResult dfr = fields.get(fieldName.toLowerCase()).getDescribe();
-            if (dfr.getType() != Schema.DisplayType.PICKLIST) return values;
-            
-            for (Schema.PicklistEntry ple : dfr.getPicklistValues()) {
-                if (ple.getLabel().equalsIgnoreCase(label)) {
-                    values.add(ple.getValue());
-                }
-            }
-        } catch (Exception e) {
-            System.debug('Picklist resolve error: ' + e.getMessage());
-        }
-        return values;
-    }
-
-    /* - `[x]` Refactor EnterMarksController.cls for Dynamic Metadata
-    - `[x]` Update getSubjects with Exam field fallback
-    - `[x]` Update getExamTypes for namespace-safety
-    - `[/]` Deploy Updated Controller to SunilDev
     - `[ ]` Run Live Diagnostic in SunilDev
     - `[ ]` Sync Final Verified Code to GitHub main branch */
 
