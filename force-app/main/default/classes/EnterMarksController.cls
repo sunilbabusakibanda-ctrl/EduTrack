@@ -111,16 +111,24 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         String subjectFieldName = findSubjectField(subjectName);
         System.debug('Resolved field name: ' + subjectFieldName);
 
-        Class__c classRecord = [SELECT Id, Name FROM Class__c WHERE Id = :classId LIMIT 1];
+        // Resolve Account and Class field names dynamically
+        String accClassField = Account.Class__c.getDescribe().getName();
+        String accRollField = Account.Roll_No__c.getDescribe().getName();
+        String accSectionField = Account.Section__c.getDescribe().getName();
+        String clsObjName = Class__c.SObjectType.getDescribe().getName();
         
-        List<Account> students = [
-            SELECT Id, Name, Roll_No__c, Class__c, Section__c, Type
-            FROM Account
-            WHERE Type = 'Student'
-              AND Class__c = :classRecord.Name
-            ORDER BY Name
-            LIMIT 50000
-        ];
+        String clsQuery = 'SELECT Id, Name FROM ' + clsObjName + ' WHERE Id = :classId LIMIT 1';
+        SObject classRecord = Database.query(clsQuery);
+        String className = (String)classRecord.get('Name');
+
+        String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', Type ' +
+                             'FROM Account ' +
+                             'WHERE Type = \'Student\' ' +
+                             'AND ' + accClassField + ' = :className ' +
+                             'ORDER BY Name ' +
+                             'LIMIT 50000';
+                             
+        List<Account> students = Database.query(studentQuery);
 
         if (students.isEmpty()) return result;
 
