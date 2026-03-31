@@ -166,23 +166,27 @@ public with sharing class GradesController {
     @AuraEnabled(cacheable=true)
     public static List<Map<String, Object>> getStudentExams(String studentId) {
         try {
-            List<String> subjectFields = new List<String>();
-            Map<String, Schema.SObjectField> fields = Schema.SObjectType.Exam__c.fields.getMap();
-            Set<String> excluded = new Set<String>{'Exam_Type__c', 'Roll_No__c', 'Roll_Number__c', 'Section__c', 'Class__c', 'Student__c', 'Name', 'Id'};
-            
+            Map<String, String> fieldToLocalMap = new Map<String, String>();
             for (String fieldName : fields.keySet()) {
                 Schema.DescribeFieldResult dfr = fields.get(fieldName).getDescribe();
-                if (dfr.isCustom() && !excluded.contains(dfr.getName())) {
+                if (dfr.isCustom() && !excluded.contains(dfr.getName()) && !excluded.contains(dfr.getLocalName())) {
                     Schema.DisplayType dt = dfr.getType();
                     if (dt == Schema.DisplayType.Double || dt == Schema.DisplayType.Integer || dt == Schema.DisplayType.Percent || dt == Schema.DisplayType.String) {
                         subjectFields.add(dfr.getName());
+                        fieldToLocalMap.put(dfr.getName(), dfr.getLocalName());
                     }
                 }
             }
 
-            String examSelect = String.join(subjectFields, ', ');
-            String query = 'SELECT Id, Exam_Type__c, Class__c, Class__r.Name, Section__c, ' + examSelect + 
-                           ' FROM Exam__c WHERE Student__c = :studentId ORDER BY CreatedDate DESC';
+            // Resolve namespaced fields for Exam__c
+            String examTypeField = Exam__c.Exam_Type__c.getDescribe().getName();
+            String examClassField = Exam__c.Class__c.getDescribe().getName();
+            String examSectionField = Exam__c.Section__c.getDescribe().getName();
+            String examStudentField = Exam__c.Student__c.getDescribe().getName();
+
+            String examSelect = subjectFields.isEmpty() ? 'Id' : String.join(subjectFields, ', ');
+            String query = 'SELECT Id, ' + examTypeField + ', ' + examClassField + ', ' + examSectionField + ', ' + examSelect + 
+                           ' FROM Exam__c WHERE ' + examStudentField + ' = :studentId ORDER BY CreatedDate DESC';
             
             List<Exam__c> exams = Database.query(query);
             List<Map<String, Object>> results = new List<Map<String, Object>>();
@@ -190,15 +194,15 @@ public with sharing class GradesController {
             for (Exam__c e : exams) {
                 Map<String, Object> row = new Map<String, Object>();
                 row.put('Id', e.Id);
-                row.put('Exam_Type__c', e.Exam_Type__c);
-                row.put('Class__c', String.isNotBlank(e.Class__r.Name) ? e.Class__r.Name : '');
-                row.put('Section__c', e.Section__c);
+                row.put('Exam_Type__c', (String)e.get(examTypeField));
+                row.put('Section__c', (String)e.get(examSectionField));
                 for (String f : subjectFields) {
                     Object val = e.get(f);
+                    String localName = fieldToLocalMap.get(f);
                     if (val instanceof String) {
-                        try { row.put(f, Decimal.valueOf((String)val)); } catch (Exception ex) { row.put(f, 0); }
+                        try { row.put(localName, Decimal.valueOf((String)val)); } catch (Exception ex) { row.put(localName, 0); }
                     } else {
-                        row.put(f, val);
+                        row.put(localName, val);
                     }
                 }
                 results.add(row);
