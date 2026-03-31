@@ -489,9 +489,9 @@ public static String saveMarks(
         
         public SubjectWrapper(String id, String name, Decimal maxMarks) {
             this.id = id;
-            this.name = name;
-            this.maxMarks = maxMarks;
-            this.icon = name.substring(0, 1).toUpperCase();
+            this.name = name != null ? name : 'Subject';
+            this.maxMarks = maxMarks != null ? maxMarks : 100;
+            this.icon = (this.name.length() > 0) ? this.name.substring(0, 1).toUpperCase() : 'S';
         }
     }
 }
