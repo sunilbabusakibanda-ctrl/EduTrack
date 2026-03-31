@@ -130,18 +130,22 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         // Check for existing Exam records
         Map<Id, Exam__c> examMarksMap = new Map<Id, Exam__c>();
         try {
-            // ✅ Always include Extra_Marks__c for dynamic subjects
+            // ✅ Resolve all fields dynamically to handle namespaces
+            String examStudentField = Exam__c.Student__c.getDescribe().getName();
+            String examTypeField = Exam__c.Exam_Type__c.getDescribe().getName();
             String extraMarksField = findSubjectField('Extra Marks'); // Resolve Extra_Marks__c
-            String query = 'SELECT Id, Student__c, Exam_Type__c ';
+            
+            String query = 'SELECT Id, ' + examStudentField + ', ' + examTypeField;
             if (subjectFieldName != null) query += ', ' + subjectFieldName;
             if (extraMarksField != null) query += ', ' + extraMarksField;
             
             query += ' FROM Exam__c ' +
-                     'WHERE Student__c IN :studentIds ' +
-                     'AND Exam_Type__c = :examType';
+                     'WHERE ' + examStudentField + ' IN :studentIds ' +
+                     'AND ' + examTypeField + ' = :examType';
             
             for (Exam__c exam : Database.query(query)) {
-                examMarksMap.put(exam.Student__c, exam);
+                Id studentId = (Id)exam.get(examStudentField);
+                examMarksMap.put(studentId, exam);
             }
         } catch (Exception e) {
             System.debug('Query failed: ' + e.getMessage());
@@ -198,42 +202,39 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
 public static String findSubjectField(String subjectName) {
     if (String.isBlank(subjectName)) return null;
     
-    System.debug('[findSubjectField] Searching for: ' + subjectName);
     String normalizedSearch = subjectName.toLowerCase().replace(' ', '').replace('_', '');
     Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Exam__c.fields.getMap();
     
-    // Get namespace prefix if any
-    String objName = Exam__c.SObjectType.getDescribe().getName();
-    String prefix = objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__') ? objName.substringBefore('__') + '__' : '';
-    System.debug('[findSubjectField] Namespace Prefix: ' + prefix);
-    
+    // Improved Prefix Detection
+    String ns = EnterMarksController.class.getName().contains('.') 
+                ? EnterMarksController.class.getName().substringBefore('.') + '__' 
+                : '';
+    if(String.isBlank(ns)){
+        // Fallback to checking the object itself
+        String objName = Exam__c.SObjectType.getDescribe().getName();
+        if(objName.contains('__') && objName.indexOf('__') != objName.lastIndexOf('__')){
+            ns = objName.substringBefore('__') + '__';
+        }
+    }
+
     String bestMatch = null;
-    
-    // Prioritize Exact Name Match (without __c)
     for (String apiName : fieldMap.keySet()) {
-        String baseName = apiName;
-        if (prefix != '' && baseName.startsWith(prefix.toLowerCase())) {
-            baseName = baseName.substring(prefix.length());
+        String baseName = apiName.toLowerCase();
+        if (ns != '' && baseName.startsWith(ns.toLowerCase())) {
+            baseName = baseName.substring(ns.length());
         }
         
         String normalizedField = baseName.replace('__c', '').replace('_', '');
         
-        // Exact match check
         if (normalizedField == normalizedSearch) {
-            System.debug('[findSubjectField] Exact match found: ' + apiName);
             return apiName;
         }
         
-        // Starts with match (fallback)
-        if (normalizedField.startsWith(normalizedSearch) || (normalizedSearch.length() > 3 && normalizedSearch.startsWith(normalizedField))) {
+        if (normalizedField.startsWith(normalizedSearch)) {
             bestMatch = apiName;
         }
-        
-        // Special case for Extra Marks
-        if (normalizedSearch == 'extramarks' && normalizedField == 'extramarks') return apiName;
     }
     
-    System.debug('[findSubjectField] Best match found: ' + bestMatch);
     return bestMatch;
 }
 @AuraEnabled
@@ -309,15 +310,23 @@ public static String saveMarks(
            5. Existing Exam records
            ========================= */
         Map<Id, Exam__c> examByStudent = new Map<Id, Exam__c>();
-        String query = 'SELECT Id, Student__c, Exam_Type__c, Class__c, Section__c ';
+        
+        // Resolve Fields Dynamically
+        String examStudentField = Exam__c.Student__c.getDescribe().getName();
+        String examTypeField = Exam__c.Exam_Type__c.getDescribe().getName();
+        String examClassField = Exam__c.Class__c.getDescribe().getName();
+        String examSectionField = Exam__c.Section__c.getDescribe().getName();
+        
+        String query = 'SELECT Id, ' + examStudentField + ', ' + examTypeField + ', ' + examClassField + ', ' + examSectionField;
         if (extraMarksField != null) query += ', ' + extraMarksField;
         
         query += ' FROM Exam__c ' +
-                 'WHERE Student__c IN :studentIds ' +
-                 'AND Exam_Type__c = :examType';
+                 'WHERE ' + examStudentField + ' IN :studentIds ' +
+                 'AND ' + examTypeField + ' = :examType';
 
         for (Exam__c ex : Database.query(query)) {
-            examByStudent.put(ex.Student__c, ex);
+            Id sId = (Id)ex.get(examStudentField);
+            examByStudent.put(sId, ex);
         }
 
         /* =========================
@@ -335,10 +344,16 @@ public static String saveMarks(
                 exam = examByStudent.get(studentId);
             } else {
                 exam = new Exam__c();
-                exam.Student__c   = studentId;
-                exam.Exam_Type__c = examType;
-                exam.Class__c     = classRec.Id;
-                exam.Section__c   = classRec.Section__c;
+                // Resolve and set fields
+                String examStudentField = Exam__c.Student__c.getDescribe().getName();
+                String examTypeField = Exam__c.Exam_Type__c.getDescribe().getName();
+                String examClassField = Exam__c.Class__c.getDescribe().getName();
+                String examSectionField = Exam__c.Section__c.getDescribe().getName();
+                
+                exam.put(examStudentField, studentId);
+                exam.put(examTypeField,    examType);
+                exam.put(examClassField,   classRec.Id);
+                exam.put(examSectionField, classRec.Section__c);
 
                 Account stu = studentMap.get(studentId);
                 exam.Name = (stu != null ? stu.Name : studentId) 
