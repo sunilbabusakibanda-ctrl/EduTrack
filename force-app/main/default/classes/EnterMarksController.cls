@@ -141,15 +141,15 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         String classLabel   = (String)classRecord.get(clsValField);
         String sectionLabel = (String)classRecord.get(clsSecField);
 
-        // ✅ FINAL FIX: Resolve Picklist API Names from Labels
-        String classApiValue   = getPicklistApiValue(accClassField, classLabel);
-        String sectionApiValue = getPicklistApiValue(accSectionField, sectionLabel);
+        // ✅ FINAL FIX: Match by both API Name and Label defensively
+        List<String> classValues   = getPicklistValues(accClassField, classLabel);
+        List<String> sectionValues = getPicklistValues(accSectionField, sectionLabel);
 
         String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', Type ' +
                              'FROM Account ' +
                              'WHERE Type = \'Student\' ' +
-                             'AND ' + accClassField + ' = :classApiValue ' +
-                             'AND ' + accSectionField + ' = :sectionApiValue ' +
+                             'AND ' + accClassField + ' IN :classValues ' +
+                             'AND ' + accSectionField + ' IN :sectionValues ' +
                              'ORDER BY Name ' +
                              'LIMIT 50000';
                              
@@ -450,27 +450,28 @@ public static String saveMarks(
     }
 
     /**
-     * Resolves the API Name of a picklist value from its Label.
+     * Returns both API values and labels to handle inconsistently stored picklist data.
      */
-    private static String getPicklistApiValue(String fieldName, String label) {
-        if (String.isBlank(label)) return label;
+    private static List<String> getPicklistValues(String fieldName, String label) {
+        List<String> values = new List<String>{label};
+        if (String.isBlank(label)) return values;
         
         try {
             Map<String, Schema.SObjectField> fields = Schema.SObjectType.Account.fields.getMap();
-            if (!fields.containsKey(fieldName.toLowerCase())) return label;
+            if (!fields.containsKey(fieldName.toLowerCase())) return values;
             
             Schema.DescribeFieldResult dfr = fields.get(fieldName.toLowerCase()).getDescribe();
-            if (dfr.getType() != Schema.DisplayType.PICKLIST) return label;
+            if (dfr.getType() != Schema.DisplayType.PICKLIST) return values;
             
             for (Schema.PicklistEntry ple : dfr.getPicklistValues()) {
-                if (ple.getLabel().equalsIgnoreCase(label) || ple.getValue().equalsIgnoreCase(label)) {
-                    return ple.getValue();
+                if (ple.getLabel().equalsIgnoreCase(label)) {
+                    values.add(ple.getValue());
                 }
             }
         } catch (Exception e) {
             System.debug('Picklist resolve error: ' + e.getMessage());
         }
-        return label;
+        return values;
     }
 
     /* - `[x]` Refactor EnterMarksController.cls for Dynamic Metadata
