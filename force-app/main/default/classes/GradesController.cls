@@ -86,6 +86,11 @@ public with sharing class GradesController {
             }
         }
         
+        // 1c. Resolve Account field names
+        String accRollField = Account.Roll_No__c.getDescribe().getName();
+        String accClassField = Account.Class__c.getDescribe().getName();
+        String accSectionField = Account.Section__c.getDescribe().getName();
+        
         // 2. Build Query on Account (All Students)
         String examSelect = subjectFields.isEmpty() ? 'Id' : String.join(subjectFields, ', ');
         String subQuery = '(SELECT Id, Exam_Type__c, ' + examSelect + ' FROM ' + examsRelName;
@@ -94,20 +99,20 @@ public with sharing class GradesController {
         }
         subQuery += ' ORDER BY CreatedDate DESC)';
         
-        String query = 'SELECT Id, Name, Roll_No__c, Class__c, Section__c, ' + subQuery + 
+        String query = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', ' + subQuery + 
                        ' FROM Account WHERE Type = \'Student\'';
         
         if (String.isNotBlank(className)) {
-            query += ' AND Class__c INCLUDES (:className)';
+            query += ' AND ' + accClassField + ' INCLUDES (:className)';
         }
         
         if (String.isNotBlank(sectionName)) {
-            query += ' AND Section__c = :sectionName';
+            query += ' AND ' + accSectionField + ' = :sectionName';
         }
         
         if (String.isNotBlank(searchTerm)) {
             String searchPattern = '%' + searchTerm + '%';
-            query += ' AND (Name LIKE :searchPattern OR Roll_No__c LIKE :searchPattern)';
+            query += ' AND (Name LIKE :searchPattern OR ' + accRollField + ' LIKE :searchPattern)';
         }
         
         query += ' ORDER BY Name';
@@ -121,9 +126,9 @@ public with sharing class GradesController {
                 row.put('Id', s.Id);
                 row.put('StudentId', s.Id);
                 row.put('Name', s.Name);
-                row.put('Roll_No__c', s.Roll_No__c);
-                row.put('Class__c', s.Class__c);
-                row.put('Section__c', s.Section__c);
+                row.put('Roll_No__c', (String)s.get(accRollField));
+                row.put('Class__c', (String)s.get(accClassField));
+                row.put('Section__c', (String)s.get(accSectionField));
                 
                 // Find matching exam for the selected type
                 Exam__c matchingExam = null;
