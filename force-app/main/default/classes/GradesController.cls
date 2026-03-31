@@ -144,7 +144,7 @@ public with sharing class GradesController {
                     String localFieldName = f;
                     
                     // Forcefully strip namespace if present (e.g. EduTrack__English__c -> English__c)
-                    if (f.countMatches('__') == 2) {
+                    if (f.contains('__') && f.indexOf('__') != f.lastIndexOf('__')) {
                         localFieldName = f.substring(f.indexOf('__') + 2);
                     }
                     
@@ -206,7 +206,7 @@ public with sharing class GradesController {
                     String localName = f;
 
                     // Forcefully strip namespace (e.g. EduTrack__Hindi__c -> Hindi__c)
-                    if (f.countMatches('__') == 2) {
+                    if (f.contains('__') && f.indexOf('__') != f.lastIndexOf('__')) {
                         localName = f.substring(f.indexOf('__') + 2);
                     }
 
