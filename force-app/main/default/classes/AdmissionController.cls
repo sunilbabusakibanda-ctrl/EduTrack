@@ -370,7 +370,9 @@ public with sharing class AdmissionController {
             
             // 1. Setup Data
             Map<String, Id> ayMap = new Map<String, Id>();
-            for(Academic_Year__c ay : [SELECT Id, Name FROM Academic_Year__c]) {
+            // Sorting by Is_Active__c ASC ensures that IF there are duplicates, 
+            // the Active record (True/1) is processed last and "wins" in the ayMap.
+            for(Academic_Year__c ay : [SELECT Id, Name FROM Academic_Year__c ORDER BY Is_Active__c ASC]) {
                 if (ay.Name != null) ayMap.put(ay.Name.replaceAll('–', '-'), ay.Id);
             }
 

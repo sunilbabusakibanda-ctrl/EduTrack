@@ -26,16 +26,33 @@ public with sharing class PromotionController {
         }
         if (studentIdsWithOpp.isEmpty()) return new List<StudentWrapper>();
 
-        String query = 'SELECT Id, Name, FirstName, LastName, Roll_No__c, Class__c FROM Account WHERE Type = \'Student\' AND Id IN :studentIdsWithOpp ';
-        if (String.isNotBlank(className) && className != 'ALL') {
-            query += 'AND Class__c = :className ';
+        // Static SOQL is always safer in namespaced orgs as it resolves local fields automatically.
+        List<Account> students;
+        if (String.isBlank(className) || className == 'ALL') {
+            if (String.isBlank(sectionName)) {
+                students = [SELECT Id, Name, FirstName, LastName, Roll_No__c, Class__c, Section__c 
+                            FROM Account 
+                            WHERE Type = 'Student' AND Id IN :studentIdsWithOpp 
+                            ORDER BY Name ASC];
+            } else {
+                students = [SELECT Id, Name, FirstName, LastName, Roll_No__c, Class__c, Section__c 
+                            FROM Account 
+                            WHERE Type = 'Student' AND Id IN :studentIdsWithOpp AND Section__c = :sectionName
+                            ORDER BY Name ASC];
+            }
+        } else {
+            if (String.isBlank(sectionName)) {
+                students = [SELECT Id, Name, FirstName, LastName, Roll_No__c, Class__c, Section__c 
+                            FROM Account 
+                            WHERE Type = 'Student' AND Id IN :studentIdsWithOpp AND Class__c = :className
+                            ORDER BY Name ASC];
+            } else {
+                students = [SELECT Id, Name, FirstName, LastName, Roll_No__c, Class__c, Section__c 
+                            FROM Account 
+                            WHERE Type = 'Student' AND Id IN :studentIdsWithOpp AND Class__c = :className AND Section__c = :sectionName
+                            ORDER BY Name ASC];
+            }
         }
-        if (String.isNotBlank(sectionName)) {
-            query += 'AND Section__c = :sectionName ';
-        }
-        query += 'ORDER BY Name ASC';
-
-        List<Account> students = Database.query(query);
         Set<Id> studentIds = new Map<Id, Account>(students).keySet();
 
         Map<Id, Decimal> balanceMap = new Map<Id, Decimal>();

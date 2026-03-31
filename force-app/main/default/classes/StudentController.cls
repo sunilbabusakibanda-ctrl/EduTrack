@@ -22,6 +22,7 @@ public with sharing class StudentController {
         @AuraEnabled public List<Map<String, Object>> exams;
         @AuraEnabled public List<AttendanceStat> attendanceStats;
         @AuraEnabled public List<Map<String, Object>> cases;
+        @AuraEnabled public Map<Id, String> academicYearNames;
     }
 
     public class AttendanceStat {
@@ -118,6 +119,19 @@ public with sharing class StudentController {
             ORDER BY Opportunity.Academic_Year__c DESC NULLS LAST, Product2.Name ASC
         ];
         detail.products = NamespaceUtils.stripNamespaceList(rawProducts);
+
+        // Map Academic Year IDs to their Names securely (avoids standard object custom relationship namespace errors)
+        Set<Id> yearIds = new Set<Id>();
+        for (OpportunityLineItem oli : rawProducts) {
+            if (oli.Opportunity.Academic_Year__c != null) {
+                yearIds.add(oli.Opportunity.Academic_Year__c);
+            }
+        }
+        Map<Id, String> yearMap = new Map<Id, String>();
+        for (Academic_Year__c ay : [SELECT Id, Name FROM Academic_Year__c WHERE Id IN :yearIds]) {
+            yearMap.put(ay.Id, ay.Name);
+        }
+        detail.academicYearNames = yearMap;
 
         // 3. Invoices
         List<Invoice__c> rawInvoices = [
