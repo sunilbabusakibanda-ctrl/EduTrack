@@ -45,22 +45,32 @@ public static List<Map<String, Object>> getClasses() {
         List<SubjectWrapper> subjectWrappers = new List<SubjectWrapper>();
 
         try {
-            System.debug('=== FETCHING SUBJECTS FROM OBJECT ===');
+            System.debug('=== FETCHING SUBJECTS ===');
             
-            // Query subjects from Subject__c object
-            List<Subject__c> subjects = [
-                SELECT Id, Name 
-                FROM Subject__c 
-                WHERE Is_Active__c = true 
-                ORDER BY Name
-            ];
+            // 1. Try to fetch from Subject__c object (dynamic for namespace)
+            String subjObjName = 'Subject__c';
+            Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
+            if(!gd.containsKey(subjObjName)) subjObjName = 'EduTrack__Subject__c';
             
-            for (Subject__c s : subjects) {
-                subjectWrappers.add(new SubjectWrapper(
-                    s.Id,
-                    s.Name,
-                    100 // Default max marks
-                ));
+            if(gd.containsKey(subjObjName)) {
+                String subjQuery = 'SELECT Id, Name FROM ' + subjObjName + ' WHERE Is_Active__c = true ORDER BY Name';
+                List<SObject> subjects = Database.query(subjQuery);
+                for (SObject s : subjects) {
+                    subjectWrappers.add(new SubjectWrapper((String)s.get('Id'), (String)s.get('Name'), 100));
+                }
+            }
+            
+            // 2. Fallback: If still empty, use fields from Exam__c (DevOrg1 style)
+            if (subjectWrappers.isEmpty()) {
+                Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Exam__c.fields.getMap();
+                for (String apiName : fieldMap.keySet()) {
+                    if (apiName.endsWith('__c') && !apiName.contains('Class') && !apiName.contains('Type') && !apiName.contains('Student') && !apiName.contains('Teacher')) {
+                        Schema.DescribeFieldResult dfr = fieldMap.get(apiName).getDescribe();
+                        if (dfr.getType() == Schema.DisplayType.DOUBLE || dfr.getType() == Schema.DisplayType.INTEGER || dfr.getType() == Schema.DisplayType.CURRENCY) {
+                            subjectWrappers.add(new SubjectWrapper(apiName, dfr.getLabel(), 100));
+                        }
+                    }
+                }
             }
             
             System.debug('✅ Subjects returned: ' + subjectWrappers.size());
