@@ -32,27 +32,30 @@ export default class EnterMarks extends LightningElement {
 
     // ─── Statistics ───────────────────────────────────────────────
     get classAverage() {
-        const students = this.studentsList.filter(s => s.obtainedMarks !== '' && s.obtainedMarks !== null && !isNaN(s.obtainedMarks));
+        // ✅ FIX: isMarksEntered() treats 0 as valid entered value
+        const students = this.studentsList.filter(s => this.isMarksEntered(s.obtainedMarks));
         if (!students.length) return '0%';
         const total = students.reduce((sum, s) => sum + parseFloat(s.obtainedMarks), 0);
         return ((total / students.length / this.maxMarks) * 100).toFixed(1) + '%';
     }
 
     get highestMarks() {
-        const students = this.studentsList.filter(s => s.obtainedMarks !== '' && s.obtainedMarks !== null && !isNaN(s.obtainedMarks));
+        const students = this.studentsList.filter(s => this.isMarksEntered(s.obtainedMarks));
         if (!students.length) return '0/' + this.maxMarks;
         return Math.max(...students.map(s => parseFloat(s.obtainedMarks))) + '/' + this.maxMarks;
     }
 
     get studentsEntered() {
-        const count = this.studentsList.filter(s => s.obtainedMarks !== '' && s.obtainedMarks !== null).length;
+        const count = this.studentsList.filter(s => this.isMarksEntered(s.obtainedMarks)).length;
         return count + '/' + this.studentsList.length;
     }
 
     get isSubjectDisabled() { return !this.selectedClass; }
     get isExamDisabled()    { return !this.selectedSubject; }
     get isSaveDisabled()    { return this.loading || !this.hasValidMarks(); }
-    get isNewSubjectSaveDisabled() { return !this.newSubjectName || this.newSubjectName.trim().length === 0 || this.loading; }
+    get isNewSubjectSaveDisabled() {
+        return !this.newSubjectName || this.newSubjectName.trim().length === 0 || this.loading;
+    }
 
     get selectedClassLabel() {
         const o = this.classOptions.find(opt => opt.value === this.selectedClass);
@@ -65,6 +68,13 @@ export default class EnterMarks extends LightningElement {
     get selectedExamLabel() {
         const o = this.examOptions.find(opt => opt.value === this.selectedExam);
         return o ? o.label : '';
+    }
+
+    // ─── KEY HELPER: treats 0 as a valid entered value ────────────
+    // null / undefined / '' = not entered
+    // 0, 1, 50, 100        = entered (including zero score)
+    isMarksEntered(val) {
+        return val !== null && val !== undefined && val !== '';
     }
 
     // ─── Lifecycle ────────────────────────────────────────────────
@@ -86,10 +96,7 @@ export default class EnterMarks extends LightningElement {
 
     async loadClasses() {
         const classes = await getClasses();
-        this.classOptions = (classes || []).map(cls => ({
-            label: cls.label,
-            value: cls.value   // Salesforce ID of Class__c record
-        }));
+        this.classOptions = (classes || []).map(cls => ({ label: cls.label, value: cls.value }));
     }
 
     async loadSubjects() {
@@ -110,23 +117,25 @@ export default class EnterMarks extends LightningElement {
         this.showNoDataMessage = false;
 
         try {
-            // Resolve subject name from stored allSubjects list
             const selectedSubj = this.allSubjects.find(
                 s => (s.id || s.Id) === this.selectedSubject
             );
             const subjectName = selectedSubj ? (selectedSubj.name || selectedSubj.Name) : '';
 
-            console.log('loadStudents → classId:', this.selectedClass, '| subjectName:', subjectName, '| examType:', this.selectedExam);
-
             const students = await getStudentsForMarksEntry({
-                classId:     this.selectedClass,   // Salesforce ID of Class__c
+                classId:     this.selectedClass,
                 subjectName: subjectName,
                 examType:    this.selectedExam
             });
 
             if (students && students.length > 0) {
                 this.studentsList = students.map(student => {
-                    const marks = student.hasMarks ? student.obtainedMarks : '';
+                    // ✅ FIX: Apex returns 0 as a number — keep it as-is.
+                    // Only treat as "not entered" when Apex explicitly returns null/undefined.
+                    const rawMarks = student.obtainedMarks;
+                    // ✅ If Apex returns null (no exam record / no marks saved), use ''
+                    // If Apex returns 0 (marks were saved as 0), use 0
+                    const marks = (rawMarks === null || rawMarks === undefined) ? '' : rawMarks;
                     const gradeData = this.calculateGrade(marks);
                     return {
                         Id:             student.studentId,
@@ -185,7 +194,7 @@ export default class EnterMarks extends LightningElement {
         }
     }
 
-    // ─── Quick Add Subject ──────────────────────────────────────
+    // ─── Quick Add Subject ────────────────────────────────────────
     handleOpenAddSubject() {
         this.isAddSubjectModalOpen = true;
         this.newSubjectName = '';
@@ -211,16 +220,12 @@ export default class EnterMarks extends LightningElement {
             if (result.created > 0) {
                 this.showToast('Success', `Subject "${this.newSubjectName}" created!`, 'success');
                 this.handleCloseAddSubject();
-                
-                // Refresh subjects list
                 await this.loadSubjects();
                 this.updateSubjectOptions();
-                
-                // Auto-select the newly created subject if possible
-                const newSub = this.allSubjects.find(s => (s.name || s.Name).toLowerCase() === this.newSubjectName.toLowerCase().trim());
-                if (newSub) {
-                    this.selectedSubject = (newSub.id || newSub.Id);
-                }
+                const newSub = this.allSubjects.find(
+                    s => (s.name || s.Name).toLowerCase() === this.newSubjectName.toLowerCase().trim()
+                );
+                if (newSub) this.selectedSubject = (newSub.id || newSub.Id);
             } else if (result.skipped > 0) {
                 this.showToast('Note', 'This subject already exists.', 'info');
                 this.handleCloseAddSubject();
@@ -245,8 +250,11 @@ export default class EnterMarks extends LightningElement {
     adjustMarks(studentId, delta) {
         this.studentsList = this.studentsList.map(student => {
             if (student.Id !== studentId) return student;
-            let val = parseFloat(student.obtainedMarks) || 0;
-            val = Math.min(Math.max(val + delta, 0), this.maxMarks);
+            // ✅ FIX: treat '' as 0 when incrementing/decrementing
+            const current = this.isMarksEntered(student.obtainedMarks)
+                            ? parseFloat(student.obtainedMarks)
+                            : 0;
+            const val = Math.min(Math.max(current + delta, 0), this.maxMarks);
             const gradeData = this.calculateGrade(val);
             return { ...student, obtainedMarks: val, grade: gradeData.grade, gradeClass: gradeData.gradeClass };
         });
@@ -254,9 +262,22 @@ export default class EnterMarks extends LightningElement {
 
     handleMarksChange(event) {
         const studentId = event.target.dataset.studentId;
-        const marks     = event.detail.value;
+        const rawValue  = event.detail.value;
 
-        if (marks !== '' && (marks < 0 || marks > this.maxMarks)) {
+        // ✅ FIX: empty string means user cleared the field → treat as not-entered ('')
+        // null from lightning-input number also means cleared
+        if (rawValue === null || rawValue === undefined || rawValue === '') {
+            this.studentsList = this.studentsList.map(student => {
+                if (student.Id !== studentId) return student;
+                return { ...student, obtainedMarks: '', grade: '', gradeClass: '' };
+            });
+            return;
+        }
+
+        const marks = parseFloat(rawValue);
+
+        // ✅ FIX: 0 is valid; only reject values outside 0–maxMarks
+        if (isNaN(marks) || marks < 0 || marks > this.maxMarks) {
             this.showToast('Invalid Marks', `Marks must be between 0 and ${this.maxMarks}`, 'warning');
             return;
         }
@@ -277,34 +298,26 @@ export default class EnterMarks extends LightningElement {
 
         this.loading = true;
         try {
-            /*
-             * ✅ CRITICAL FIX:
-             *    obtainedMarks is sent as a plain INTEGER.
-             *    When Apex receives Map<String,Object>, JSON integers deserialize
-             *    as Long on 64-bit, which safeToDecimal() handles on the Apex side.
-             *    We also guard here with Math.round() so no floats are sent.
-             */
+            // ✅ FIX: include students where marks === 0 (isMarksEntered handles this)
             const marksDataList = this.studentsList
-                .filter(s => s.obtainedMarks !== '' && s.obtainedMarks !== null && s.obtainedMarks !== undefined)
+                .filter(s => this.isMarksEntered(s.obtainedMarks))
                 .map(student => ({
-                    studentId:     student.Id,                            // String (ID)
-                    subjectId:     this.selectedSubject,                  // String (synthetic SUBJ001 etc.)
-                    obtainedMarks: Math.round(parseFloat(student.obtainedMarks)), // ✅ Integer
-                    maxMarks:      Math.round(this.maxMarks),             // ✅ Integer
-                    examId:        student.examId || null                 // String | null
+                    studentId:     student.Id,
+                    subjectId:     this.selectedSubject,
+                    obtainedMarks: Math.round(parseFloat(student.obtainedMarks)),
+                    maxMarks:      Math.round(this.maxMarks),
+                    examId:        student.examId || null
                 }));
-
-            console.log('Saving marks:', JSON.stringify(marksDataList));
 
             const result = await saveMarks({
                 studentMarksDataList: marksDataList,
                 examType:  this.selectedExam,
-                classId:   this.selectedClass,     // Salesforce ID of Class__c
+                classId:   this.selectedClass,
                 teacherId: this.teacherId || null
             });
 
             this.showToast('Success', result || 'Marks saved successfully!', 'success');
-            await this.loadStudents(); // Refresh to show updated marks
+            await this.loadStudents();
 
         } catch (error) {
             this.handleError('Failed to save marks', error);
@@ -318,7 +331,8 @@ export default class EnterMarks extends LightningElement {
 
     // ─── Helpers ──────────────────────────────────────────────────
     calculateGrade(marks) {
-        if (marks === '' || marks === null || marks === undefined) return { grade: '', gradeClass: '' };
+        // ✅ FIX: isMarksEntered check so grade shows for 0 too (grade F)
+        if (!this.isMarksEntered(marks)) return { grade: '', gradeClass: '' };
         const pct = (parseFloat(marks) / this.maxMarks) * 100;
         if (isNaN(pct)) return { grade: '', gradeClass: '' };
 
@@ -334,19 +348,24 @@ export default class EnterMarks extends LightningElement {
         return { grade, gradeClass: 'grade-badge ' + suffix };
     }
 
+    // ✅ FIX: validateMarks now correctly treats 0 as a valid entered mark
     validateMarks() {
-        const hasAny = this.studentsList.some(s => s.obtainedMarks !== '' && s.obtainedMarks !== null);
+        // Must have at least one student with marks entered (including 0)
+        const hasAny = this.studentsList.some(s => this.isMarksEntered(s.obtainedMarks));
         if (!hasAny) return false;
+
+        // Every entered mark must be a valid number in range
         return this.studentsList.every(s => {
-            if (s.obtainedMarks === '' || s.obtainedMarks === null) return true;
+            if (!this.isMarksEntered(s.obtainedMarks)) return true; // skipped = OK
             const v = parseFloat(s.obtainedMarks);
             return !isNaN(v) && v >= 0 && v <= this.maxMarks;
         });
     }
 
+    // ✅ FIX: hasValidMarks treats 0 as valid — Save button enables when any mark entered
     hasValidMarks() {
         return this.studentsList.length > 0 &&
-               this.studentsList.some(s => s.obtainedMarks !== '' && s.obtainedMarks !== null);
+               this.studentsList.some(s => this.isMarksEntered(s.obtainedMarks));
     }
 
     resetForm() {
