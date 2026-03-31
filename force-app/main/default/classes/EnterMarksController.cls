@@ -113,21 +113,25 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
 
         // Defensive field lookup for Account
         Map<String, Schema.SObjectField> accFields = Schema.SObjectType.Account.fields.getMap();
-        String accClassField   = accFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
-        String accRollField    = accFields.containsKey('edutrack__roll_no__c') ? 'EduTrack__Roll_No__c' : 'Roll_No__c';
+        String accClassRefField = accFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
         String accSectionField = accFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
+        String accRollField    = accFields.containsKey('edutrack__roll_no__c') ? 'EduTrack__Roll_No__c' : 'Roll_No__c';
         
         // Defensive object lookup for Class__c
-        String clsObjName = Class__c.SObjectType.getDescribe().getName();
+        Map<String, Schema.SObjectField> clsFields = Schema.SObjectType.Class__c.fields.getMap();
+        String clsValField = clsFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
+        String clsSecField = clsFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
         
-        String clsQuery = 'SELECT Id, Name FROM ' + clsObjName + ' WHERE Id = :classId LIMIT 1';
+        String clsQuery = 'SELECT Id, Name, ' + clsValField + ', ' + clsSecField + ' FROM Class__c WHERE Id = :classId LIMIT 1';
         SObject classRecord = Database.query(clsQuery);
-        String className = (String)classRecord.get('Name');
+        String className = (String)classRecord.get(clsValField);
+        String sectionName = (String)classRecord.get(clsSecField);
 
-        String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', Type ' +
+        String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassRefField + ', ' + accSectionField + ', Type ' +
                              'FROM Account ' +
                              'WHERE Type = \'Student\' ' +
-                             'AND ' + accClassField + ' = :className ' +
+                             'AND ' + accClassRefField + ' = :className ' +
+                             'AND ' + accSectionField + ' = :sectionName ' +
                              'ORDER BY Name ' +
                              'LIMIT 50000';
                              
