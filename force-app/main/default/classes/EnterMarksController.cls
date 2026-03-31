@@ -111,34 +111,28 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         String subjectFieldName = findSubjectField(subjectName);
         System.debug('Resolved field name: ' + subjectFieldName);
 
-        // Defensive field lookup for Account
+        // Resolve Account field names defensively
         Map<String, Schema.SObjectField> accFields = Schema.SObjectType.Account.fields.getMap();
-        Schema.DescribeFieldResult classDesc = accFields.containsKey('edutrack__class__c') 
-                                              ? accFields.get('edutrack__class__c').getDescribe() 
-                                              : accFields.get('class__c').getDescribe();
+        String accClassField   = accFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
+        String accSectionField = accFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
+        String accRollField    = accFields.containsKey('edutrack__roll_no__c') ? 'EduTrack__Roll_No__c' : 'Roll_No__c';
         
-        String accClassRefField = classDesc.getName();
-        String accSectionField  = accFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
-        String accRollField     = accFields.containsKey('edutrack__roll_no__c') ? 'EduTrack__Roll_No__c' : 'Roll_No__c';
-        
-        // Resolve Class specifics
+        // Resolve Class specifics defensively
         Map<String, Schema.SObjectField> clsFields = Schema.SObjectType.Class__c.fields.getMap();
         String clsValField = clsFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
         String clsSecField = clsFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
         
+        // Fetch the Class and Section values from the Class__c record
         String clsQuery = 'SELECT Id, Name, ' + clsValField + ', ' + clsSecField + ' FROM Class__c WHERE Id = :classId LIMIT 1';
         SObject classRecord = Database.query(clsQuery);
         String className   = (String)classRecord.get(clsValField);
         String sectionName = (String)classRecord.get(clsSecField);
 
-        // ✅ THE FIX: Switch between ID and Name based on field type
-        Boolean isIdFilter = (classDesc.getType() == Schema.DisplayType.REFERENCE);
-        Object  classFilterValue = isIdFilter ? (Object)classId : (Object)className;
-
-        String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassRefField + ', ' + accSectionField + ', Type ' +
+        // ✅ FINAL FIX: Match Students by Class AND Section separately
+        String studentQuery = 'SELECT Id, Name, ' + accRollField + ', ' + accClassField + ', ' + accSectionField + ', Type ' +
                              'FROM Account ' +
                              'WHERE Type = \'Student\' ' +
-                             'AND ' + accClassRefField + ' = :classFilterValue ' +
+                             'AND ' + accClassField + ' = :className ' +
                              'AND ' + accSectionField + ' = :sectionName ' +
                              'ORDER BY Name ' +
                              'LIMIT 50000';
