@@ -111,10 +111,13 @@ public static List<Map<String, Object>> getStudentsForMarksEntry(
         String subjectFieldName = findSubjectField(subjectName);
         System.debug('Resolved field name: ' + subjectFieldName);
 
-        // Resolve Account and Class field names dynamically
-        String accClassField = Account.Class__c.getDescribe().getName();
-        String accRollField = Account.Roll_No__c.getDescribe().getName();
-        String accSectionField = Account.Section__c.getDescribe().getName();
+        // Defensive field lookup for Account
+        Map<String, Schema.SObjectField> accFields = Schema.SObjectType.Account.fields.getMap();
+        String accClassField   = accFields.containsKey('edutrack__class__c') ? 'EduTrack__Class__c' : 'Class__c';
+        String accRollField    = accFields.containsKey('edutrack__roll_no__c') ? 'EduTrack__Roll_No__c' : 'Roll_No__c';
+        String accSectionField = accFields.containsKey('edutrack__section__c') ? 'EduTrack__Section__c' : 'Section__c';
+        
+        // Defensive object lookup for Class__c
         String clsObjName = Class__c.SObjectType.getDescribe().getName();
         
         String clsQuery = 'SELECT Id, Name FROM ' + clsObjName + ' WHERE Id = :classId LIMIT 1';
