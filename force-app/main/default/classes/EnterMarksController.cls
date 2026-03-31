@@ -345,10 +345,10 @@ public static String saveMarks(
             } else {
                 exam = new Exam__c();
                 // Resolve and set fields
-                String examStudentField = Exam__c.Student__c.getDescribe().getName();
-                String examTypeField = Exam__c.Exam_Type__c.getDescribe().getName();
-                String examClassField = Exam__c.Class__c.getDescribe().getName();
-                String examSectionField = Exam__c.Section__c.getDescribe().getName();
+                examStudentField = Exam__c.Student__c.getDescribe().getName();
+                examTypeField = Exam__c.Exam_Type__c.getDescribe().getName();
+                examClassField = Exam__c.Class__c.getDescribe().getName();
+                examSectionField = Exam__c.Section__c.getDescribe().getName();
                 
                 exam.put(examStudentField, studentId);
                 exam.put(examTypeField,    examType);
