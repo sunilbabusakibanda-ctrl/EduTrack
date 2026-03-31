@@ -71,15 +71,24 @@ public with sharing class GradesController {
             if (dfr.isCustom() && !excluded.contains(dfr.getName()) && !excluded.contains(dfr.getLocalName())) {
                 Schema.DisplayType dt = dfr.getType();
                 if (dt == Schema.DisplayType.Double || dt == Schema.DisplayType.Integer || dt == Schema.DisplayType.Percent || dt == Schema.DisplayType.String) {
-                    subjectFields.add(dfr.getName());
-                    fieldToLocalMap.put(dfr.getName(), dfr.getLocalName());
+                    subjectFields.add(dfr.getName()); // Full API Name
+                    fieldToLocalMap.put(dfr.getName(), dfr.getLocalName()); // Local Name
                 }
             }
         }
         
+        // 1b. Resolve Relationship Name
+        String examsRelName = 'Exams__r';
+        for(Schema.ChildRelationship rel : Schema.SObjectType.Account.getChildRelationships()) {
+            if(rel.getChildSObject() == Exam__c.sObjectType) {
+                examsRelName = rel.getRelationshipName();
+                break;
+            }
+        }
+        
         // 2. Build Query on Account (All Students)
-        String examSelect = String.join(subjectFields, ', ');
-        String subQuery = '(SELECT Id, Exam_Type__c, ' + examSelect + ' FROM Exams__r';
+        String examSelect = subjectFields.isEmpty() ? 'Id' : String.join(subjectFields, ', ');
+        String subQuery = '(SELECT Id, Exam_Type__c, ' + examSelect + ' FROM ' + examsRelName;
         if (String.isNotBlank(examType)) {
             subQuery += ' WHERE Exam_Type__c = \'' + String.escapeSingleQuotes(examType) + '\'';
         }
@@ -118,10 +127,9 @@ public with sharing class GradesController {
                 
                 // Find matching exam for the selected type
                 Exam__c matchingExam = null;
-                if (s.Exams__r != null && !s.Exams__r.isEmpty()) {
-                    // If examType is specified, take the first matching one. 
-                    // If examType is null (All Tests), take the most recent one.
-                    matchingExam = s.Exams__r[0];
+                List<Exam__c> relatedExams = (List<Exam__c>)s.getSObjects(examsRelName);
+                if (relatedExams != null && !relatedExams.isEmpty()) {
+                    matchingExam = relatedExams[0];
                 }
                 
                 row.put('Exam_Type__c', matchingExam != null ? matchingExam.Exam_Type__c : (String.isNotBlank(examType) ? examType : 'All Tests'));
