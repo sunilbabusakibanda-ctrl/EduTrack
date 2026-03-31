@@ -9,31 +9,94 @@ Stages:
 
 ▶ Preparing…
    Deploying v60.0 metadata to sunil@devorg.com using the v66.0 SOAP API.
-   Deploy ID: 0Aff6000004BlaoCAC
+   Deploy ID: 0Aff6000004MWoYCAW
    Target Org: sunil@devorg.com
-✔ Preparing (281ms)
-◯ Waiting for the org to respond - Skipped
+✔ Preparing (301ms)
+▶ Waiting for the org to respond…
+✔ Waiting for the org to respond (1.31s)
 ▶ Deploying Metadata…
-   Components: 0/476 (0%)
-   Components: 46/476 (10%)
-   Components: 379/476 (80%)
-   Components: 473/476 (99%)
-   Components: 473/477 (99%)
-✘ Deploying Metadata (32.09s)
+   Components: 0/438 (0%)
+   Components: 25/438 (6%)
+   Components: 44/438 (10%)
+   Components: 67/438 (15%)
+   Components: 393/438 (90%)
+   Components: 434/438 (99%)
+✘ Deploying Metadata (34.03s)
+   Components: 434/505 (86%)
 
 Deploying v60.0 metadata to sunil@devorg.com using the v66.0 SOAP API.
 Status: Failed
-Deploy ID: 0Aff6000004BlaoCAC
+Deploy ID: 0Aff6000004MWoYCAW
 Target Org: sunil@devorg.com
 
-Elapsed time: 32.37s
+Elapsed time: 35.65s
 
-[1m[31mComponent Failures [4][39m[22m
- Type       Name                      Problem                                                                                                                                                                                 Line:Column 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (49:46)  49:46       
- ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (53:49)  53:49       
- ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(String, String, String, List<String>, Integer, Integer, Integer) from the type EduTrack.AttendanceController (60:30)  60:30       
- ApexClass  AttendanceControllerTest  Method does not exist or incorrect signature: void saveAttendance(NULL, NULL, String, NULL, Integer, Integer, Integer) from the type EduTrack.AttendanceController (63:34)              63:34       
+[1m[31mComponent Failures [64][39m[22m
+ Type       Name                      Problem                                                                                           Line:Column 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ ApexClass  EnterMarksController      Invalid type: SubjectWrapper (47:40)                                                              47:40       
+ ApexClass  EnterMarksController      Invalid type: SubjectWrapper (48:9)                                                               48:9        
+ ApexClass  EnterMarksController      Variable does not exist: subjectWrappers (62:21)                                                  62:21       
+ ApexClass  EnterMarksController      Invalid type: SubjectWrapper (62:41)                                                              62:41       
+ ApexClass  EnterMarksController      Variable does not exist: subjectWrappers (67:17)                                                  67:17       
+ ApexClass  EnterMarksController      Variable does not exist: subjectWrappers (73:29)                                                  73:29       
+ ApexClass  EnterMarksController      Invalid type: SubjectWrapper (73:49)                                                              73:49       
+ ApexClass  EnterMarksController      Variable does not exist: subjectWrappers (79:52)                                                  79:52       
+ ApexClass  EnterMarksController      Operation instanceof is always true since an instance of Id is always an instance of Id (145:13)  145:13      
+ ApexClass  EnterMarksController      Method must have a body (467:33)                                                                  467:33      
+ ApexClass  EnterMarksController      Missing return statement required return type: List<String> (467:33)                              467:33      
+ ApexClass  EnterMarksController      Found punctuation symbol or operator '`' that isn't valid in Apex. (478:7)                        478:7       
+ ApexClass  EnterMarksController      Unexpected token ']'. (478:10)                                                                    478:10      
+ ApexClass  EnterMarksController      Found punctuation symbol or operator '`' that isn't valid in Apex. (478:11)                       478:11      
+ ApexClass  EnterMarksController      Missing ';' at 'Live' (478:17)                                                                    478:17      
+ ApexClass  EnterMarksController      Missing ';' at 'Diagnostic' (478:22)                                                              478:22      
+ ApexClass  EnterMarksController      Expecting ';' but was: 'in' (478:33)                                                              478:33      
+ ApexClass  EnterMarksController      Found punctuation symbol or operator '`' that isn't valid in Apex. (479:7)                        479:7       
+ ApexClass  EnterMarksController      Unexpected token ']'. (479:10)                                                                    479:10      
+ ApexClass  EnterMarksController      Found punctuation symbol or operator '`' that isn't valid in Apex. (479:11)                       479:11      
+ ApexClass  EnterMarksController      Unexpected token 'Final'. (479:18)                                                                479:18      
+ ApexClass  EnterMarksController      Missing ';' at 'Code' (479:33)                                                                    479:33      
+ ApexClass  EnterMarksController      Missing ';' at 'to' (479:38)                                                                      479:38      
+ ApexClass  EnterMarksController      Missing ';' at 'GitHub' (479:41)                                                                  479:41      
+ ApexClass  EnterMarksController      Missing ';' at 'main' (479:48)                                                                    479:48      
+ ApexClass  EnterMarksController      Missing ';' at 'branch' (479:53)                                                                  479:53      
+ ApexClass  EnterMarksController      Unexpected token '/'. (479:61)                                                                    479:61      
+ ApexClass  EnterMarksController      Unexpected token 'public'. (482:5)                                                                482:5       
+ ApexClass  EnterMarksController      Missing ';' at '{' (482:33)                                                                       482:33      
+ ApexClass  EnterMarksController      Unexpected token '@'. (483:9)                                                                     483:9       
+ ApexClass  EnterMarksController      Unexpected token 'public'. (483:22)                                                               483:22      
+ ApexClass  EnterMarksController      Missing ';' at 'id' (483:36)                                                                      483:36      
+ ApexClass  EnterMarksController      Missing ';' at '{' (483:39)                                                                       483:39      
+ ApexClass  EnterMarksController      Unexpected token '@'. (484:9)                                                                     484:9       
+ ApexClass  EnterMarksController      Unexpected token 'public'. (484:22)                                                               484:22      
+ ApexClass  EnterMarksController      Missing ';' at 'name' (484:36)                                                                    484:36      
+ ApexClass  EnterMarksController      Missing ';' at '{' (484:41)                                                                       484:41      
+ ApexClass  EnterMarksController      Unexpected token '@'. (485:9)                                                                     485:9       
+ ApexClass  EnterMarksController      Unexpected token 'public'. (485:22)                                                               485:22      
+ ApexClass  EnterMarksController      Missing ';' at 'maxMarks' (485:37)                                                                485:37      
+ ApexClass  EnterMarksController      Missing ';' at '{' (485:46)                                                                       485:46      
+ ApexClass  EnterMarksController      Unexpected token '@'. (486:9)                                                                     486:9       
+ ApexClass  EnterMarksController      Unexpected token 'public'. (486:22)                                                               486:22      
+ ApexClass  EnterMarksController      Missing ';' at 'icon' (486:36)                                                                    486:36      
+ ApexClass  EnterMarksController      Missing ';' at '{' (486:41)                                                                       486:41      
+ ApexClass  EnterMarksController      Unexpected token 'public'. (488:9)                                                                488:9       
+ ApexClass  EnterMarksController      Expecting ')' but was: 'id' (488:38)                                                              488:38      
+ ApexClass  EnterMarksController      Expecting ';' but was: ',' (488:40)                                                               488:40      
+ ApexClass  EnterMarksController      Missing ';' at 'maxMarks' (488:63)                                                                488:63      
+ ApexClass  EnterMarksController      Expecting ';' but was: ')' (488:71)                                                               488:71      
+ ApexClass  EnterMarksController      Expecting '}' but was: '<EOF>' (496:1)                                                            496:1       
+ ApexClass  EnterMarksControllerTest  Invalid type: EnterMarksController.SubjectWrapper (30:9)                                          30:9        
+ ApexClass  EnterMarksControllerTest  Variable does not exist: subjects (31:24)                                                         31:24       
+ ApexClass  EnterMarksControllerTest  Invalid type: EnterMarksController.SubjectWrapper (40:9)                                          40:9        
+ ApexClass  EnterMarksControllerTest  Variable does not exist: subjects (41:30)                                                         41:30       
+ ApexClass  EnterMarksControllerTest  Variable does not exist: name (41:99)                                                             41:99       
+ ApexClass  EnterMarksControllerTest  Invalid type: EnterMarksController.SubjectWrapper (54:9)                                          54:9        
+ ApexClass  EnterMarksControllerTest  Variable does not exist: subjects (55:28)                                                         55:28       
+ ApexClass  EnterMarksControllerTest  Variable does not exist: id (55:73)                                                               55:73       
+ ApexClass  EnterMarksControllerTest  Variable does not exist: subjects (56:30)                                                         56:30       
+ ApexClass  EnterMarksControllerTest  Variable does not exist: name (56:99)                                                             56:99       
+ ApexClass  EnterMarksControllerTest  Invalid type: EnterMarksController.SubjectWrapper (131:9)                                         131:9       
+ ApexClass  EnterMarksControllerTest  Variable does not exist: subjects (132:28)                                                        132:28      
+ ApexClass  EnterMarksControllerTest  Variable does not exist: id (132:73)                                                              132:73      
 
 
